@@ -47,7 +47,6 @@ objs/core/WignerSeitz.o \
 objs/electronic/BandDavidson.o \
 objs/electronic/BandMinimizer.o \
 objs/electronic/Basis.o \
-objs/electronic/Blip.o \
 objs/electronic/ColumnBundle.o \
 objs/electronic/ColumnBundleOperators.o \
 objs/electronic/ColumnBundleTransform.o \
@@ -73,10 +72,7 @@ objs/electronic/IonDynamics.o \
 objs/electronic/IonicMinimizer.o \
 objs/electronic/IonInfo.o \
 objs/electronic/LatticeMinimizer.o \
-objs/electronic/matrix.o \
-objs/electronic/operators.o \
 objs/electronic/Polarizability.o \
-objs/electronic/RadialFunction.o \
 objs/electronic/RadialSchrodinger.o \
 objs/electronic/SCF.o \
 objs/electronic/SpeciesInfo_atomic.o \

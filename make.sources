@@ -47,7 +47,6 @@ jdftx/core/WignerSeitz.cpp \
 jdftx/electronic/BandDavidson.cpp \
 jdftx/electronic/BandMinimizer.cpp \
 jdftx/electronic/Basis.cpp \
-jdftx/electronic/Blip.cpp \
 jdftx/electronic/ColumnBundle.cpp \
 jdftx/electronic/ColumnBundleOperators.cpp \
 jdftx/electronic/ColumnBundleTransform.cpp \
@@ -73,10 +72,7 @@ jdftx/electronic/IonDynamics.cpp \
 jdftx/electronic/IonicMinimizer.cpp \
 jdftx/electronic/IonInfo.cpp \
 jdftx/electronic/LatticeMinimizer.cpp \
-jdftx/electronic/matrix.cpp \
-jdftx/electronic/operators.cpp \
 jdftx/electronic/Polarizability.cpp \
-jdftx/electronic/RadialFunction.cpp \
 jdftx/electronic/RadialSchrodinger.cpp \
 jdftx/electronic/SCF.cpp \
 jdftx/electronic/SpeciesInfo_atomic.cpp \

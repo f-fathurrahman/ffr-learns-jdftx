@@ -4,4 +4,6 @@ FLAGS="-Wall -O3 -ftemplate-depth-512 -std=c++0x"
 
 INCLUDE="-I./jdftx"
 
-icpc $INCLUDE $FLAGS $1 -o $prefix.x
+LIBS=
+
+g++ $INCLUDE $FLAGS $1 -o $prefix.x

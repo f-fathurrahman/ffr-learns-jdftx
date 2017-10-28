@@ -142,9 +142,6 @@ objs/electronic/BandMinimizer.o:
 objs/electronic/Basis.o:
 	$(CXX) -c $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) jdftx/electronic/Basis.cpp -o objs/electronic/Basis.o
 
-objs/electronic/Blip.o:
-	$(CXX) -c $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) jdftx/electronic/Blip.cpp -o objs/electronic/Blip.o
-
 objs/electronic/ColumnBundle.o:
 	$(CXX) -c $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) jdftx/electronic/ColumnBundle.cpp -o objs/electronic/ColumnBundle.o
 
@@ -220,17 +217,8 @@ objs/electronic/IonInfo.o:
 objs/electronic/LatticeMinimizer.o:
 	$(CXX) -c $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) jdftx/electronic/LatticeMinimizer.cpp -o objs/electronic/LatticeMinimizer.o
 
-objs/electronic/matrix.o:
-	$(CXX) -c $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) jdftx/electronic/matrix.cpp -o objs/electronic/matrix.o
-
-objs/electronic/operators.o:
-	$(CXX) -c $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) jdftx/electronic/operators.cpp -o objs/electronic/operators.o
-
 objs/electronic/Polarizability.o:
 	$(CXX) -c $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) jdftx/electronic/Polarizability.cpp -o objs/electronic/Polarizability.o
-
-objs/electronic/RadialFunction.o:
-	$(CXX) -c $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) jdftx/electronic/RadialFunction.cpp -o objs/electronic/RadialFunction.o
 
 objs/electronic/RadialSchrodinger.o:
 	$(CXX) -c $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) jdftx/electronic/RadialSchrodinger.cpp -o objs/electronic/RadialSchrodinger.o
