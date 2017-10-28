@@ -28,13 +28,13 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class Fex_H2O_FittedCorrelations : public Fex
 {
 public:
-	Fex_H2O_FittedCorrelations(const FluidMixture*, const FluidComponent*);
+  Fex_H2O_FittedCorrelations(const FluidMixture*, const FluidComponent*);
     virtual ~Fex_H2O_FittedCorrelations();
-	
-	double compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const;
-	double computeUniform(const double* N, double* Phi_N) const;
+  
+  double compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const;
+  double computeUniform(const double* N, double* Phi_N) const;
 private:
-	RadialFunctionG COO, COH, CHH, fex_gauss;
+  RadialFunctionG COO, COH, CHH, fex_gauss;
 };
 
 //! @}

@@ -34,25 +34,25 @@ class ExCorr;
 class ConvCoupling : public Fmix
 {
 public:
-	ConvCoupling(FluidMixture* fluidMixture, const ExCorr& exCorr);
-	
-	//! Set explicit system properties
-	//! @param nCavity "Cavity-effective" density of the explicit system (explicit electrons + chargeball)
-	void setExplicit(const ScalarFieldTilde& nCavityTilde);
+  ConvCoupling(FluidMixture* fluidMixture, const ExCorr& exCorr);
+  
+  //! Set explicit system properties
+  //! @param nCavity "Cavity-effective" density of the explicit system (explicit electrons + chargeball)
+  void setExplicit(const ScalarFieldTilde& nCavityTilde);
 
-	//! Main energy and gradients function
-	double energyAndGrad(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray* Phi_Ntilde=0, ScalarFieldTilde* Phi_nCavityTilde=0) const;
-	
-	//Interface to fluid side (virtual functions from Fmix):
-	double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const;
-	double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const;
-	string getName() const;
-	double Vxc_bulk;
-	const ExCorr& exCorr;
+  //! Main energy and gradients function
+  double energyAndGrad(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray* Phi_Ntilde=0, ScalarFieldTilde* Phi_nCavityTilde=0) const;
+  
+  //Interface to fluid side (virtual functions from Fmix):
+  double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const;
+  double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const;
+  string getName() const;
+  double Vxc_bulk;
+  const ExCorr& exCorr;
 
 private:
-	const std::vector<const FluidComponent*>& component;
-	ScalarField nCavity;
+  const std::vector<const FluidComponent*>& component;
+  ScalarField nCavity;
 };
 
 //! @}

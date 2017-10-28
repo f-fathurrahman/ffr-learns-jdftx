@@ -33,22 +33,22 @@ struct FluidComponent;
 class Fex
 {
 public:
-	const Molecule& molecule;
-	const GridInfo& gInfo;
-	const double T;
+  const Molecule& molecule;
+  const GridInfo& gInfo;
+  const double T;
 
-	Fex(const FluidMixture*, const FluidComponent*);
-	virtual ~Fex() {}
+  Fex(const FluidMixture*, const FluidComponent*);
+  virtual ~Fex() {}
 
-	//! Return the excess free energy given the reciprocal space site densities
-	//! and accumulate the gradient (functional derivative) w.r.t them in Phi_Ntilde
-	virtual double compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const=0;
+  //! Return the excess free energy given the reciprocal space site densities
+  //! and accumulate the gradient (functional derivative) w.r.t them in Phi_Ntilde
+  virtual double compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const=0;
 
-	//! Return the uniform fluid excess free energy density given the site densities N
-	//! and accumulate the derivative w.r.t them in Phi_N. This MUST return the
-	//! result corresponding to calling compute() with a uniform scalar field.
-	//! This is called several times during FluidMixture::initialize() to get the desired bulk properties
-	virtual double computeUniform(const double* N, double* Phi_N) const=0;
+  //! Return the uniform fluid excess free energy density given the site densities N
+  //! and accumulate the derivative w.r.t them in Phi_N. This MUST return the
+  //! result corresponding to calling compute() with a uniform scalar field.
+  //! This is called several times during FluidMixture::initialize() to get the desired bulk properties
+  virtual double computeUniform(const double* N, double* Phi_N) const=0;
 };
 
 //! @}

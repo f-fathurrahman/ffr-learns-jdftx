@@ -32,14 +32,14 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //! @brief Abstract base class for all the minimize commands
 struct CommandMinimize : public Command
-{	CommandMinimize(string systemName, string path); //!< provide a command called systemName-minimize in specified section
-	void process(ParamList& pl, Everything& e);
-	void printStatus(Everything& e, int iRep);
+{  CommandMinimize(string systemName, string path); //!< provide a command called systemName-minimize in specified section
+  void process(ParamList& pl, Everything& e);
+  void printStatus(Everything& e, int iRep);
 protected:
-	//! @brief Derived class should specify where the parameters are stored
-	//! @param e Reference to Everything
-	//! @return Return reference to the relevant MinimizeParams that this command should operate on.
-	virtual MinimizeParams& target(Everything& e)=0;
+  //! @brief Derived class should specify where the parameters are stored
+  //! @param e Reference to Everything
+  //! @return Return reference to the relevant MinimizeParams that this command should operate on.
+  virtual MinimizeParams& target(Everything& e)=0;
 };
 
 //! @}

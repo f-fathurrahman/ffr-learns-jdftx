@@ -32,35 +32,35 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class PCM : public FluidSolver
 {
 public:
-	PCM(const Everything& e, const FluidSolverParams& fsp);
-	virtual ~PCM();
-	
-	void dumpDensities(const char* filenamePattern) const; //!< dump cavity shape functions
-	void dumpDebug(const char* filenamePattern) const; //!< generate fluidDebug text file with common info to all PCMs
+  PCM(const Everything& e, const FluidSolverParams& fsp);
+  virtual ~PCM();
+  
+  void dumpDensities(const char* filenamePattern) const; //!< dump cavity shape functions
+  void dumpDebug(const char* filenamePattern) const; //!< generate fluidDebug text file with common info to all PCMs
 
 protected:
-	EnergyComponents Adiel; //!< PCM energy components
-	ScalarFieldTilde rhoExplicitTilde; //!< Charge density of explicit (electronic) system
-	ScalarField nCavity, tauCavity, nCavityEx[2]; //!< Cavity determining electron density (or product for SaLSA, or KE density for SG14tauVW, and expanded electron densities for the SGA13 variant)
-	ScalarField shape, shapeVdw; //!< Electrostatic cavity shape function (and separate cavitation/dispersion shape function for the SGA13 variant)
-	
-	virtual void printDebug(FILE* fp) const {} //!< over-ride to get extra PCM-specific output in fluidDebug text file
-	
-	void updateCavity(); //!< update shape function(s) from nCavity, and energies dependent upon shape alone
-	void propagateCavityGradients(const ScalarField& A_shape, ScalarField& A_nCavity, ScalarFieldTilde& A_rhoExplicitTilde, bool electricOnly) const; //!< propagate A_shape (+ cached Acavity_shape) and accumulate to those w.r.t nCavity and rhoExplicitTilde
-	void setExtraForces(IonicGradient* forces, const ScalarFieldTilde& A_nCavityTilde) const; //!< set extra fluid forces (vdw and full-core forces, when applicable)
-	ScalarFieldTilde getFullCore() const; //!< get full core correction for PCM variants that need them
+  EnergyComponents Adiel; //!< PCM energy components
+  ScalarFieldTilde rhoExplicitTilde; //!< Charge density of explicit (electronic) system
+  ScalarField nCavity, tauCavity, nCavityEx[2]; //!< Cavity determining electron density (or product for SaLSA, or KE density for SG14tauVW, and expanded electron densities for the SGA13 variant)
+  ScalarField shape, shapeVdw; //!< Electrostatic cavity shape function (and separate cavitation/dispersion shape function for the SGA13 variant)
+  
+  virtual void printDebug(FILE* fp) const {} //!< over-ride to get extra PCM-specific output in fluidDebug text file
+  
+  void updateCavity(); //!< update shape function(s) from nCavity, and energies dependent upon shape alone
+  void propagateCavityGradients(const ScalarField& A_shape, ScalarField& A_nCavity, ScalarFieldTilde& A_rhoExplicitTilde, bool electricOnly) const; //!< propagate A_shape (+ cached Acavity_shape) and accumulate to those w.r.t nCavity and rhoExplicitTilde
+  void setExtraForces(IonicGradient* forces, const ScalarFieldTilde& A_nCavityTilde) const; //!< set extra fluid forces (vdw and full-core forces, when applicable)
+  ScalarFieldTilde getFullCore() const; //!< get full core correction for PCM variants that need them
 private:
-	ScalarField Acavity_shape, Acavity_shapeVdw; //!< Cached gradients of cavitation (and dispersion) energies w.r.t shape functions
-	double A_nc, A_tension, A_vdwScale, A_eta_wDiel, A_pCavity; //!< Cached derivatives w.r.t fit parameters (accessed via dumpDebug() for PCM fits)
-	double Rex[2]; //!< radii for cavity expansion (SGA13 only)
-	RadialFunctionG wExpand[2]; //!< weight function for cavity expansion (SGA13 only)
-	RadialFunctionG wCavity; //!< weight function for nonlocal cavitation energy
+  ScalarField Acavity_shape, Acavity_shapeVdw; //!< Cached gradients of cavitation (and dispersion) energies w.r.t shape functions
+  double A_nc, A_tension, A_vdwScale, A_eta_wDiel, A_pCavity; //!< Cached derivatives w.r.t fit parameters (accessed via dumpDebug() for PCM fits)
+  double Rex[2]; //!< radii for cavity expansion (SGA13 only)
+  RadialFunctionG wExpand[2]; //!< weight function for cavity expansion (SGA13 only)
+  RadialFunctionG wCavity; //!< weight function for nonlocal cavitation energy
 protected:
-	std::vector<RadialFunctionG> Sf; //!< spherically-averaged structure factors for each solvent site
-	std::vector<int> atomicNumbers; //!< atomic number for each solvent site (for dispersion interactions)
-	static ScalarFieldTilde coulomb(const ScalarFieldTilde& rho) { return (-4*M_PI) * Linv(O(rho)); }
-	friend struct ChargedDefect;
+  std::vector<RadialFunctionG> Sf; //!< spherically-averaged structure factors for each solvent site
+  std::vector<int> atomicNumbers; //!< atomic number for each solvent site (for dispersion interactions)
+  static ScalarFieldTilde coulomb(const ScalarFieldTilde& rho) { return (-4*M_PI) * Linv(O(rho)); }
+  friend struct ChargedDefect;
 };
 
 //! @}

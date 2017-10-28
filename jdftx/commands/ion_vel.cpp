@@ -23,74 +23,74 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 struct CommandIonVelocity : public Command
 {
-	CommandIonVelocity() : Command("ion-vel", "jdftx/Ionic/Dynamics")
-	{
-		format = "<species-id> <x0> <x1> <x2> <v0> <v1> <v2>";
-		comments =
-			"Add an atom of species <species-id> at coordinates (<x0>,<x1>,<x2>)\n"
-			"with an initial velocity of (<v0>,<v1>,<v2)>\n"
-			"\n";
-		allowMultiple = true;
+  CommandIonVelocity() : Command("ion-vel", "jdftx/Ionic/Dynamics")
+  {
+    format = "<species-id> <x0> <x1> <x2> <v0> <v1> <v2>";
+    comments =
+      "Add an atom of species <species-id> at coordinates (<x0>,<x1>,<x2>)\n"
+      "with an initial velocity of (<v0>,<v1>,<v2)>\n"
+      "\n";
+    allowMultiple = true;
 
-		require("ion-species");
-		//Dependencies due to coordinate system option:
-		require("latt-scale");
-		require("coords-type");
-		require("ionic-dynamics");
-		forbid("ion");
-	}
+    require("ion-species");
+    //Dependencies due to coordinate system option:
+    require("latt-scale");
+    require("coords-type");
+    require("ionic-dynamics");
+    forbid("ion");
+  }
 
-	void process(ParamList& pl, Everything& e)
-	{	//Find species:
-		string id; pl.get(id, string(), "species-id", true);
-		auto sp = findSpecies(id, e);
-		if(!sp) throw string("Species "+id+" has not been defined");
-		//Read coordinates:
-		vector3<> pos,vel;
-		for(int k=0; k<3; k++)
-		{	ostringstream oss; oss << "x" << k;
-			pl.get(pos[k], 0.0, oss.str(), true);
-		}
-		bool velocitiesGiven = true;
-		for(int k=0; k<3; k++)
-		{	ostringstream oss; oss << "v" << k;
-			pl.get(vel[k], (double)NAN, oss.str(), false);
-			if (std::isnan(vel[k]))
-			      velocitiesGiven = (velocitiesGiven && false); // if any of the velocity components is missing, then don't push_back
-		}
-		//Transform coordinates if necessary
-		if(e.iInfo.coordsType == CoordsCartesian)
-		{	pos = inv(e.gInfo.R) * pos;
-			vel = inv(e.gInfo.R) * vel;
-		}
-		//Add position to list:
-		sp->atpos.push_back(pos);
-		if (velocitiesGiven)
-			sp->velocities.push_back(vel);
-		
-		//No need for constraints
-		SpeciesInfo::Constraint constraint;
-		constraint.moveScale = 1.0;
-		constraint.type = SpeciesInfo::Constraint::None;
-		sp->constraints.push_back(constraint);
-	}
+  void process(ParamList& pl, Everything& e)
+  {  //Find species:
+    string id; pl.get(id, string(), "species-id", true);
+    auto sp = findSpecies(id, e);
+    if(!sp) throw string("Species "+id+" has not been defined");
+    //Read coordinates:
+    vector3<> pos,vel;
+    for(int k=0; k<3; k++)
+    {  ostringstream oss; oss << "x" << k;
+      pl.get(pos[k], 0.0, oss.str(), true);
+    }
+    bool velocitiesGiven = true;
+    for(int k=0; k<3; k++)
+    {  ostringstream oss; oss << "v" << k;
+      pl.get(vel[k], (double)NAN, oss.str(), false);
+      if (std::isnan(vel[k]))
+            velocitiesGiven = (velocitiesGiven && false); // if any of the velocity components is missing, then don't push_back
+    }
+    //Transform coordinates if necessary
+    if(e.iInfo.coordsType == CoordsCartesian)
+    {  pos = inv(e.gInfo.R) * pos;
+      vel = inv(e.gInfo.R) * vel;
+    }
+    //Add position to list:
+    sp->atpos.push_back(pos);
+    if (velocitiesGiven)
+      sp->velocities.push_back(vel);
+    
+    //No need for constraints
+    SpeciesInfo::Constraint constraint;
+    constraint.moveScale = 1.0;
+    constraint.type = SpeciesInfo::Constraint::None;
+    sp->constraints.push_back(constraint);
+  }
 
-	void printStatus(Everything& e, int iRep)
-	{	int iIon=0;
-		for(auto sp: e.iInfo.species)
-			for(unsigned at=0; at<sp->atpos.size(); at++)
-			{	if(iIon==iRep)
-				{	vector3<> pos = sp->atpos[at];
-					vector3<> vel = sp->velocities[at];
-					if(e.iInfo.coordsType == CoordsCartesian)
-					{	pos = e.gInfo.R * pos; //report cartesian positions
-						vel = e.gInfo.R * vel;
-					}
-					logPrintf("%s %19.15lf %19.15lf %19.15lf %19.15lf %19.15lf %19.15lf", sp->name.c_str(),
-						pos[0], pos[1], pos[2], vel[0], vel[1], vel[2]);
-				}
-				iIon++;
-			}
-	}
+  void printStatus(Everything& e, int iRep)
+  {  int iIon=0;
+    for(auto sp: e.iInfo.species)
+      for(unsigned at=0; at<sp->atpos.size(); at++)
+      {  if(iIon==iRep)
+        {  vector3<> pos = sp->atpos[at];
+          vector3<> vel = sp->velocities[at];
+          if(e.iInfo.coordsType == CoordsCartesian)
+          {  pos = e.gInfo.R * pos; //report cartesian positions
+            vel = e.gInfo.R * vel;
+          }
+          logPrintf("%s %19.15lf %19.15lf %19.15lf %19.15lf %19.15lf %19.15lf", sp->name.c_str(),
+            pos[0], pos[1], pos[2], vel[0], vel[1], vel[2]);
+        }
+        iIon++;
+      }
+  }
 }
 commandIonVelocity;

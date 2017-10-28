@@ -29,27 +29,27 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 //! Calculate the polarizability in a convenient eigenbasis
 struct Polarizability
 {
-	//! Response-matrix whose eigen-basis to use for final output
-	enum EigenBasis
-	{	NonInteracting, //!< Non-interacting response of Kohn-Sham system
-		External, //!< Charge response to external electrostatic potential
-		Total //!< Charge response to total electrostatic potential
-	}
-	eigenBasis;
-	
-	double Ecut; //!< energy-cutoff for occupied-valence pair densities (if zero, 4*Ecut of wavefunctions)
-	int nEigs; //!< number of eigenvectors in output (if zero, output all)
-	
-	vector3<> dk; //!< k-point difference at which to obtain results
-	
-	string dkFilenamePattern; //!< if non-null, read wavefunctions and eigenvalues for offset states form here
-	
-	Polarizability();
-	void dump(const class Everything& e); //!< compute and dump polarizability eigenvectors and matrix elements
-	
+  //! Response-matrix whose eigen-basis to use for final output
+  enum EigenBasis
+  {  NonInteracting, //!< Non-interacting response of Kohn-Sham system
+    External, //!< Charge response to external electrostatic potential
+    Total //!< Charge response to total electrostatic potential
+  }
+  eigenBasis;
+  
+  double Ecut; //!< energy-cutoff for occupied-valence pair densities (if zero, 4*Ecut of wavefunctions)
+  int nEigs; //!< number of eigenvectors in output (if zero, output all)
+  
+  vector3<> dk; //!< k-point difference at which to obtain results
+  
+  string dkFilenamePattern; //!< if non-null, read wavefunctions and eigenvalues for offset states form here
+  
+  Polarizability();
+  void dump(const class Everything& e); //!< compute and dump polarizability eigenvectors and matrix elements
+  
 private:
-	string dkFilename(int ik, string varName) const; //!< get the filename to read specified variable for specified k-point
-	friend class PairDensityCalculator;
+  string dkFilename(int ik, string varName) const; //!< get the filename to read specified variable for specified k-point
+  friend class PairDensityCalculator;
 };
 
 //! @}

@@ -37,12 +37,12 @@ extern cudaDeviceProp cudaDevProps; //!< cached properties of currently running 
 
 //! Base-class for launch configuration for gpu kernels
 struct GpuLaunchConfig
-{	cudaFuncAttributes attr; //!< attributes of the function
-	
-	//! Initialize the device and function properties
-	template<typename GpuKernel> GpuLaunchConfig(GpuKernel* gpuKernel)
-	{	cudaFuncGetAttributes(&attr, gpuKernel);
-	}
+{  cudaFuncAttributes attr; //!< attributes of the function
+  
+  //! Initialize the device and function properties
+  template<typename GpuKernel> GpuLaunchConfig(GpuKernel* gpuKernel)
+  {  cudaFuncGetAttributes(&attr, gpuKernel);
+  }
 };
 
 
@@ -55,52 +55,52 @@ struct GpuLaunchConfig
 
 //! 1D launch configuration
 struct GpuLaunchConfig1D : public GpuLaunchConfig
-{	dim3 nPerBlock; //!< dimension of block
-	dim3 nBlocks; //!< dimension of grid (note nBlocks could be 3D for really large kernels)
+{  dim3 nPerBlock; //!< dimension of block
+  dim3 nBlocks; //!< dimension of grid (note nBlocks could be 3D for really large kernels)
 
-	//! Set up blocks and grid for a 1D operation over N data points
-	template<typename GpuKernel> GpuLaunchConfig1D(GpuKernel* gpuKernel, int N)
-	: GpuLaunchConfig(gpuKernel),
-	nPerBlock(attr.maxThreadsPerBlock,1,1),
-	nBlocks(ceildiv(N, int(nPerBlock.x)),1,1)
-	{	//If the grid is too big, make it 2D:
-		while(int(nBlocks.x) > cudaDevProps.maxGridSize[0])
-		{	nBlocks.x = ceildiv(int(nBlocks.x),2);
-			nBlocks.y *= 2;
-		}
-	}
+  //! Set up blocks and grid for a 1D operation over N data points
+  template<typename GpuKernel> GpuLaunchConfig1D(GpuKernel* gpuKernel, int N)
+  : GpuLaunchConfig(gpuKernel),
+  nPerBlock(attr.maxThreadsPerBlock,1,1),
+  nBlocks(ceildiv(N, int(nPerBlock.x)),1,1)
+  {  //If the grid is too big, make it 2D:
+    while(int(nBlocks.x) > cudaDevProps.maxGridSize[0])
+    {  nBlocks.x = ceildiv(int(nBlocks.x),2);
+      nBlocks.y *= 2;
+    }
+  }
 };
 
 //! 3D launch configuration
 struct GpuLaunchConfig3D : public GpuLaunchConfig
-{	dim3 nPerBlock; //!< dimension of block
-	dim3 nBlocks; //!< dimension of grid (note nBlocks could be 3D for really large kernels)
-	int zBlockMax; //!< Grids are 2D, so need to loop over last dim
+{  dim3 nPerBlock; //!< dimension of block
+  dim3 nBlocks; //!< dimension of grid (note nBlocks could be 3D for really large kernels)
+  int zBlockMax; //!< Grids are 2D, so need to loop over last dim
 
-	//! Set up blocks and grid for a 1D operation over N data points
-	template<typename GpuKernel> GpuLaunchConfig3D(GpuKernel* gpuKernel, vector3<int> S)
-	: GpuLaunchConfig(gpuKernel)
-	{	// Try to minimize zBlockMax and maximize block size within constraint:
-		zBlockMax = ceildiv(S[0], std::min(attr.maxThreadsPerBlock, cudaDevProps.maxThreadsDim[2]));
-		nPerBlock.z = ceildiv(S[0], zBlockMax);
-		// For the chosen z configuration, maximize x block size within constraint
-		int maxBlockXY = attr.maxThreadsPerBlock/nPerBlock.z;
-		nBlocks.x = ceildiv(S[2], std::min(maxBlockXY,cudaDevProps.maxThreadsDim[0]));
-		nPerBlock.x = ceildiv(S[2], int(nBlocks.x));
-		// For the chosen x and z configuration, maximize y block size within constraint
-		int maxBlockY = attr.maxThreadsPerBlock/(nPerBlock.z*nPerBlock.x);
-		nBlocks.y = ceildiv(S[1], std::min(maxBlockY,cudaDevProps.maxThreadsDim[1]));
-		nPerBlock.y = ceildiv(S[1], int(nBlocks.y));
-	}
+  //! Set up blocks and grid for a 1D operation over N data points
+  template<typename GpuKernel> GpuLaunchConfig3D(GpuKernel* gpuKernel, vector3<int> S)
+  : GpuLaunchConfig(gpuKernel)
+  {  // Try to minimize zBlockMax and maximize block size within constraint:
+    zBlockMax = ceildiv(S[0], std::min(attr.maxThreadsPerBlock, cudaDevProps.maxThreadsDim[2]));
+    nPerBlock.z = ceildiv(S[0], zBlockMax);
+    // For the chosen z configuration, maximize x block size within constraint
+    int maxBlockXY = attr.maxThreadsPerBlock/nPerBlock.z;
+    nBlocks.x = ceildiv(S[2], std::min(maxBlockXY,cudaDevProps.maxThreadsDim[0]));
+    nPerBlock.x = ceildiv(S[2], int(nBlocks.x));
+    // For the chosen x and z configuration, maximize y block size within constraint
+    int maxBlockY = attr.maxThreadsPerBlock/(nPerBlock.z*nPerBlock.x);
+    nBlocks.y = ceildiv(S[1], std::min(maxBlockY,cudaDevProps.maxThreadsDim[1]));
+    nPerBlock.y = ceildiv(S[1], int(nBlocks.y));
+  }
 };
 
 //! 3D launch configuration for symmetry-reduced G-space loops (z dimension folded for real data sets)
 struct GpuLaunchConfigHalf3D : public GpuLaunchConfig3D
-{	//!Just use the above after reducing the z-dimension to half
-	template<typename GpuKernel> GpuLaunchConfigHalf3D(GpuKernel* gpuKernel, vector3<int> S)
-	: GpuLaunchConfig3D(gpuKernel, vector3<int>(S[0], S[1], S[2]/2+1))
-	{
-	}
+{  //!Just use the above after reducing the z-dimension to half
+  template<typename GpuKernel> GpuLaunchConfigHalf3D(GpuKernel* gpuKernel, vector3<int> S)
+  : GpuLaunchConfig3D(gpuKernel, vector3<int>(S[0], S[1], S[2]/2+1))
+  {
+  }
 };
 
 //! Check for gpu errors and print a useful message (implemented in GpuUtils.cpp)

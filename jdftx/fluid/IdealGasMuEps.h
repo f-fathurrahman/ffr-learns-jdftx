@@ -29,15 +29,15 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class IdealGasMuEps : public IdealGasPomega
 {
 public:
-	//!Initialize and associate with excess functional fex (and its fluid mixture)
-	//!Also specify the orientation quadrature and translation operator used for the orientation integrals
-	IdealGasMuEps(const FluidMixture*, const FluidComponent*, const SO3quad& quad, const TranslationOperator& trans);
+  //!Initialize and associate with excess functional fex (and its fluid mixture)
+  //!Also specify the orientation quadrature and translation operator used for the orientation integrals
+  IdealGasMuEps(const FluidMixture*, const FluidComponent*, const SO3quad& quad, const TranslationOperator& trans);
 
 protected:
-	string representationName() const;
-	void initState_o(int o, const matrix3<>& rot, double scale, const ScalarField& Eo, ScalarField* mueps) const;
-	void getDensities_o(int o, const matrix3<>& rot, const ScalarField* mueps, ScalarField& logPomega_o) const;
-	void convertGradients_o(int o, const matrix3<>& rot, const ScalarField& Phi_logPomega_o, ScalarField* Phi_mueps) const;
+  string representationName() const;
+  void initState_o(int o, const matrix3<>& rot, double scale, const ScalarField& Eo, ScalarField* mueps) const;
+  void getDensities_o(int o, const matrix3<>& rot, const ScalarField* mueps, ScalarField& logPomega_o) const;
+  void convertGradients_o(int o, const matrix3<>& rot, const ScalarField& Phi_logPomega_o, ScalarField* Phi_mueps) const;
 };
 
 //! @}

@@ -32,41 +32,41 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 //! Symmetric traceless rank-2 tensor in 3D
 template<typename scalar=double> class tensor3
 {
-	scalar v[5];
+  scalar v[5];
 public:
-	//Accessors
-	__hostanddev__ scalar& operator[](int k) { return v[k]; }
-	__hostanddev__ const scalar& operator[](int k) const { return v[k]; }
-	__hostanddev__ scalar& xy() { return v[0]; }
-	__hostanddev__ scalar& yz() { return v[1]; }
-	__hostanddev__ scalar& zx() { return v[2]; }
-	__hostanddev__ scalar& xxr() { return v[3]; } //!< xxr = x^2 - r^2/3
-	__hostanddev__ scalar& yyr() { return v[4]; } //!< yyr = y^2-r^2/3
-	__hostanddev__ const scalar& xy() const { return v[0]; }
-	__hostanddev__ const scalar& yz() const { return v[1]; }
-	__hostanddev__ const scalar& zx() const { return v[2]; }
-	__hostanddev__ const scalar& xxr() const { return v[3]; }
-	__hostanddev__ const scalar& yyr() const { return v[4]; }
+  //Accessors
+  __hostanddev__ scalar& operator[](int k) { return v[k]; }
+  __hostanddev__ const scalar& operator[](int k) const { return v[k]; }
+  __hostanddev__ scalar& xy() { return v[0]; }
+  __hostanddev__ scalar& yz() { return v[1]; }
+  __hostanddev__ scalar& zx() { return v[2]; }
+  __hostanddev__ scalar& xxr() { return v[3]; } //!< xxr = x^2 - r^2/3
+  __hostanddev__ scalar& yyr() { return v[4]; } //!< yyr = y^2-r^2/3
+  __hostanddev__ const scalar& xy() const { return v[0]; }
+  __hostanddev__ const scalar& yz() const { return v[1]; }
+  __hostanddev__ const scalar& zx() const { return v[2]; }
+  __hostanddev__ const scalar& xxr() const { return v[3]; }
+  __hostanddev__ const scalar& yyr() const { return v[4]; }
 
-	explicit __hostanddev__ tensor3(scalar a=0, scalar b=0, scalar c=0, scalar d=0, scalar e=0) { v[0]=a; v[1]=b; v[2]=c; v[3]=d; v[4]=e; }
-	tensor3(std::vector<scalar> a) { LOOP5( v[k]=a[k]; ) }
+  explicit __hostanddev__ tensor3(scalar a=0, scalar b=0, scalar c=0, scalar d=0, scalar e=0) { v[0]=a; v[1]=b; v[2]=c; v[3]=d; v[4]=e; }
+  tensor3(std::vector<scalar> a) { LOOP5( v[k]=a[k]; ) }
 };
 
 //! Load tensor from a constant tensor field
 template<typename scalar> __hostanddev__ tensor3<scalar> loadTensor(const tensor3<const scalar*>& tArr, int i)
-{	return tensor3<scalar>( tArr[0][i], tArr[1][i], tArr[2][i], tArr[3][i], tArr[4][i] );
+{  return tensor3<scalar>( tArr[0][i], tArr[1][i], tArr[2][i], tArr[3][i], tArr[4][i] );
 }
 //! Load tensor from a tensor field
 template<typename scalar> __hostanddev__ tensor3<scalar> loadTensor(const tensor3<scalar*>& tArr, int i)
-{	return tensor3<scalar>( tArr[0][i], tArr[1][i], tArr[2][i], tArr[3][i], tArr[4][i] );
+{  return tensor3<scalar>( tArr[0][i], tArr[1][i], tArr[2][i], tArr[3][i], tArr[4][i] );
 }
 //! Store tensor to a tensor field
 template<typename scalar> __hostanddev__ void storeTensor(const tensor3<scalar>& t, tensor3<scalar*>& tArr, int i)
-{	LOOP5( tArr[k][i] = t[k]; )
+{  LOOP5( tArr[k][i] = t[k]; )
 }
 //! Accumulate tensor onto a tensor field
 template<typename scalar> __hostanddev__ void accumTensor(const tensor3<scalar>& t, tensor3<scalar*>& tArr, int i)
-{	LOOP5( tArr[k][i] += t[k]; )
+{  LOOP5( tArr[k][i] += t[k]; )
 }
 
 //! @}

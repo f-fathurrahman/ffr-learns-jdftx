@@ -37,63 +37,63 @@ All routines are inlined for performance.
 
 //! @brief Get the position of the new Z-axis, given alpha and beta (does not depend on gamma)
 inline vector3<> polarUnitVector(double alpha, double beta)
-{	double sBeta = sin(beta);
-	return vector3<>(sBeta*cos(alpha), sBeta*sin(alpha), cos(beta));
+{  double sBeta = sin(beta);
+  return vector3<>(sBeta*cos(alpha), sBeta*sin(alpha), cos(beta));
 }
 
 //! @brief Calculates euler[0]=alpha and euler[1]=beta given newZ, the direction of the Z-axis in the rotated frame
 inline void getEulerAxis(const vector3<>& newZ, vector3<>& euler)
-{	euler[1] = acos(newZ[2]/newZ.length());
-	if(euler[1]*(M_PI-euler[1]) < 1e-6) //beta = 0 or pi
-	{	euler[0] = 0.0; //alpha is meaningless
-	}
-	else
-	{	euler[0] = atan2(newZ[1], newZ[0]);
-	}
+{  euler[1] = acos(newZ[2]/newZ.length());
+  if(euler[1]*(M_PI-euler[1]) < 1e-6) //beta = 0 or pi
+  {  euler[0] = 0.0; //alpha is meaningless
+  }
+  else
+  {  euler[0] = atan2(newZ[1], newZ[0]);
+  }
 }
 
 //! @brief Calculate rotation matrices from euler angles
 inline matrix3<> matrixFromEuler(const vector3<>& euler)
-{	return rotation(euler[0], 2) //R_Z(alpha)
-		* rotation(euler[1], 1) //R_Y(beta)
-		* rotation(euler[2], 2); //R_Z(gamma)
+{  return rotation(euler[0], 2) //R_Z(alpha)
+    * rotation(euler[1], 1) //R_Y(beta)
+    * rotation(euler[2], 2); //R_Z(gamma)
 }
 
 //! @brief Calculate euler angles from rotation matrices
 inline vector3<> eulerFromMatrix(const matrix3<>& mat)
-{	if(fabs(mat(2,2))>1.-1e-7) //beta is 0 or pi and only gamma+/-alpha is determined (set alpha=0 w.l.og)
-		return vector3<>(0., //alpha (set 0 w.l.o.g)
-			(mat(2,2)>0 ? 0. : M_PI), //beta
-			atan2(-mat(1,0),mat(1,1)) ); //gamma
-	else
-		return vector3<>(	atan2(mat(1,2),-mat(0,2)), //alpha
-					acos(mat(2,2)), //beta
-					atan2(mat(2,1),mat(2,0)) ); //gamma
+{  if(fabs(mat(2,2))>1.-1e-7) //beta is 0 or pi and only gamma+/-alpha is determined (set alpha=0 w.l.og)
+    return vector3<>(0., //alpha (set 0 w.l.o.g)
+      (mat(2,2)>0 ? 0. : M_PI), //beta
+      atan2(-mat(1,0),mat(1,1)) ); //gamma
+  else
+    return vector3<>(  atan2(mat(1,2),-mat(0,2)), //alpha
+          acos(mat(2,2)), //beta
+          atan2(mat(2,1),mat(2,0)) ); //gamma
 }
 
 
 //! @brief Wigner d-function d^j_{m1 m2}(beta) for ZYZ Euler angles
 inline double wigner_d(const int j, const int m1, const int m2, const double beta)
-{	int t1 = j+m1;
-	int t2 = j-m2;
-	int t3 = m2-m1;
-	int t4 = 2*j + m1 - m2;
+{  int t1 = j+m1;
+  int t2 = j-m2;
+  int t3 = m2-m1;
+  int t4 = 2*j + m1 - m2;
 
-	int sMin = (-t3 < 0) ? 0 : -t3;
-	int sMax = (t2 < t1) ? t2 : t1;
+  int sMin = (-t3 < 0) ? 0 : -t3;
+  int sMax = (t2 < t1) ? t2 : t1;
 
-	double cosbeta = cos(beta * 0.5);
-	double sinbeta = sin(beta * 0.5);
-	double a = 0.5*(gsl_sf_lnfact(t1) + gsl_sf_lnfact(t2) + gsl_sf_lnfact(j-m1) + gsl_sf_lnfact(j+m2));
+  double cosbeta = cos(beta * 0.5);
+  double sinbeta = sin(beta * 0.5);
+  double a = 0.5*(gsl_sf_lnfact(t1) + gsl_sf_lnfact(t2) + gsl_sf_lnfact(j-m1) + gsl_sf_lnfact(j+m2));
 
-	double result = 0.0;
-	double sign = (sMin % 2 ? -1.0 : 1.0);
-	for(int s = sMin; s <= sMax; s++)
-	{	result += copysign(gsl_sf_pow_int(cosbeta, t4-2*s) * gsl_sf_pow_int(sinbeta, t3+2*s)
-				* exp(a - (gsl_sf_lnfact(t1 - s) + gsl_sf_lnfact(t2 - s) + gsl_sf_lnfact(t3 + s) + gsl_sf_lnfact(s))), sign);
-		sign = -sign;
-	}
-	return result;
+  double result = 0.0;
+  double sign = (sMin % 2 ? -1.0 : 1.0);
+  for(int s = sMin; s <= sMax; s++)
+  {  result += copysign(gsl_sf_pow_int(cosbeta, t4-2*s) * gsl_sf_pow_int(sinbeta, t3+2*s)
+        * exp(a - (gsl_sf_lnfact(t1 - s) + gsl_sf_lnfact(t2 - s) + gsl_sf_lnfact(t3 + s) + gsl_sf_lnfact(s))), sign);
+    sign = -sign;
+  }
+  return result;
 }
 
 

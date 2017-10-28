@@ -32,49 +32,49 @@ class ColumnBundle;
 class ColumnBundleTransform
 {
 public:
-	struct BasisWrapper
-	{	BasisWrapper(const Basis& basis);
-		const Basis& basis; //!< reference to underlying basis
-		vector3<int> iGbox; //!< half-size of index look-up table
-		vector3<int> pitch; //!< pitch of each dimension in index look-up table
-		std::vector<int> table; //!< index look-up table
-	};
-	
-	/**
-	Define transformations between basis/k 'C' indexed continuously and basis/k 'D' indexed
-	discontinuously i.e. scatter will occur from C to D, whereas gather will occur from D to C.
-	The D basis is wrapped so that a lookup table generated during construction
-	can be reused if many transformations to a common D are required.
-	The symmetry operation sym is in covariant lattice coordinates,
-	and explicit k-point inversion is specified by invert = +/- 1.
-	Optionally, super specifies a transform to a supercell (D corresponds to a supercell of C);
-	columnbundles will however not be automatically re-normalized for the supercell
-	Note that the transformation is kD = kC * sym * invert * super + offset (where offset is determined automatically).
-	If the ColumnBundles are spinorial (nSpinor=2), corresponding spin-space transformations will also be applied
-	*/
-	ColumnBundleTransform(const vector3<>& kC, const Basis& basisC, const vector3<>& kD, const BasisWrapper& basisDwrapper,
-		int nSpinor, const SpaceGroupOp& sym, int invert, const matrix3<int>& super = matrix3<int>(1,1,1));
-	
-	//Non-copyable:
-	ColumnBundleTransform(const ColumnBundleTransform&)=delete;
-	ColumnBundleTransform& operator=(const ColumnBundleTransform&)=delete;
-	
-	void scatterAxpy(complex alpha, const ColumnBundle& C_C, int bC, ColumnBundle& C_D, int bD) const; //!< scatter-accumulate a single column
-	void gatherAxpy(complex alpha, const ColumnBundle& C_D, int bD, ColumnBundle& C_C, int bC) const; //!< gather-accumulate a single column
-	
-	void scatterAxpy(complex alpha, const ColumnBundle& C_C, ColumnBundle& C_D, int bDstart, int bDstep) const; //!< scatter-accumulate all columns of C_C
-	void gatherAxpy(complex alpha, const ColumnBundle& C_D, int bDstart, int bDstep, ColumnBundle& C_C) const; //!< gather-accumulate all columns of C_C
+  struct BasisWrapper
+  {  BasisWrapper(const Basis& basis);
+    const Basis& basis; //!< reference to underlying basis
+    vector3<int> iGbox; //!< half-size of index look-up table
+    vector3<int> pitch; //!< pitch of each dimension in index look-up table
+    std::vector<int> table; //!< index look-up table
+  };
+  
+  /**
+  Define transformations between basis/k 'C' indexed continuously and basis/k 'D' indexed
+  discontinuously i.e. scatter will occur from C to D, whereas gather will occur from D to C.
+  The D basis is wrapped so that a lookup table generated during construction
+  can be reused if many transformations to a common D are required.
+  The symmetry operation sym is in covariant lattice coordinates,
+  and explicit k-point inversion is specified by invert = +/- 1.
+  Optionally, super specifies a transform to a supercell (D corresponds to a supercell of C);
+  columnbundles will however not be automatically re-normalized for the supercell
+  Note that the transformation is kD = kC * sym * invert * super + offset (where offset is determined automatically).
+  If the ColumnBundles are spinorial (nSpinor=2), corresponding spin-space transformations will also be applied
+  */
+  ColumnBundleTransform(const vector3<>& kC, const Basis& basisC, const vector3<>& kD, const BasisWrapper& basisDwrapper,
+    int nSpinor, const SpaceGroupOp& sym, int invert, const matrix3<int>& super = matrix3<int>(1,1,1));
+  
+  //Non-copyable:
+  ColumnBundleTransform(const ColumnBundleTransform&)=delete;
+  ColumnBundleTransform& operator=(const ColumnBundleTransform&)=delete;
+  
+  void scatterAxpy(complex alpha, const ColumnBundle& C_C, int bC, ColumnBundle& C_D, int bD) const; //!< scatter-accumulate a single column
+  void gatherAxpy(complex alpha, const ColumnBundle& C_D, int bD, ColumnBundle& C_C, int bC) const; //!< gather-accumulate a single column
+  
+  void scatterAxpy(complex alpha, const ColumnBundle& C_C, ColumnBundle& C_D, int bDstart, int bDstep) const; //!< scatter-accumulate all columns of C_C
+  void gatherAxpy(complex alpha, const ColumnBundle& C_D, int bDstart, int bDstep, ColumnBundle& C_C) const; //!< gather-accumulate all columns of C_C
 
 private:
-	const Basis& basisC;
-	const Basis& basisD;
-	int nSpinor, invert;
-	
-	//Index array:
-	IndexArray index;
-	ManagedArray<complex> phase; //Bloch phase for space-group translation
+  const Basis& basisC;
+  const Basis& basisD;
+  int nSpinor, invert;
+  
+  //Index array:
+  IndexArray index;
+  ManagedArray<complex> phase; //Bloch phase for space-group translation
 
-	matrix spinorRot; //spinor space rotation
+  matrix spinorRot; //spinor space rotation
 };
 
 //! @}

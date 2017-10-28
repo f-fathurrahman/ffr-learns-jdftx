@@ -29,37 +29,37 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 //! Helper class for evaluating regularized Coulomb kernel for exchange
 struct ExchangeEval
 {
-	ExchangeEval(const GridInfo& gInfo, const CoulombParams& params, const Coulomb& coulomb, double omega);
-	~ExchangeEval();
-	complexScalarFieldTilde operator()(complexScalarFieldTilde&& in, vector3<> kDiff) const;
+  ExchangeEval(const GridInfo& gInfo, const CoulombParams& params, const Coulomb& coulomb, double omega);
+  ~ExchangeEval();
+  complexScalarFieldTilde operator()(complexScalarFieldTilde&& in, vector3<> kDiff) const;
 
 private:
-	const GridInfo& gInfo;
-	double omega;
-	
-	//Shorthand for combinations of regularization method and geometry
-	enum KernelMode
-	{	PeriodicKernel, //regularization = None/AuxiliaryFunction/ProbeChargeEwald, with geometry = Periodic
-		SphericalKernel, //regularization = SphericalTruncated, or regularization = None and geometry = Spherical
-		SlabKernel, //regularization = None/AuxiliaryFunction/ProbeChargeEwald with geometry = Slab
-		WignerSeitzGammaKernel, //regularization = None and geometry = Isolated
-		NumericalKernel //regularization = WignerSeitzTruncated, or regularization = None/AuxiliaryFunction/ProbeChargeEwald with geometry = Wire/Cylinder
-	} kernelMode;
-	
-	//For all analytic modes (None, AuxiliaryFunction, SphericalTruncated):
-	double Vzero; //G=0 term (0, the auxiliary correction, and the G=0 limit respectively)
-	//For spherical mode
-	double Rc;
-	ExchangeSphericalScreened_calc sphericalScreenedCalc; //for screened exchange
-	ManagedArray<double> sphericalScreenedCoeff;
-	//For slab mode:
-	ExchangeSlab_calc slabCalc;
-	ManagedArray<double> slabCoeff;
-	//For Wigner-Seitz Gamma-only truncated mode:
-	RealKernel* VcGamma; //Gamma-point-only kernel (used for Isolated geometry (with no need for regularization))
-	//For precomputed numerical kernel mode:
-	std::vector< vector3<> > dkArr; //list of allowed k-point differences (modulo integer offsets)
-	ManagedArray<double> kernelData; //data for all the kernels
+  const GridInfo& gInfo;
+  double omega;
+  
+  //Shorthand for combinations of regularization method and geometry
+  enum KernelMode
+  {  PeriodicKernel, //regularization = None/AuxiliaryFunction/ProbeChargeEwald, with geometry = Periodic
+    SphericalKernel, //regularization = SphericalTruncated, or regularization = None and geometry = Spherical
+    SlabKernel, //regularization = None/AuxiliaryFunction/ProbeChargeEwald with geometry = Slab
+    WignerSeitzGammaKernel, //regularization = None and geometry = Isolated
+    NumericalKernel //regularization = WignerSeitzTruncated, or regularization = None/AuxiliaryFunction/ProbeChargeEwald with geometry = Wire/Cylinder
+  } kernelMode;
+  
+  //For all analytic modes (None, AuxiliaryFunction, SphericalTruncated):
+  double Vzero; //G=0 term (0, the auxiliary correction, and the G=0 limit respectively)
+  //For spherical mode
+  double Rc;
+  ExchangeSphericalScreened_calc sphericalScreenedCalc; //for screened exchange
+  ManagedArray<double> sphericalScreenedCoeff;
+  //For slab mode:
+  ExchangeSlab_calc slabCalc;
+  ManagedArray<double> slabCoeff;
+  //For Wigner-Seitz Gamma-only truncated mode:
+  RealKernel* VcGamma; //Gamma-point-only kernel (used for Isolated geometry (with no need for regularization))
+  //For precomputed numerical kernel mode:
+  std::vector< vector3<> > dkArr; //list of allowed k-point differences (modulo integer offsets)
+  ManagedArray<double> kernelData; //data for all the kernels
 };
 
 //! @}

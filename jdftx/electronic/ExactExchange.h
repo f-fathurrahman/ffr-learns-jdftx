@@ -32,17 +32,17 @@ class ColumnBundle;
 class ExactExchange
 {
 public:
-	ExactExchange(const Everything& e);
-	~ExactExchange();
-	
-	//! Compute scaled exact exchange energy with scale aXX and range omega
-	//! (and optionally accumulate gradients) given fillings and wavefunctions
-	double operator()(double aXX, double omega,
-		const std::vector<diagMatrix>& F, const std::vector<ColumnBundle>& C,
-		std::vector<ColumnBundle>* HC = 0) const;
+  ExactExchange(const Everything& e);
+  ~ExactExchange();
+  
+  //! Compute scaled exact exchange energy with scale aXX and range omega
+  //! (and optionally accumulate gradients) given fillings and wavefunctions
+  double operator()(double aXX, double omega,
+    const std::vector<diagMatrix>& F, const std::vector<ColumnBundle>& C,
+    std::vector<ColumnBundle>* HC = 0) const;
 private:
-	const Everything& e;
-	class ExactExchangeEval* eval; //!< opaque pointer to an internal computation class
+  const Everything& e;
+  class ExactExchangeEval* eval; //!< opaque pointer to an internal computation class
 };
 
 //! @}

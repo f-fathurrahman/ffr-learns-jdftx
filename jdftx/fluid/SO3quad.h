@@ -30,24 +30,24 @@ struct Molecule;
 class SO3quad
 {
 public:
-	//! Initialize SO3 quadrature from an S2 quadrature decsription, reduced by symmetries of the given molecule
-	SO3quad(const S2quad&, const Molecule& molecule);
-	
-	//! Initialize SO3 quadrature from an S2 quadrature name, reduced by symmetries of the given molecule
-	//! (nBeta, nAlpha and nGamma are used only for Euler quadrature)
-	SO3quad(S2quadType type, const Molecule& molecule, unsigned nBeta=0, unsigned nAlpha=0, unsigned nGamma=0);
-	
-	void print(); //!< Summarize euler angles and weights for the quadrature
-	int nOrientations() const; //!< get cardinality of sampling set
-	vector3<> euler(int iOrientation) const; //!< get euler angles for the iOrientation'th node
-	double weight(int iOrientation) const; //!< get weight for the iOrientation'th node
+  //! Initialize SO3 quadrature from an S2 quadrature decsription, reduced by symmetries of the given molecule
+  SO3quad(const S2quad&, const Molecule& molecule);
+  
+  //! Initialize SO3 quadrature from an S2 quadrature name, reduced by symmetries of the given molecule
+  //! (nBeta, nAlpha and nGamma are used only for Euler quadrature)
+  SO3quad(S2quadType type, const Molecule& molecule, unsigned nBeta=0, unsigned nAlpha=0, unsigned nGamma=0);
+  
+  void print(); //!< Summarize euler angles and weights for the quadrature
+  int nOrientations() const; //!< get cardinality of sampling set
+  vector3<> euler(int iOrientation) const; //!< get euler angles for the iOrientation'th node
+  double weight(int iOrientation) const; //!< get weight for the iOrientation'th node
 
 private:
-	int nS1byZn; //!< actual number of S1 samples (reduced by symmetry)
-	int nS1; //!< effective number of S1 samples (counting symmetric images)
-	std::vector<vector3<> > eulerS2; //!< S2 quadrature points
-	std::vector<double> weightS2; //!< S2 quadrature weights
-	void setup(const S2quad&, const Molecule& molecule); //!< Initialize SO3 quadrature from an S2 quadrature decsription
+  int nS1byZn; //!< actual number of S1 samples (reduced by symmetry)
+  int nS1; //!< effective number of S1 samples (counting symmetric images)
+  std::vector<vector3<> > eulerS2; //!< S2 quadrature points
+  std::vector<double> weightS2; //!< S2 quadrature weights
+  void setup(const S2quad&, const Molecule& molecule); //!< Initialize SO3 quadrature from an S2 quadrature decsription
 };
 
 //! @}

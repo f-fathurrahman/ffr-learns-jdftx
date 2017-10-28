@@ -26,41 +26,41 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //Program entry point
 int main(int argc, char** argv)
-{	//Parse command line, initialize system and logs:
-	string inputFilename; bool dryRun, printDefaults;
-	WannierEverything e;
-	initSystemCmdline(argc, argv, "Compute maximally-localized Wannier functions.", inputFilename, dryRun, printDefaults, &e);
+{  //Parse command line, initialize system and logs:
+  string inputFilename; bool dryRun, printDefaults;
+  WannierEverything e;
+  initSystemCmdline(argc, argv, "Compute maximally-localized Wannier functions.", inputFilename, dryRun, printDefaults, &e);
 
-	//Parse input file:
-	parse(readInputFile(inputFilename), e, printDefaults);
-	
-	//Set initial filenames and prevent unnecessary setup below:
-	e.eVars.wfnsFilename = e.wannier.getFilename(Wannier::FilenameInit, "wfns");
-	e.eVars.eigsFilename = e.wannier.getFilename(Wannier::FilenameInit, "eigenvals");
-	e.eVars.nFilenamePattern.clear();
-	e.eVars.VFilenamePattern.clear();
-	e.eVars.fluidParams.fluidType = FluidNone;
-	if(dryRun) e.eVars.skipWfnsInit = true;
-	
-	//Setup:
-	e.setup();
-	Citations::print();
-	if(dryRun)
-	{	logPrintf("Dry run successful: commands are valid and initialization succeeded.\n");
-		finalizeSystem();
-		return 0;
-	}
-	
-	if(e.wannier.saveMomenta && e.eInfo.hasU)
-	{	//Calculate U_rho needed for the DFT+U correction to the [r,H] momentum matrix elements:
-		e.iInfo.rhoAtom_initZero(e.eVars.rhoAtom);
-		e.iInfo.rhoAtom_initZero(e.eVars.U_rhoAtom);
-		e.iInfo.rhoAtom_calc(e.eVars.F, e.eVars.C, e.eVars.rhoAtom);
-		e.iInfo.rhoAtom_computeU(e.eVars.rhoAtom, e.eVars.U_rhoAtom);
-	}
-	
-	e.wannier.saveMLWF();
-	
-	finalizeSystem();
-	return 0;
+  //Parse input file:
+  parse(readInputFile(inputFilename), e, printDefaults);
+  
+  //Set initial filenames and prevent unnecessary setup below:
+  e.eVars.wfnsFilename = e.wannier.getFilename(Wannier::FilenameInit, "wfns");
+  e.eVars.eigsFilename = e.wannier.getFilename(Wannier::FilenameInit, "eigenvals");
+  e.eVars.nFilenamePattern.clear();
+  e.eVars.VFilenamePattern.clear();
+  e.eVars.fluidParams.fluidType = FluidNone;
+  if(dryRun) e.eVars.skipWfnsInit = true;
+  
+  //Setup:
+  e.setup();
+  Citations::print();
+  if(dryRun)
+  {  logPrintf("Dry run successful: commands are valid and initialization succeeded.\n");
+    finalizeSystem();
+    return 0;
+  }
+  
+  if(e.wannier.saveMomenta && e.eInfo.hasU)
+  {  //Calculate U_rho needed for the DFT+U correction to the [r,H] momentum matrix elements:
+    e.iInfo.rhoAtom_initZero(e.eVars.rhoAtom);
+    e.iInfo.rhoAtom_initZero(e.eVars.U_rhoAtom);
+    e.iInfo.rhoAtom_calc(e.eVars.F, e.eVars.C, e.eVars.rhoAtom);
+    e.iInfo.rhoAtom_computeU(e.eVars.rhoAtom, e.eVars.U_rhoAtom);
+  }
+  
+  e.wannier.saveMLWF();
+  
+  finalizeSystem();
+  return 0;
 }

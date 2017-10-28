@@ -33,22 +33,22 @@ const double Fex_H2O_BondedVoids::sigmaU = 2.62*Angstrom;
 Fex_H2O_BondedVoids::Fex_H2O_BondedVoids(const FluidMixture* fluidMixture, const FluidComponent* comp)
 : Fex(fluidMixture, comp)
 {
-	//Initialize the kernels: 
-	setLJatt(Ua, gInfo, -9.0/(32*sqrt(2)*M_PI*pow(sigmaU,3)), sigmaU);
-	Citations::add("Bonded-Voids water functional",
-		"R. Sundararaman, K. Letchworth-Weaver and T.A. Arias, J. Chem. Phys. 137, 044107 (2012) and arXiv:1112.1442");
+  //Initialize the kernels: 
+  setLJatt(Ua, gInfo, -9.0/(32*sqrt(2)*M_PI*pow(sigmaU,3)), sigmaU);
+  Citations::add("Bonded-Voids water functional",
+    "R. Sundararaman, K. Letchworth-Weaver and T.A. Arias, J. Chem. Phys. 137, 044107 (2012) and arXiv:1112.1442");
 }
 Fex_H2O_BondedVoids::~Fex_H2O_BondedVoids()
-{	Ua.free();
+{  Ua.free();
 }
 
 double Fex_H2O_BondedVoids::compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const
-{	ScalarFieldTilde V = (-kappa * gInfo.nr) * (Ua * Ntilde[0]);
-	Phi_Ntilde[0] += V;
-	return 0.5*gInfo.dV*dot(V,Ntilde[0]);
+{  ScalarFieldTilde V = (-kappa * gInfo.nr) * (Ua * Ntilde[0]);
+  Phi_Ntilde[0] += V;
+  return 0.5*gInfo.dV*dot(V,Ntilde[0]);
 }
 double Fex_H2O_BondedVoids::computeUniform(const double* N, double* Phi_N) const
-{	Phi_N[0] += (-kappa)*Ua(0)*N[0];
-	return 0.5*(-kappa)*N[0]*Ua(0)*N[0];
+{  Phi_N[0] += (-kappa)*Ua(0)*N[0];
+  return 0.5*(-kappa)*N[0]*Ua(0)*N[0];
 }
 

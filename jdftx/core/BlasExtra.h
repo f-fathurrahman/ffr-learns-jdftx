@@ -104,28 +104,28 @@ void eblas_zdivd_gpu(const int N, const double* X, const int incX, complex* Y, c
 //! @param Z Data pointer for input Z
 //! @param incZ Pointer increment for input Z
 void eblas_lincomb(const int N,
-	const complex& sX, const complex* X, const int incX,
-	const complex& sY, const complex* Y, const int incY,
-	complex* Z, const int incZ);
+  const complex& sX, const complex* X, const int incX,
+  const complex& sY, const complex* Y, const int incY,
+  complex* Z, const int incZ);
 
 #ifdef GPU_ENABLED
 //! @brief Equivalent of eblas_lincomb() for GPU data pointers
 void eblas_lincomb_gpu(const int N,
-	const complex& sX, const complex* X, const int incX,
-	const complex& sY, const complex* Y, const int incY,
-	complex* Z, const int incZ);
+  const complex& sX, const complex* X, const int incX,
+  const complex& sY, const complex* Y, const int incY,
+  complex* Z, const int incZ);
 #endif
 
 //! @brief Threaded complex matrix multiply (threaded wrapper around zgemm)
 //! All the parameters have the same meaning as in cblas_zgemm, except element order is always Column Major (FORTRAN order!)
 void eblas_zgemm(CBLAS_TRANSPOSE TransA, CBLAS_TRANSPOSE TransB, int M, int N, int K,
-	const complex& alpha, const complex *A, const int lda, const complex *B, const int ldb,
-	const complex& beta, complex *C, const int ldc);
+  const complex& alpha, const complex *A, const int lda, const complex *B, const int ldb,
+  const complex& beta, complex *C, const int ldc);
 #ifdef GPU_ENABLED
 //! @brief Wrap cublasZgemm to provide the same interface as eblas_zgemm()
 void eblas_zgemm_gpu(CBLAS_TRANSPOSE TransA, CBLAS_TRANSPOSE TransB, int M, int N, int K,
-	const complex& alpha, const complex *A, const int lda, const complex *B, const int ldb,
-	const complex& beta, complex *C, const int ldc);
+  const complex& alpha, const complex *A, const int lda, const complex *B, const int ldb,
+  const complex& beta, complex *C, const int ldc);
 #endif
 
 //Sparse<->dense vector operations:
@@ -284,9 +284,9 @@ double eblas_dznrm2_gpu(int N, const complex* x, int incx);
 
 //! @brief Select between functionName and functionName_gpu for the CPU and GPU executables respectively
 #ifdef GPU_ENABLED
-	#define callPref(functionName) functionName##_gpu //gpu versions available, so use them preferentially
+  #define callPref(functionName) functionName##_gpu //gpu versions available, so use them preferentially
 #else
-	#define callPref(functionName) functionName //only cpu version available
+  #define callPref(functionName) functionName //only cpu version available
 #endif
 
 
@@ -314,26 +314,26 @@ void eblas_capMinMax_gpu(const int N, double* x, double& xMin, double& xMax, dou
 //Elementwise multiply implementation:
 template<typename Ty, typename Tx>
 void eblas_mul_sub(size_t iMin, size_t iMax, const Tx* X, const int incX, Ty* Y, const int incY)
-{	for(size_t i=iMin; i<iMax; i++) Y[incY*i] *= X[incX*i];
+{  for(size_t i=iMin; i<iMax; i++) Y[incY*i] *= X[incX*i];
 }
 
 template<typename Ty, typename Tx>
 void eblas_mul(const int N, const Tx* X, const int incX, Ty* Y, const int incY)
-{	if(incY==0) die("incY cannot be = 0")
-	threadLaunch((N<100000) ? 1 : 0, //force single threaded for small problem sizes
-		eblas_mul_sub<Ty,Tx>, N, X, incX, Y, incY);
+{  if(incY==0) die("incY cannot be = 0")
+  threadLaunch((N<100000) ? 1 : 0, //force single threaded for small problem sizes
+    eblas_mul_sub<Ty,Tx>, N, X, incX, Y, incY);
 }
 
 //Elementwise divide implementation:
 template<typename Ty, typename Tx>
 void eblas_div_sub(size_t iMin, size_t iMax, const Tx* X, const int incX, Ty* Y, const int incY)
-{	for(size_t i=iMin; i<iMax; i++) Y[incY*i] /= X[incX*i];
+{  for(size_t i=iMin; i<iMax; i++) Y[incY*i] /= X[incX*i];
 }
 template<typename Ty, typename Tx>
 void eblas_div(const int N, const Tx* X, const int incX, Ty* Y, const int incY)
-{	if(incY==0) die("incY cannot be = 0")
-	threadLaunch((N<100000) ? 1 : 0, //force single threaded for small problem sizes
-		eblas_div_sub<Ty,Tx>, N, X, incX, Y, incY);
+{  if(incY==0) die("incY cannot be = 0")
+  threadLaunch((N<100000) ? 1 : 0, //force single threaded for small problem sizes
+    eblas_div_sub<Ty,Tx>, N, X, incX, Y, incY);
 }
 //!@endcond
 

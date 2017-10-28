@@ -32,30 +32,30 @@ class FluidMixture;
 class Fmix
 {
 public:
-	const GridInfo& gInfo;
-	const double T;
+  const GridInfo& gInfo;
+  const double T;
 
-	//! Initialize base and register with this fluidMixture
-	Fmix(FluidMixture* fluidMixture);
-	virtual ~Fmix() {}
+  //! Initialize base and register with this fluidMixture
+  Fmix(FluidMixture* fluidMixture);
+  virtual ~Fmix() {}
 
-	virtual string getName() const=0; //!< A string identifier for this mixing functional (used in EnergyComponent label)
+  virtual string getName() const=0; //!< A string identifier for this mixing functional (used in EnergyComponent label)
 
-	//! Return the interaction free energy given the reciprocal space site densities
-	//! and accumulate the gradient (functional derivative) w.r.t them in Phi_Ntilde
-	//! Note that unlike Fex, all site densities are handed to an Fmix and it
-	//! is Fmix's responsibility to pick up the correct site densities
-	//! (perhaps using FluidMixture::get_offsetDensity())
-	virtual double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const=0;
+  //! Return the interaction free energy given the reciprocal space site densities
+  //! and accumulate the gradient (functional derivative) w.r.t them in Phi_Ntilde
+  //! Note that unlike Fex, all site densities are handed to an Fmix and it
+  //! is Fmix's responsibility to pick up the correct site densities
+  //! (perhaps using FluidMixture::get_offsetDensity())
+  virtual double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const=0;
 
-	//! Return the uniform fluid interaction free energy density given the site densities N
-	//! and accumulate the derivative w.r.t them in Phi_N. This MUST return the
-	//! result corresponding to calling compute() with a uniform scalar field.
-	//! This is called several times during FluidMixture::initialize() to get the desired bulk properties
-	//! Note that unlike Fex, all site densities are handed to an Fmix and it
-	//! is Fmix's responsibility to pick up the correct site densities
-	//! (perhaps using FluidMixture::get_offsetDensity())
-	virtual double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const=0;
+  //! Return the uniform fluid interaction free energy density given the site densities N
+  //! and accumulate the derivative w.r.t them in Phi_N. This MUST return the
+  //! result corresponding to calling compute() with a uniform scalar field.
+  //! This is called several times during FluidMixture::initialize() to get the desired bulk properties
+  //! Note that unlike Fex, all site densities are handed to an Fmix and it
+  //! is Fmix's responsibility to pick up the correct site densities
+  //! (perhaps using FluidMixture::get_offsetDensity())
+  virtual double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const=0;
 };
 
 //! @}

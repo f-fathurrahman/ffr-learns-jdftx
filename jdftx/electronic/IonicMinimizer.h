@@ -31,17 +31,17 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 //! Vector space entry for ionic minimization (forces)
 struct IonicGradient : std::vector< std::vector< vector3<> > >
 {
-	void init(const class IonInfo&); //!< initialize to zeroes with the correct species and atom numbers for iInfo
-	void print(const Everything&, FILE*, const char* prefix="force") const;
-	void write(const char* fname) const; //binary write to file
-	void read(const char* fname); //binary read from file
-	
-	IonicGradient& operator*=(double);
-	IonicGradient& operator+=(const IonicGradient&);
-	
-	IonicGradient operator*(double) const;
-	IonicGradient operator+(const IonicGradient&) const;
-	IonicGradient operator-(const IonicGradient&) const;
+  void init(const class IonInfo&); //!< initialize to zeroes with the correct species and atom numbers for iInfo
+  void print(const Everything&, FILE*, const char* prefix="force") const;
+  void write(const char* fname) const; //binary write to file
+  void read(const char* fname); //binary read from file
+  
+  IonicGradient& operator*=(double);
+  IonicGradient& operator+=(const IonicGradient&);
+  
+  IonicGradient operator*(double) const;
+  IonicGradient operator+(const IonicGradient&) const;
+  IonicGradient operator-(const IonicGradient&) const;
 };
 
 void axpy(double alpha, const IonicGradient& x, IonicGradient& y); //!< accumulate operation: Y += alpha*X
@@ -53,25 +53,25 @@ IonicGradient operator*(const matrix3<>&, const IonicGradient&); //!< coordinate
 
 //! Ionic minimizer
 class IonicMinimizer : public Minimizable<IonicGradient>
-{	Everything& e;
-	
+{  Everything& e;
+  
 public:
-	IonicMinimizer(Everything& e);
-	//Virtual functions from Minimizable:
-	void step(const IonicGradient& dir, double alpha);
-	double compute(IonicGradient* grad, IonicGradient* Kgrad);
-	bool report(int iter);
-	void constrain(IonicGradient&);
-	static const double maxAtomTestDisplacement; //!< maximum allowed atom displacement in test step
-	static const double maxWfnsDragDisplacement; //!< maximum atom displacement for which wavefunction drag is allowed
-	double safeStepSize(const IonicGradient& dir) const; //!< enforces IonicMinimizer::maxAtomTestDisplacement on test step size
-	double sync(double x) const; //!< All processes minimize together; make sure scalars are in sync to round-off error
-	
-	double minimize(const MinimizeParams& params); //!< minor addition to Minimizable::minimize to invoke charge analysis at final positions
+  IonicMinimizer(Everything& e);
+  //Virtual functions from Minimizable:
+  void step(const IonicGradient& dir, double alpha);
+  double compute(IonicGradient* grad, IonicGradient* Kgrad);
+  bool report(int iter);
+  void constrain(IonicGradient&);
+  static const double maxAtomTestDisplacement; //!< maximum allowed atom displacement in test step
+  static const double maxWfnsDragDisplacement; //!< maximum atom displacement for which wavefunction drag is allowed
+  double safeStepSize(const IonicGradient& dir) const; //!< enforces IonicMinimizer::maxAtomTestDisplacement on test step size
+  double sync(double x) const; //!< All processes minimize together; make sure scalars are in sync to round-off error
+  
+  double minimize(const MinimizeParams& params); //!< minor addition to Minimizable::minimize to invoke charge analysis at final positions
 private:
-	bool populationAnalysisPending; //!< report() has requested a charge analysis output that is yet to be done
-	bool skipWfnsDrag; //!< whether to temprarily skip wavefunction dragging due to large steps
-	bool anyConstrained; //!< whether any atoms are constrained
+  bool populationAnalysisPending; //!< report() has requested a charge analysis output that is yet to be done
+  bool skipWfnsDrag; //!< whether to temprarily skip wavefunction dragging due to large steps
+  bool anyConstrained; //!< whether any atoms are constrained
 };
 
 //! @}

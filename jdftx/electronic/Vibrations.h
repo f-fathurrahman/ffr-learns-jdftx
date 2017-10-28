@@ -31,25 +31,25 @@ class Everything;
 class Vibrations
 {
 public:
-	double dr; //!< Perturbation amplitude
-	bool centralDiff; //!< whether to use central difference derivatives
-	bool useConstraints; //!< whether to use ion constraints to restrict vibrational modes
-	bool translationSym; //!< whether to use translation symmetry to optimize force calculations
-	bool rotationSym; //!< whether to project out rotational modes: valid only for molecules
-	double omegaMin; //!< frequency cutoff for free energy calculation and detailed mode print out
-	double T; //!< ionic temperature used for entropy and free energy estimation
-	double omegaResolution; //!< frequency resolution used for identifying and reporting degeneracies
-	
-	Vibrations();
-	void setup(Everything* e);
-	void calculate();
-	
+  double dr; //!< Perturbation amplitude
+  bool centralDiff; //!< whether to use central difference derivatives
+  bool useConstraints; //!< whether to use ion constraints to restrict vibrational modes
+  bool translationSym; //!< whether to use translation symmetry to optimize force calculations
+  bool rotationSym; //!< whether to project out rotational modes: valid only for molecules
+  double omegaMin; //!< frequency cutoff for free energy calculation and detailed mode print out
+  double T; //!< ionic temperature used for entropy and free energy estimation
+  double omegaResolution; //!< frequency resolution used for identifying and reporting degeneracies
+
+  Vibrations();
+  void setup(Everything* e);
+  void calculate();
+
 private:
-	Everything* e;
-	vector3<> getSplit() const; //get optimum latttice coordinates for splitting periodicity in a molecular geometry
-	struct IonicGradient getCMcoords() const; //get cartesian coordinates of all atoms relative to molecule center of mass
-	VectorField Ptest; //vector field that measures dipole moment in lattice coordinates
-	vector3<> getPel() const; //get electronic dipole moment at current state in cartesian coordinates
+  Everything* e;
+  vector3<> getSplit() const; //get optimum latttice coordinates for splitting periodicity in a molecular geometry
+  struct IonicGradient getCMcoords() const; //get cartesian coordinates of all atoms relative to molecule center of mass
+  VectorField Ptest; //vector field that measures dipole moment in lattice coordinates
+  vector3<> getPel() const; //get electronic dipole moment at current state in cartesian coordinates
 };
 
 //! @}

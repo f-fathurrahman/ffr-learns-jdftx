@@ -28,11 +28,11 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Type of confining potential
 enum ConfiningPotentialType
-{	ConfineLinear,
-	ConfineQuadratic,
-	ConfineCubic,
-	ConfineSmoothLinear,
-	ConfineNone
+{  ConfineLinear,
+  ConfineQuadratic,
+  ConfineCubic,
+  ConfineSmoothLinear,
+  ConfineNone
 };
 
 //! Strategy for eliminating drift 
@@ -44,16 +44,16 @@ enum DriftRemovalType
 
 //! Parameters to control IonicDynamics
 struct IonDynamicsParams
-{	double dt; //!< time step
-	double tMax; //!< maximum time
-	double kT; //!< temperature
-	double alpha; //!< velocity scaling parameter
-	DriftRemovalType driftType; //!< drift removal strategy
-	ConfiningPotentialType confineType; //!< confinement potential type
-	std::vector<double> confineParameters; //!< parameters controlling confinement potential
-	
-	//! Set the default values
-	IonDynamicsParams(): dt(1.0*fs), tMax(0.0) ,kT(0.001), alpha(0.0), driftType(DriftMomentum), confineType(ConfineNone){}
+{  double dt; //!< time step
+  double tMax; //!< maximum time
+  double kT; //!< temperature
+  double alpha; //!< velocity scaling parameter
+  DriftRemovalType driftType; //!< drift removal strategy
+  ConfiningPotentialType confineType; //!< confinement potential type
+  std::vector<double> confineParameters; //!< parameters controlling confinement potential
+  
+  //! Set the default values
+  IonDynamicsParams(): dt(1.0*fs), tMax(0.0) ,kT(0.001), alpha(0.0), driftType(DriftMomentum), confineType(ConfineNone){}
 };
 
 //! @}

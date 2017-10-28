@@ -138,16 +138,16 @@ template<class T> Tptr operator*(double scaleFac, Tptr&& in) { return in *= scal
 
 //! Generic elementwise conjugate for complex data:
 template<class T> Tptr conj(Tptr&& in)
-{	callPref(eblas_dscal)(in->nElem, -1., ((double*)in->dataPref(false))+1, 2); //negate the imaginary parts
-	return in;
+{  callPref(eblas_dscal)(in->nElem, -1., ((double*)in->dataPref(false))+1, 2); //negate the imaginary parts
+  return in;
 }
 template<class T> Tptr conj(const Tptr& in) { return conj(clone(in)); }
 
 //! Generic elementwise multiply for complex data:
 template<class T> Tptr& operator*=(Tptr& in, const Tptr& other)
-{	in->scale *= other->scale;
-	callPref(eblas_zmul)(in->nElem, other->dataPref(false), 1, in->dataPref(false), 1);
-	return in;
+{  in->scale *= other->scale;
+  callPref(eblas_zmul)(in->nElem, other->dataPref(false), 1, in->dataPref(false), 1);
+  return in;
 }
 ScalarField& operator*=(ScalarField& in, const ScalarField& other); //!< Elementwise multiply for real data
 template<class T> Tptr operator*(const Tptr& in1, const Tptr& in2) { Tptr out(in1->clone()); return out *= in2; } //!< Elementwise multiply (preserve inputs)
@@ -174,14 +174,14 @@ ScalarFieldTilde operator*(ScalarFieldTilde&&, const RealKernel&); //!< Elementw
 
 //!Generic axpy for complex data types (Note: null pointers are treated as zero)
 template<typename T> void axpy(double alpha, const Tptr& X, Tptr& Y)
-{	if(X)
-	{	if(Y)
-		{	if(Y->scale == 0.0) { Y = X * alpha; }
-			else callPref(eblas_zaxpy)(X->nElem, alpha*X->scale/Y->scale, X->dataPref(false), 1, Y->dataPref(false), 1);
-		}
-		else Y = X * alpha;
-	}
-	//if X is null, nothing needs to be done, Y remains unchanged
+{  if(X)
+  {  if(Y)
+    {  if(Y->scale == 0.0) { Y = X * alpha; }
+      else callPref(eblas_zaxpy)(X->nElem, alpha*X->scale/Y->scale, X->dataPref(false), 1, Y->dataPref(false), 1);
+    }
+    else Y = X * alpha;
+  }
+  //if X is null, nothing needs to be done, Y remains unchanged
 }
 void axpy(double alpha, const ScalarField& X, ScalarField& Y); //!< Real data Linear combine: Y += alpha * X (Note: null pointers are treated as zero)
 template<class T> Tptr& operator+=(Tptr& in, const Tptr& other) { axpy(+1.0, other, in); return in; } //!< Increment
@@ -212,14 +212,14 @@ ScalarField operator-(ScalarField&&, double); //!< Subtract scalar (destructible
 //------------------------------ Norms and dot products ------------------------------
 
 template<typename T> complex dot(const Tptr& X, const Tptr& Y) //!< Generic inner product for complex types
-{	return callPref(eblas_zdotc)(X->nElem, X->dataPref(), 1, Y->dataPref(), 1); 
+{  return callPref(eblas_zdotc)(X->nElem, X->dataPref(), 1, Y->dataPref(), 1); 
 }
 template<typename T> double nrm2(const Tptr& X) //!< Generic 2-norm for complex types
-{	return callPref(eblas_dznrm2)(X->nElem, X->dataPref(), 1); 
+{  return callPref(eblas_dznrm2)(X->nElem, X->dataPref(), 1); 
 }
 template<typename T> complex sum(const Tptr& X) //!< Generic sum for complex types
-{	ManagedArray<complex> dataOne(std::vector<complex>(1, complex(1.,0.))); //Managed data storing "1"
-	return callPref(eblas_zdotc)(X->nElem, (complex*)dataOne.dataPref(), 0, X->dataPref(), 1); 
+{  ManagedArray<complex> dataOne(std::vector<complex>(1, complex(1.,0.))); //Managed data storing "1"
+  return callPref(eblas_zdotc)(X->nElem, (complex*)dataOne.dataPref(), 0, X->dataPref(), 1); 
 }
 //Special handling for real scalar fields:
 double dot(const ScalarField&, const ScalarField&); //!< Inner product
@@ -269,10 +269,10 @@ void printStats(const ScalarField& X, const char* name, FILE* fp=stdout); //!< P
 //! @tparam Callable An operator with function call signature Vec Callable(const Vec&)
 //! @tparam Vec Any operand type representing an element of a vector space
 template<typename Callable, typename Vec> void checkSymmetry(Callable* func, const Vec& v1, const Vec& v2, const char* funcName)
-{	double dot1 = dot(v1, (*func)(v2));
-	double dot2 = dot(v2, (*func)(v1));
-	double dotDiff = fabs(dot1-dot2);
-	logPrintf("Relative error in symmetry of %s: %le\n", funcName, dotDiff/sqrt(fabs(dot1)*fabs(dot2)));
+{  double dot1 = dot(v1, (*func)(v2));
+  double dot2 = dot(v2, (*func)(v1));
+  double dotDiff = fabs(dot1-dot2);
+  logPrintf("Relative error in symmetry of %s: %le\n", funcName, dotDiff/sqrt(fabs(dot1)*fabs(dot2)));
 }
 
 //! @}
@@ -284,21 +284,21 @@ template<typename Callable, typename Vec> void checkSymmetry(Callable* func, con
 
 template<typename Func, typename... Args>
 void applyFuncGsq_sub(size_t iStart, size_t iStop, const vector3<int> S, const matrix3<> GGT, const Func* f, Args... args)
-{	THREAD_halfGspaceLoop( (*f)(i, GGT.metric_length_squared(iG), args...); )
+{  THREAD_halfGspaceLoop( (*f)(i, GGT.metric_length_squared(iG), args...); )
 }
 template<typename Func, typename... Args> void applyFuncGsq(const GridInfo& gInfo, const Func& f, Args... args)
-{	threadLaunch(applyFuncGsq_sub<Func,Args...>, gInfo.nG, gInfo.S, gInfo.GGT, &f, args...);
+{  threadLaunch(applyFuncGsq_sub<Func,Args...>, gInfo.nG, gInfo.S, gInfo.GGT, &f, args...);
 }
 
 template<typename Func, typename... Args>
 void applyFunc_r_sub(size_t iStart, size_t iStop, const vector3<int> S, const vector3<> h[3], const Func* f, Args... args)
-{	THREAD_rLoop
-	(	vector3<> ri = iv[0]*h[0] + iv[1]*h[1] + iv[2]*h[2];
-		(*f)(i, ri, args...);
-	)
+{  THREAD_rLoop
+  (  vector3<> ri = iv[0]*h[0] + iv[1]*h[1] + iv[2]*h[2];
+    (*f)(i, ri, args...);
+  )
 }
 template<typename Func, typename... Args> void applyFunc_r(const GridInfo& gInfo, const Func& f, Args... args)
-{	threadLaunch(applyFunc_r_sub<Func,Args...>, gInfo.nr, gInfo.S, gInfo.h, f, args...);
+{  threadLaunch(applyFunc_r_sub<Func,Args...>, gInfo.nr, gInfo.S, gInfo.h, f, args...);
 }
 //!@endcond
 #endif //JDFTX_CORE_OPERATORS_H

@@ -33,61 +33,61 @@ pthread_key_t gpuOwnerKey; //thread-local storage to identify thread that owns g
 //This may not be true on Windows or for non-gcc compilers!
 
 bool gpuInit(FILE* fpLog, const std::vector<int>* mpiSiblings, double* nGPUs)
-{	//Thread local storage to identify GPU owner thread
-	pthread_key_create(&gpuOwnerKey, 0);
-	pthread_setspecific(gpuOwnerKey, (const void*)1); //this will show up as 1 only on current thread
+{  //Thread local storage to identify GPU owner thread
+  pthread_key_create(&gpuOwnerKey, 0);
+  pthread_setspecific(gpuOwnerKey, (const void*)1); //this will show up as 1 only on current thread
 
-	//Find compatible GPUs and select the one with maximum memory
-	int nDevices, selectedDevice=-1; unsigned long maxGlobalMem=0;
-	std::vector<int> compatibleDevices;
-	cudaGetDeviceCount(&nDevices);
-	for(int device=0; device<nDevices; device++)
-	{	cudaDeviceProp prop;
-		cudaGetDeviceProperties(&prop, device);
-		std::pair<int,int> computeCap(prop.major, prop.minor);
-		if(computeCap != std::make_pair(9999,9999) // not the emulation device
-			&& computeCap >= std::make_pair(1,3) //compute capability >= 1.3 for double precision
-			&& !prop.integrated) //reject on-board devices
-		{
-			fprintf(fpLog, "gpuInit: Found compatible cuda device %d '%s'\n", device, prop.name);
-			compatibleDevices.push_back(device);
-			if(prop.totalGlobalMem > maxGlobalMem)
-			{	maxGlobalMem = prop.totalGlobalMem;
-				selectedDevice = device;
-			}
-		}
-	}
-	if(selectedDevice < 0)
-	{	fprintf(fpLog, "gpuInit: No compatible devices (>=1.3 compute capability, not on-board) found\n");
-		return false;
-	}
-	if(nGPUs) *nGPUs = 1.;
-	
-	//Divide GPUs between processes, if requested:
-	if(mpiSiblings && mpiSiblings->size()>1) //only if more than one process per node
-	{	int iSibling = std::find(mpiSiblings->begin(), mpiSiblings->end(), mpiUtil->iProcess()) - mpiSiblings->begin();
-		selectedDevice = iSibling % int(compatibleDevices.size());
-		if(nGPUs) *nGPUs = std::min(1., compatibleDevices.size()*1./mpiSiblings->size());
-	}
-	
-	//Print selected devices:
-	fprintf(fpLog, "gpuInit: Selected device %d\n", selectedDevice);
-	cudaSetDevice(selectedDevice);
-	cudaGetDeviceProperties(&cudaDevProps, selectedDevice);
-	return true;
+  //Find compatible GPUs and select the one with maximum memory
+  int nDevices, selectedDevice=-1; unsigned long maxGlobalMem=0;
+  std::vector<int> compatibleDevices;
+  cudaGetDeviceCount(&nDevices);
+  for(int device=0; device<nDevices; device++)
+  {  cudaDeviceProp prop;
+    cudaGetDeviceProperties(&prop, device);
+    std::pair<int,int> computeCap(prop.major, prop.minor);
+    if(computeCap != std::make_pair(9999,9999) // not the emulation device
+      && computeCap >= std::make_pair(1,3) //compute capability >= 1.3 for double precision
+      && !prop.integrated) //reject on-board devices
+    {
+      fprintf(fpLog, "gpuInit: Found compatible cuda device %d '%s'\n", device, prop.name);
+      compatibleDevices.push_back(device);
+      if(prop.totalGlobalMem > maxGlobalMem)
+      {  maxGlobalMem = prop.totalGlobalMem;
+        selectedDevice = device;
+      }
+    }
+  }
+  if(selectedDevice < 0)
+  {  fprintf(fpLog, "gpuInit: No compatible devices (>=1.3 compute capability, not on-board) found\n");
+    return false;
+  }
+  if(nGPUs) *nGPUs = 1.;
+  
+  //Divide GPUs between processes, if requested:
+  if(mpiSiblings && mpiSiblings->size()>1) //only if more than one process per node
+  {  int iSibling = std::find(mpiSiblings->begin(), mpiSiblings->end(), mpiUtil->iProcess()) - mpiSiblings->begin();
+    selectedDevice = iSibling % int(compatibleDevices.size());
+    if(nGPUs) *nGPUs = std::min(1., compatibleDevices.size()*1./mpiSiblings->size());
+  }
+  
+  //Print selected devices:
+  fprintf(fpLog, "gpuInit: Selected device %d\n", selectedDevice);
+  cudaSetDevice(selectedDevice);
+  cudaGetDeviceProperties(&cudaDevProps, selectedDevice);
+  return true;
 }
 
 bool isGpuMine()
-{	return bool(pthread_getspecific(gpuOwnerKey));
+{  return bool(pthread_getspecific(gpuOwnerKey));
 }
 
 void gpuErrorCheck()
-{	//cudaThreadSynchronize(); //NOTE: Uncomment this when trying to debug GPU kernel launches
-	cudaError_t err = cudaGetLastError();
-	if(err != cudaSuccess)
-	{	fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(err));
-		stackTraceExit(1);
-	}
+{  //cudaThreadSynchronize(); //NOTE: Uncomment this when trying to debug GPU kernel launches
+  cudaError_t err = cudaGetLastError();
+  if(err != cudaSuccess)
+  {  fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(err));
+    stackTraceExit(1);
+  }
 }
 
 

@@ -29,13 +29,13 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class IdealGasMonoatomic : public IdealGas
 {
 public:
-	//!Initialize and associate with excess functional fex (and its fluid mixture)
-	IdealGasMonoatomic(const FluidMixture*, const FluidComponent*);
+  //!Initialize and associate with excess functional fex (and its fluid mixture)
+  IdealGasMonoatomic(const FluidMixture*, const FluidComponent*);
 
-	void initState(const ScalarField* Vex, ScalarField* psi, double scale, double Elo, double Ehi) const;
-	void getDensities(const ScalarField* psi, ScalarField* N, vector3<>& P0) const;
-	double compute(const ScalarField* psi, const ScalarField* N, ScalarField* Phi_N, const double Nscale, double& Phi_Nscale) const;
-	void convertGradients(const ScalarField* psi, const ScalarField* N, const ScalarField* Phi_N, const vector3<>&  Phi_P0, ScalarField* Phi_psi, const double Nscale) const;
+  void initState(const ScalarField* Vex, ScalarField* psi, double scale, double Elo, double Ehi) const;
+  void getDensities(const ScalarField* psi, ScalarField* N, vector3<>& P0) const;
+  double compute(const ScalarField* psi, const ScalarField* N, ScalarField* Phi_N, const double Nscale, double& Phi_Nscale) const;
+  void convertGradients(const ScalarField* psi, const ScalarField* N, const ScalarField* Phi_N, const vector3<>&  Phi_P0, ScalarField* Phi_psi, const double Nscale) const;
 };
 
 //! @}

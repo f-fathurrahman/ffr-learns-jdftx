@@ -34,48 +34,48 @@ class QuantumNumber;
 //! Electron-electron scattering (ImSigma_ee) calculator
 struct ElectronScattering
 {
-	double eta; //!< frequency resolution and half the imaginary part ascribed to probe frequency (set to eInfo.kT if unspecified)
-	double Ecut; //!< energy cut-off for dielectric matrices (set to cntrl.Ecut if unspecified)
-	double fCut; //!< threshold for considering states fully occupied / unoccupied (default: 1e-6)
-	double omegaMax; //!< maximum energy transfer to account for and hence maximum frequency in dielectric grid (if zero, autodetermine from available eigenvalues)
-	
-	bool slabResponse; //!< whether to work in slab response output mode
-	double EcutTransverse; //!< energy cutoff in directions transverse to slab normal (same as Ecut above if unspecified)
-	
-	ElectronScattering();
-	void dump(const Everything& e); //!< compute and dump Im(Sigma_ee) for each eigenstate
+  double eta; //!< frequency resolution and half the imaginary part ascribed to probe frequency (set to eInfo.kT if unspecified)
+  double Ecut; //!< energy cut-off for dielectric matrices (set to cntrl.Ecut if unspecified)
+  double fCut; //!< threshold for considering states fully occupied / unoccupied (default: 1e-6)
+  double omegaMax; //!< maximum energy transfer to account for and hence maximum frequency in dielectric grid (if zero, autodetermine from available eigenvalues)
+  
+  bool slabResponse; //!< whether to work in slab response output mode
+  double EcutTransverse; //!< energy cutoff in directions transverse to slab normal (same as Ecut above if unspecified)
+  
+  ElectronScattering();
+  void dump(const Everything& e); //!< compute and dump Im(Sigma_ee) for each eigenstate
 
 private:
-	const Everything* e;
-	int nBands, nSpinor;
-	double Emin, Emax; //!< energy range that contributes to transitions less than omegaMax
-	std::vector<ColumnBundle> C; //wavefunctions, made available on all processes
-	std::vector<diagMatrix> E, F; //energies and fillings, available on all processes
-	std::shared_ptr<const Supercell> supercell; //contains transformations between full and reduced k-mesh
-	std::shared_ptr<const PeriodicLookup< vector3<> > > plook; //O(1) lookup for finding k-points in mesh
-	std::vector<QuantumNumber> qmesh; //reduced momentum-transfer mesh
-	std::vector<Basis> basisChi; //polarizability bases for qmesh
-	Basis basis; //common wavefunction  basis
-	std::map< vector3<int>, std::shared_ptr<class ColumnBundleTransform> > transform; //k-mesh transformations
-	std::map< vector3<int>, QuantumNumber > qnumMesh; //equivalent of eInfo.qnums for entire k-mesh
-	
-	struct Event
-	{	int i, j; //band indices
-		double fWeight; //relevant fillings combination ( (fi - fj)/2 or (1-fi-fj) for chiMode = true or false )
-		double Eji; //Ej - Ei
-	};
-	
-	std::vector<Event> getEvents( //!< return list of events
-		bool chiMode, //!< whether to calculate fWeight for chi (true) or ImSigma (false), and hence which events to select (occ-unocc or occ-occ + unocc-unocc)
-		size_t ik, //!< k-mesh index for first state
-		size_t iq, //!< q-mesh index for momentum transfer
-		size_t& jk, //!< set k-mesh index for second state
-		matrix& nij //!< set pair densities for each event, one per column
-	) const;
-	
-	ColumnBundle getWfns(size_t ik, const vector3<>& k) const; //get wavefunctions at an arbitrary point in k-mesh
-	matrix coulombMatrix(size_t iq) const; //retrieve the Coulomb operator for a specific momentum transfer
-	void dumpSlabResponse(Everything& e, const diagMatrix& omegaGrid);
+  const Everything* e;
+  int nBands, nSpinor;
+  double Emin, Emax; //!< energy range that contributes to transitions less than omegaMax
+  std::vector<ColumnBundle> C; //wavefunctions, made available on all processes
+  std::vector<diagMatrix> E, F; //energies and fillings, available on all processes
+  std::shared_ptr<const Supercell> supercell; //contains transformations between full and reduced k-mesh
+  std::shared_ptr<const PeriodicLookup< vector3<> > > plook; //O(1) lookup for finding k-points in mesh
+  std::vector<QuantumNumber> qmesh; //reduced momentum-transfer mesh
+  std::vector<Basis> basisChi; //polarizability bases for qmesh
+  Basis basis; //common wavefunction  basis
+  std::map< vector3<int>, std::shared_ptr<class ColumnBundleTransform> > transform; //k-mesh transformations
+  std::map< vector3<int>, QuantumNumber > qnumMesh; //equivalent of eInfo.qnums for entire k-mesh
+  
+  struct Event
+  {  int i, j; //band indices
+    double fWeight; //relevant fillings combination ( (fi - fj)/2 or (1-fi-fj) for chiMode = true or false )
+    double Eji; //Ej - Ei
+  };
+  
+  std::vector<Event> getEvents( //!< return list of events
+    bool chiMode, //!< whether to calculate fWeight for chi (true) or ImSigma (false), and hence which events to select (occ-unocc or occ-occ + unocc-unocc)
+    size_t ik, //!< k-mesh index for first state
+    size_t iq, //!< q-mesh index for momentum transfer
+    size_t& jk, //!< set k-mesh index for second state
+    matrix& nij //!< set pair densities for each event, one per column
+  ) const;
+  
+  ColumnBundle getWfns(size_t ik, const vector3<>& k) const; //get wavefunctions at an arbitrary point in k-mesh
+  matrix coulombMatrix(size_t iq) const; //retrieve the Coulomb operator for a specific momentum transfer
+  void dumpSlabResponse(Everything& e, const diagMatrix& omegaGrid);
 };
 
 //! @}

@@ -30,10 +30,10 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class CoulombSlab : public Coulomb
 {
 public:
-	CoulombSlab(const GridInfo& gInfoOrig, const CoulombParams& params);
+  CoulombSlab(const GridInfo& gInfoOrig, const CoulombParams& params);
 protected:
-	ScalarFieldTilde apply(ScalarFieldTilde&&) const;
-	std::shared_ptr<Ewald> createEwald(matrix3<> R, size_t nAtoms) const;
+  ScalarFieldTilde apply(ScalarFieldTilde&&) const;
+  std::shared_ptr<Ewald> createEwald(matrix3<> R, size_t nAtoms) const;
 };
 
 //! @}

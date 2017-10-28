@@ -29,17 +29,17 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class IdealGasPsiAlpha : public IdealGasPomega
 {
 public:
-	//!Initialize and associate with excess functional fex (and its fluid mixture)
-	//!Also specify the orientation quadrature and translation operator used for the orientation integrals
-	IdealGasPsiAlpha(const FluidMixture*, const FluidComponent*, const SO3quad& quad, const TranslationOperator& trans);
+  //!Initialize and associate with excess functional fex (and its fluid mixture)
+  //!Also specify the orientation quadrature and translation operator used for the orientation integrals
+  IdealGasPsiAlpha(const FluidMixture*, const FluidComponent*, const SO3quad& quad, const TranslationOperator& trans);
 
-	void initState(const ScalarField* Vex, ScalarField* psi, double scale, double Elo, double Ehi) const;
+  void initState(const ScalarField* Vex, ScalarField* psi, double scale, double Elo, double Ehi) const;
 
 protected:
-	string representationName() const;
-	void initState_o(int o, const matrix3<>& rot, double scale, const ScalarField& Eo, ScalarField* psi) const;
-	void getDensities_o(int o, const matrix3<>& rot, const ScalarField* psi, ScalarField& logPomega_o) const;
-	void convertGradients_o(int o, const matrix3<>& rot, const ScalarField& Phi_logPomega_o, ScalarField* Phi_psi) const;
+  string representationName() const;
+  void initState_o(int o, const matrix3<>& rot, double scale, const ScalarField& Eo, ScalarField* psi) const;
+  void getDensities_o(int o, const matrix3<>& rot, const ScalarField* psi, ScalarField& logPomega_o) const;
+  void convertGradients_o(int o, const matrix3<>& rot, const ScalarField& Phi_logPomega_o, ScalarField* Phi_psi) const;
 };
 
 //! @}

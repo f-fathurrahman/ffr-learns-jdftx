@@ -32,27 +32,27 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Dump frequency options:
 enum DumpFrequency
-{	DumpFreq_End, //!< At the end of calculation
-	DumpFreq_Electronic, //!< Every (few) electronic step(s)
-	DumpFreq_Fluid, //!< Every (few) fluid step(s)
-	DumpFreq_Ionic, //!< Every (few) ionic (or lattice) optimization step(s)
-	DumpFreq_Gummel, //!< Every (few) gummel step(s)
-	DumpFreq_Dynamics, //!< Every (few) dynamic time step(s)
-	DumpFreq_Delim  //special value used as a delimiter during command processing
+{  DumpFreq_End, //!< At the end of calculation
+  DumpFreq_Electronic, //!< Every (few) electronic step(s)
+  DumpFreq_Fluid, //!< Every (few) fluid step(s)
+  DumpFreq_Ionic, //!< Every (few) ionic (or lattice) optimization step(s)
+  DumpFreq_Gummel, //!< Every (few) gummel step(s)
+  DumpFreq_Dynamics, //!< Every (few) dynamic time step(s)
+  DumpFreq_Delim  //special value used as a delimiter during command processing
 };
 
 //! Dump variable selection options:
 enum DumpVariable { DumpNone, DumpState, //None or exactly those required to restart calculation
-	DumpIonicPositions, DumpForces, DumpLattice, DumpIonicDensity, //Ionic positions, Forces, Lattice vectors, Nuclear charge density
-	DumpElecDensity, DumpElecDensityAccum, DumpCoreDensity, DumpKEdensity, DumpFluidDensity, // electronic valence, core and KE densities, fluid densities
-	DumpDvac, DumpDfluid, DumpDtot, //electrostatic potential of explicit system, fluid system, total
-	DumpVcavity, DumpVfluidTot, //cavity potential of fluid, net electron potential due to fluid (electrostatic+cavity)
-	DumpVlocps, DumpVscloc, DumpBandEigs, DumpEigStats, DumpFillings, DumpRhoAtom,
-	DumpEcomponents, DumpExcCompare,
- 	DumpBoundCharge, DumpSolvationRadii, DumpQMC, DumpOcean, DumpBGW, DumpRealSpaceWfns, DumpFluidDebug, DumpSlabEpsilon, DumpBulkEpsilon, DumpChargedDefect,
-	DumpDOS, DumpPolarizability, DumpElectronScattering, DumpSIC, DumpDipole, DumpStress, DumpExcitations,
-	DumpMomenta, DumpSymmetries, DumpKpoints, DumpGvectors, DumpOrbitalDep, DumpXCanalysis, DumpEresolvedDensity, DumpFermiDensity,
-	DumpDelim, //special value used as a delimiter during command processing
+  DumpIonicPositions, DumpForces, DumpLattice, DumpIonicDensity, //Ionic positions, Forces, Lattice vectors, Nuclear charge density
+  DumpElecDensity, DumpElecDensityAccum, DumpCoreDensity, DumpKEdensity, DumpFluidDensity, // electronic valence, core and KE densities, fluid densities
+  DumpDvac, DumpDfluid, DumpDtot, //electrostatic potential of explicit system, fluid system, total
+  DumpVcavity, DumpVfluidTot, //cavity potential of fluid, net electron potential due to fluid (electrostatic+cavity)
+  DumpVlocps, DumpVscloc, DumpBandEigs, DumpEigStats, DumpFillings, DumpRhoAtom,
+  DumpEcomponents, DumpExcCompare,
+   DumpBoundCharge, DumpSolvationRadii, DumpQMC, DumpOcean, DumpBGW, DumpRealSpaceWfns, DumpFluidDebug, DumpSlabEpsilon, DumpBulkEpsilon, DumpChargedDefect,
+  DumpDOS, DumpPolarizability, DumpElectronScattering, DumpSIC, DumpDipole, DumpStress, DumpExcitations,
+  DumpMomenta, DumpSymmetries, DumpKpoints, DumpGvectors, DumpOrbitalDep, DumpXCanalysis, DumpEresolvedDensity, DumpFermiDensity,
+  DumpDelim, //special value used as a delimiter during command processing
 };
 
 
@@ -60,41 +60,41 @@ enum DumpVariable { DumpNone, DumpState, //None or exactly those required to res
 class Dump : public std::set<std::pair<DumpFrequency,DumpVariable> >
 {
 public:
-	Dump();
-	void setup(const Everything&);
-	
-	//! Dump all variables that should be dumped at the given DumpFrequency type
-	//!(End/Gummel/Ionic) at the iter'th iteration at that frequency
-	void operator()(DumpFrequency freq, int iter);
-	
-	//! Get the dump filename corresponding to a particular variable name
-	string getFilename(string varName) const;
-	
-	//! Check whether to dump at given frequency and iteration:
-	bool checkInterval(DumpFrequency freq, int iter) const;
-	
-	std::shared_ptr<class DOS> dos; //!< density-of-states calculator
-	std::shared_ptr<struct Polarizability> polarizability; //!< electronic polarizability calculator
-	std::shared_ptr<struct ElectronScattering> electronScattering; //!< electron-electron scattering calculator
-	std::vector< std::pair<double,double> > densityErange; //!< energy ranges for energy-resolved density output
-	std::vector<double> fermiDensityLevels; //!< energies at which to evaluate fermi-dirac derivative
-	std::shared_ptr<struct SlabEpsilon> slabEpsilon; //!< slab dielectric function calculator
-	std::shared_ptr<struct BulkEpsilon> bulkEpsilon; //!< bulk dielectric constant calculator
-	std::shared_ptr<struct ChargedDefect> chargedDefect; //!< charged defect correction calculator
-	bool potentialSubtraction; //!< whether to subtract neutral-atom potentials in Dvac and Dtot output
+  Dump();
+  void setup(const Everything&);
+  
+  //! Dump all variables that should be dumped at the given DumpFrequency type
+  //!(End/Gummel/Ionic) at the iter'th iteration at that frequency
+  void operator()(DumpFrequency freq, int iter);
+  
+  //! Get the dump filename corresponding to a particular variable name
+  string getFilename(string varName) const;
+  
+  //! Check whether to dump at given frequency and iteration:
+  bool checkInterval(DumpFrequency freq, int iter) const;
+  
+  std::shared_ptr<class DOS> dos; //!< density-of-states calculator
+  std::shared_ptr<struct Polarizability> polarizability; //!< electronic polarizability calculator
+  std::shared_ptr<struct ElectronScattering> electronScattering; //!< electron-electron scattering calculator
+  std::vector< std::pair<double,double> > densityErange; //!< energy ranges for energy-resolved density output
+  std::vector<double> fermiDensityLevels; //!< energies at which to evaluate fermi-dirac derivative
+  std::shared_ptr<struct SlabEpsilon> slabEpsilon; //!< slab dielectric function calculator
+  std::shared_ptr<struct BulkEpsilon> bulkEpsilon; //!< bulk dielectric constant calculator
+  std::shared_ptr<struct ChargedDefect> chargedDefect; //!< charged defect correction calculator
+  bool potentialSubtraction; //!< whether to subtract neutral-atom potentials in Dvac and Dtot output
 private:
-	const Everything* e;
-	string format; //!< Filename format containing $VAR, $STAMP, $FREQ etc.
-	string stamp; //!< timestamp for current dump
-	std::map<DumpFrequency,int> interval; //!< for each frequency, dump every interval times
-	friend class Phonon;
-	friend struct CommandDump;
-	friend struct CommandDumpName;
-	friend struct CommandDumpInterval;
-	void dumpQMC(); //!< QMC export implemented in DumpQMC.cpp
-	void dumpOcean(); //!< BSE code export implemented in DumpOcean.cpp
-	void dumpBGW(); //!< BerkeleyGW code export implemented in DumpBGW.cpp
-	void dumpRsol(ScalarField nbound, string fname);
+  const Everything* e;
+  string format; //!< Filename format containing $VAR, $STAMP, $FREQ etc.
+  string stamp; //!< timestamp for current dump
+  std::map<DumpFrequency,int> interval; //!< for each frequency, dump every interval times
+  friend class Phonon;
+  friend struct CommandDump;
+  friend struct CommandDumpName;
+  friend struct CommandDumpInterval;
+  void dumpQMC(); //!< QMC export implemented in DumpQMC.cpp
+  void dumpOcean(); //!< BSE code export implemented in DumpOcean.cpp
+  void dumpBGW(); //!< BerkeleyGW code export implemented in DumpBGW.cpp
+  void dumpRsol(ScalarField nbound, string fname);
 };
 
 //! @}

@@ -29,17 +29,17 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class WannierMinimizerRS : public WannierMinimizer
 {
 public:
-	WannierMinimizerRS(const Everything& e, const Wannier& wannier);
+  WannierMinimizerRS(const Everything& e, const Wannier& wannier);
 
-	void initialize(int iSpin);
-	double getOmega(bool grad);
-	double getOmegaI(bool grad);
-	
+  void initialize(int iSpin);
+  double getOmega(bool grad);
+  double getOmegaI(bool grad);
+  
 private:
-	VectorField r; ScalarField rSq; //!< r and r^2 wrapped on the Wigner-Seitz cell
-	int iSpin; //!< spin channel currently being minimized
-	int nStart, nStop; //!< center MPI division
-	double getOmega(bool grad, bool invariant); //!< compute Omega or OmegaI depending on invariant
+  VectorField r; ScalarField rSq; //!< r and r^2 wrapped on the Wigner-Seitz cell
+  int iSpin; //!< spin channel currently being minimized
+  int nStart, nStop; //!< center MPI division
+  double getOmega(bool grad, bool invariant); //!< compute Omega or OmegaI depending on invariant
 };
 
 //! @}

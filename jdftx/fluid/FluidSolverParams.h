@@ -31,124 +31,124 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 enum FluidType
 {
-	FluidNone, //!< No fluid
-	FluidLinearPCM, //!< Linear local-dielectric fluid, optionally including non-electrostatic terms \cite PCM-Kendra
-	FluidNonlinearPCM, //!< Nonlinear local-dielectric fluid including non-electrostatic terms \cite NonlinearPCM
-	FluidSaLSA, //!< Spherically-averaged liquid susceptibility ansatz \cite SaLSA
-	FluidClassicalDFT //!< Classical density functional description of fluid \cite PolarizableCDFT \cite RigidCDFT
+  FluidNone, //!< No fluid
+  FluidLinearPCM, //!< Linear local-dielectric fluid, optionally including non-electrostatic terms \cite PCM-Kendra
+  FluidNonlinearPCM, //!< Nonlinear local-dielectric fluid including non-electrostatic terms \cite NonlinearPCM
+  FluidSaLSA, //!< Spherically-averaged liquid susceptibility ansatz \cite SaLSA
+  FluidClassicalDFT //!< Classical density functional description of fluid \cite PolarizableCDFT \cite RigidCDFT
 };
 
 enum FluidSolveFrequency
 {
-	FluidFreqInner, //!< Solve fluid every electronic step
-	FluidFreqGummel, //!< Use a Gummel iteration
-	FluidFreqDefault //!< Decide based on fluid type (Inner for linear fluids, Gummel for rest)
+  FluidFreqInner, //!< Solve fluid every electronic step
+  FluidFreqGummel, //!< Use a Gummel iteration
+  FluidFreqDefault //!< Decide based on fluid type (Inner for linear fluids, Gummel for rest)
 };
 
 //!Mixing functional choices
 enum FMixFunctional
 {
-	FMixNone, //!< No Interaction
-	LJPotential, //!<Interaction with attractive part of Lennard Jones with sigma/eps potential only
-	GaussianKernel, //!< Interaction with gaussian kernel with Rsolv/Esolv
+  FMixNone, //!< No Interaction
+  LJPotential, //!<Interaction with attractive part of Lennard Jones with sigma/eps potential only
+  GaussianKernel, //!< Interaction with gaussian kernel with Rsolv/Esolv
 };
 
 //! Parameters needed to mix fluids
 struct FmixParams
 {
-	std::shared_ptr<FluidComponent> fluid1,fluid2;
-	FMixFunctional FmixType; //!<Type of Fmix to be used (GaussianKernel or LJPotential)
-	double energyScale,lengthScale; //!<Energy scale (eps for LJ potential) and range parameter (sigma for LJ potential)
+  std::shared_ptr<FluidComponent> fluid1,fluid2;
+  FMixFunctional FmixType; //!<Type of Fmix to be used (GaussianKernel or LJPotential)
+  double energyScale,lengthScale; //!<Energy scale (eps for LJ potential) and range parameter (sigma for LJ potential)
 };
 
 enum PCMVariant
-{	PCM_SaLSA, //!< Use only with fluid type FluidSaLSA \cite SaLSA
-	PCM_CANDLE, //!< Charge-asymmetric nonlocally-determined local-electric (CANDLE) solvation model \cite CANDLE
-	PCM_SGA13, //!< Local-response dielectric fluid or electrolyte with weighted-density cavitation and dispersion \cite CavityWDA
-	PCM_GLSSA13, //!< Local-response dielectric fluid or electrolyte with empirical cavity tension \cite NonlinearPCM
-	PCM_LA12, //!< Linear local-response electrolyte \cite PCM-Kendra
-	PCM_SCCS_g09,      //!< g09 parametrization of SCCS local linear model for water \cite PCM-SCCS
-	PCM_SCCS_g03,      //!< g03 parametrization of SCCS local linear model for water \cite PCM-SCCS
-	PCM_SCCS_g03p,     //!< g03' parametrization of SCCS local linear model for water  \cite PCM-SCCS
-	PCM_SCCS_g09beta,  //!< g09+beta parametrization of SCCS local linear model for water \cite PCM-SCCS
-	PCM_SCCS_g03beta,  //!< g03+beta parametrization of SCCS local linear model for water \cite PCM-SCCS
-	PCM_SCCS_g03pbeta, //!< g03'+beta parametrization of SCCS local linear model for water \cite PCM-SCCS
-	PCM_SCCS_cation,   //!< cations-only parametrization of SCCS local linear model for water \cite PCM-SCCS-charged
-	PCM_SCCS_anion     //!< anions-only parametrization of SCCS local linear model for water \cite PCM-SCCS-charged
+{  PCM_SaLSA, //!< Use only with fluid type FluidSaLSA \cite SaLSA
+  PCM_CANDLE, //!< Charge-asymmetric nonlocally-determined local-electric (CANDLE) solvation model \cite CANDLE
+  PCM_SGA13, //!< Local-response dielectric fluid or electrolyte with weighted-density cavitation and dispersion \cite CavityWDA
+  PCM_GLSSA13, //!< Local-response dielectric fluid or electrolyte with empirical cavity tension \cite NonlinearPCM
+  PCM_LA12, //!< Linear local-response electrolyte \cite PCM-Kendra
+  PCM_SCCS_g09,      //!< g09 parametrization of SCCS local linear model for water \cite PCM-SCCS
+  PCM_SCCS_g03,      //!< g03 parametrization of SCCS local linear model for water \cite PCM-SCCS
+  PCM_SCCS_g03p,     //!< g03' parametrization of SCCS local linear model for water  \cite PCM-SCCS
+  PCM_SCCS_g09beta,  //!< g09+beta parametrization of SCCS local linear model for water \cite PCM-SCCS
+  PCM_SCCS_g03beta,  //!< g03+beta parametrization of SCCS local linear model for water \cite PCM-SCCS
+  PCM_SCCS_g03pbeta, //!< g03'+beta parametrization of SCCS local linear model for water \cite PCM-SCCS
+  PCM_SCCS_cation,   //!< cations-only parametrization of SCCS local linear model for water \cite PCM-SCCS-charged
+  PCM_SCCS_anion     //!< anions-only parametrization of SCCS local linear model for water \cite PCM-SCCS-charged
 };
 
 //! Check for any of the SCCS cases:
 #define case_PCM_SCCS_any \
-	case PCM_SCCS_g09: \
-	case PCM_SCCS_g03: \
-	case PCM_SCCS_g03p: \
-	case PCM_SCCS_g09beta: \
-	case PCM_SCCS_g03beta: \
-	case PCM_SCCS_g03pbeta: \
-	case PCM_SCCS_cation: \
-	case PCM_SCCS_anion
+  case PCM_SCCS_g09: \
+  case PCM_SCCS_g03: \
+  case PCM_SCCS_g03p: \
+  case PCM_SCCS_g09beta: \
+  case PCM_SCCS_g03beta: \
+  case PCM_SCCS_g03pbeta: \
+  case PCM_SCCS_cation: \
+  case PCM_SCCS_anion
 inline bool isPCM_SCCS(PCMVariant pcmVariant) { switch(pcmVariant) { case_PCM_SCCS_any: return true; default: return false; } }
 
 
 //! Extra parameters for fluids:
 struct FluidSolverParams
 {
-	FluidType fluidType;
-	PCMVariant pcmVariant;
-	
-	double T; //!< temperature
-	double P; //!< pressure
-	double epsBulkOverride, epsInfOverride; //!< Override default dielectric constants if non-zero
-	bool verboseLog; //!< whether iteration progress is printed for Linear PCM's, and whether sub-iteration progress is printed for others
-	FluidSolveFrequency solveFrequency;
-	
-	const std::vector< std::shared_ptr<FluidComponent> >& components; //!< list of all fluid components
-	const std::vector< std::shared_ptr<FluidComponent> >& solvents; //!< list of solvent components
-	const std::vector< std::shared_ptr<FluidComponent> >& cations; //!< list of cationic components
-	const std::vector< std::shared_ptr<FluidComponent> >& anions; //!< list of anionic components
-	
-	void addComponent(const std::shared_ptr<FluidComponent>& component); //!< Add component to the component list as well as one of solvents, anions or cations as appropriate
-	
-	//Fit parameters:
-	double nc; //!< critical density for the PCM cavity shape function
-	double sigma; //!< smoothing factor for the PCM cavity shape function
-	double cavityTension; //!< effective surface tension (including dispersion etc.) of the cavity (hartree per bohr^2)
-	double vdwScale; //!< overall scale factor for Grimme pair potentials (or damping range scale factor for vdw-TS when implemented)
-	
-	//For CANDLE alone:
-	double Ztot; //!< number of valence electrons
-	double eta_wDiel; //!< control electrostatic weight function (gaussian convolved by delta(r-eta) at l=1) (fit parameter)
-	double sqrtC6eff; //!< (effective C6 parameter in J-nm^6/mol)^(1/2) for the entire molecule (fit parameter) (vdwScale unnecessary and not used due to this)
-	double pCavity; //!< sensitivity of cavity to surface electric field to emulate charge asymmetry [e-a0/Eh]  (fit parameter)
-	
-	//For SCCS alone:
-	double rhoMin, rhoMax; //!< start and end of transition
-	double rhoDelta; //!< Delta used for "quantum surface"
-	double cavityPressure; //!< volume term (used in some parametrizations)
-	
-	//For SaLSA alone:
-	int lMax;
-	
-	//Debug parameters for Nonlinear PCM's:
-	bool linearDielectric; //!< If true, work in the linear dielectric response limit
-	bool linearScreening; //!< If true, work in the linearized Poisson-Boltzman limit for the ions
-	bool nonlinearSCF; //!< whether to use an SCF method for nonlinear PCMs
-	double screenOverride; //! overrides screening factor with this value
-	PulayParams scfParams; //!< parameters controlling Pulay mixing for SCF version of nonlinear PCM
-	
-	//For Explicit Fluid JDFT alone:
-	ExCorr exCorr; //!< Fluid exchange-correlation and kinetic energy functional
+  FluidType fluidType;
+  PCMVariant pcmVariant;
+  
+  double T; //!< temperature
+  double P; //!< pressure
+  double epsBulkOverride, epsInfOverride; //!< Override default dielectric constants if non-zero
+  bool verboseLog; //!< whether iteration progress is printed for Linear PCM's, and whether sub-iteration progress is printed for others
+  FluidSolveFrequency solveFrequency;
+  
+  const std::vector< std::shared_ptr<FluidComponent> >& components; //!< list of all fluid components
+  const std::vector< std::shared_ptr<FluidComponent> >& solvents; //!< list of solvent components
+  const std::vector< std::shared_ptr<FluidComponent> >& cations; //!< list of cationic components
+  const std::vector< std::shared_ptr<FluidComponent> >& anions; //!< list of anionic components
+  
+  void addComponent(const std::shared_ptr<FluidComponent>& component); //!< Add component to the component list as well as one of solvents, anions or cations as appropriate
+  
+  //Fit parameters:
+  double nc; //!< critical density for the PCM cavity shape function
+  double sigma; //!< smoothing factor for the PCM cavity shape function
+  double cavityTension; //!< effective surface tension (including dispersion etc.) of the cavity (hartree per bohr^2)
+  double vdwScale; //!< overall scale factor for Grimme pair potentials (or damping range scale factor for vdw-TS when implemented)
+  
+  //For CANDLE alone:
+  double Ztot; //!< number of valence electrons
+  double eta_wDiel; //!< control electrostatic weight function (gaussian convolved by delta(r-eta) at l=1) (fit parameter)
+  double sqrtC6eff; //!< (effective C6 parameter in J-nm^6/mol)^(1/2) for the entire molecule (fit parameter) (vdwScale unnecessary and not used due to this)
+  double pCavity; //!< sensitivity of cavity to surface electric field to emulate charge asymmetry [e-a0/Eh]  (fit parameter)
+  
+  //For SCCS alone:
+  double rhoMin, rhoMax; //!< start and end of transition
+  double rhoDelta; //!< Delta used for "quantum surface"
+  double cavityPressure; //!< volume term (used in some parametrizations)
+  
+  //For SaLSA alone:
+  int lMax;
+  
+  //Debug parameters for Nonlinear PCM's:
+  bool linearDielectric; //!< If true, work in the linear dielectric response limit
+  bool linearScreening; //!< If true, work in the linearized Poisson-Boltzman limit for the ions
+  bool nonlinearSCF; //!< whether to use an SCF method for nonlinear PCMs
+  double screenOverride; //! overrides screening factor with this value
+  PulayParams scfParams; //!< parameters controlling Pulay mixing for SCF version of nonlinear PCM
+  
+  //For Explicit Fluid JDFT alone:
+  ExCorr exCorr; //!< Fluid exchange-correlation and kinetic energy functional
         std::vector<FmixParams> FmixList; //!< Tabulates which components interact through an additional Fmix
 
-	string initWarnings; //!< warnings emitted during parameter initialization, if any
-	
-	FluidSolverParams();
-	void setPCMparams(); //!< Set predefined parameters for solventName (for a specific model)
-	void setCDFTparams(); //!< Set predefined parameters for solventName (for a classical DFT model)
-	bool needsVDW() const; //!< whether pair-potential vdW corrections are required
-	bool ionicScreening() const; //!< whether list of fluid components includes ionic species for Debye screening
+  string initWarnings; //!< warnings emitted during parameter initialization, if any
+  
+  FluidSolverParams();
+  void setPCMparams(); //!< Set predefined parameters for solventName (for a specific model)
+  void setCDFTparams(); //!< Set predefined parameters for solventName (for a classical DFT model)
+  bool needsVDW() const; //!< whether pair-potential vdW corrections are required
+  bool ionicScreening() const; //!< whether list of fluid components includes ionic species for Debye screening
 private:
-	std::vector< std::shared_ptr<FluidComponent> > components_, solvents_, cations_, anions_; //internal mutable versions of the public component lists
+  std::vector< std::shared_ptr<FluidComponent> > components_, solvents_, cations_, anions_; //internal mutable versions of the public component lists
 };
 
 //! @}

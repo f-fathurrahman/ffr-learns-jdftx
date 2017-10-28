@@ -27,29 +27,29 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 VDWCoupling::VDWCoupling(FluidMixture* fluidMixture, const std::vector< std::vector< vector3<> > >& atpos, const std::shared_ptr<VanDerWaals>& vdW, double vdwScale)
 : Fmix(fluidMixture), atpos(atpos), vdW(vdW), vdwScale(vdwScale)
 {
-	//create a list of fluid atomic numbers to calculate vdW interactions
-	const std::vector<const FluidComponent*>& component = fluidMixture->getComponents();
-	for(unsigned ic=0; ic<component.size(); ic++)
-	{	const FluidComponent& c = *component[ic];
-		for(unsigned i=0; i<c.molecule.sites.size(); i++)
-			atomicNumber.push_back(c.molecule.sites[i]->atomicNumber);
-	}
-	logPrintf("Initialized Grimme Pair Potentials for vdW interactions with scale factor %lg.\n", vdwScale);
+  //create a list of fluid atomic numbers to calculate vdW interactions
+  const std::vector<const FluidComponent*>& component = fluidMixture->getComponents();
+  for(unsigned ic=0; ic<component.size(); ic++)
+  {  const FluidComponent& c = *component[ic];
+    for(unsigned i=0; i<c.molecule.sites.size(); i++)
+      atomicNumber.push_back(c.molecule.sites[i]->atomicNumber);
+  }
+  logPrintf("Initialized Grimme Pair Potentials for vdW interactions with scale factor %lg.\n", vdwScale);
 }
 
 double VDWCoupling::computeUniform(const std::vector< double >& N, std::vector< double >& Phi_N) const
-{	return 0.; //No electronic system to couple to in the bulk fluid
+{  return 0.; //No electronic system to couple to in the bulk fluid
 }
 
 double VDWCoupling::compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const
-{	return energyAndGrad(Ntilde, &Phi_Ntilde);
+{  return energyAndGrad(Ntilde, &Phi_Ntilde);
 }
 
 double VDWCoupling::energyAndGrad(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray* Phi_Ntilde, IonicGradient* forces) const
-{	return vdW->energyAndGrad(atpos, Ntilde, atomicNumber, vdwScale, Phi_Ntilde, forces);
+{  return vdW->energyAndGrad(atpos, Ntilde, atomicNumber, vdwScale, Phi_Ntilde, forces);
 }
 
 string VDWCoupling::getName() const
-{	return "VDWCoupling";
+{  return "VDWCoupling";
 }
 

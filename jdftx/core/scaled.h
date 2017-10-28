@@ -25,11 +25,11 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Template to avoid (delay) scaling operations on linear objects
 template<typename T> struct scaled
-{	const T& data; //!< linear object reference
-	double scale; //!< pending scale factor
-	scaled(const T& data, double scale=1.0) : data(data), scale(scale) {}
-	operator T() const { T ret(data); return ret *= scale; } //!< apply scale
-	scaled<T>& operator*=(double s) { scale *= s; return *this; } //!< merge scale operation into pending scale factor
+{  const T& data; //!< linear object reference
+  double scale; //!< pending scale factor
+  scaled(const T& data, double scale=1.0) : data(data), scale(scale) {}
+  operator T() const { T ret(data); return ret *= scale; } //!< apply scale
+  scaled<T>& operator*=(double s) { scale *= s; return *this; } //!< merge scale operation into pending scale factor
 };
 
 template<typename T> T& operator+=(T& y, const scaled<T>& x) { if(y) axpy(x.scale, x.data, y); else y = x.scale * x.data; return y; }

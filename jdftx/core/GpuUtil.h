@@ -52,11 +52,11 @@ extern void gpuErrorCheck();
 //! A utility function to eliminate ugly #ifdef's when not required
 inline bool isGpuEnabled()
 {
-	#ifdef GPU_ENABLED
-	return true;
-	#else
-	return false;
-	#endif
+  #ifdef GPU_ENABLED
+  return true;
+  #else
+  return false;
+  #endif
 }
 
 //! @}

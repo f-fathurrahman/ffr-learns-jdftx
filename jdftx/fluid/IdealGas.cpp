@@ -27,10 +27,10 @@ V(molecule.sites.size()), Nbulk(0), mu(0)
 }
 
 double IdealGas::get_Nbulk()
-{	return Nbulk;
+{  return Nbulk;
 }
 
 void IdealGas::overrideBulk(double Nbulk, double mu)
-{	this->Nbulk = Nbulk;
-	this->mu = mu;
+{  this->Nbulk = Nbulk;
+  this->mu = mu;
 }
