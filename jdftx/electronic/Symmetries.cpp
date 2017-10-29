@@ -51,9 +51,9 @@ void Symmetries::setup(const Everything& everything)
       checkSymmetries(); //make sure atoms respect the specified symmetries
       break;
     default: //No symmetry (only operation is identity)
-      sym.assign(1, SpaceGroupOp());
+      sym.assign(1, SpaceGroupOp()); 
   }
-
+  
   initAtomMaps(); // Map atoms to symmetry related ones
 }
 
@@ -325,7 +325,7 @@ void Symmetries::calcSymmetries()
   sym = findSpaceGroup(symLattice);
   logPrintf("Found %lu space-group symmetries with basis%s\n", sym.size(),
     sup==vector3<int>(1,1,1) ? "" : " (with translations restricted to unit cells)"); //clarify constraint in phonon case
-
+  
   //Find symmetries commensurate with external electric field (if any):
   if(e->coulombParams.Efield.length_squared())
   {  std::vector<SpaceGroupOp> symNew;
@@ -340,7 +340,7 @@ void Symmetries::calcSymmetries()
     sym = symNew;
     logPrintf("reduced to %lu space-group symmetries with electric field\n", sym.size());
   }
-
+  
   //Make sure identity is the first symmetry
   sortSymmetries();
 
@@ -363,8 +363,8 @@ std::vector<SpaceGroupOp> Symmetries::findSpaceGroup(const std::vector< matrix3<
 {  std::vector<SpaceGroupOp> spaceGroup;
   //Loop over lattice symmetries:
   for(const matrix3<int>& rot: symLattice)
-  {
-    //Determine offsets after this rotation that map the structure onto itself
+  {  
+    //Determine offsets after this rotation that map the structure onto itself 
     std::vector<vector3<>> aArr; //list of candidates for the offset
     bool firstAtom = true;
     for(auto sp: e->iInfo.species)
@@ -385,7 +385,7 @@ std::vector<SpaceGroupOp> Symmetries::findSpaceGroup(const std::vector< matrix3<
               aCur.push_back(dpos);
             }
           }
-
+        
         //Intersect current candidates with global list:
         if(firstAtom)
         {  aArr = aCur; //no previous list; intersection = current
@@ -399,18 +399,18 @@ std::vector<SpaceGroupOp> Symmetries::findSpaceGroup(const std::vector< matrix3<
               aNext.push_back(a);
         }
         aArr = aNext;
-
+        
         if(!aArr.size()) break;
       }
       if(!aArr.size()) break;
     }
-
+    
     //Special handling for system with no atoms:
     if(firstAtom)
     {  spaceGroup.push_back(SpaceGroupOp(rot, vector3<>())); //space group = point group
       continue;
     }
-
+    
     //Refine offsets:
     for(vector3<>& a: aArr)
     {  a = inv(Diag(vector3<>(sup))) * a; //switch offset back to current cell coordinates (matters if this is a phonon supercell)
@@ -513,7 +513,7 @@ void Symmetries::checkFFTbox()
           die("FFT box not commensurate with symmetries.\n");
         }
   }
-
+  
   //Check embedded truncation center:
   if(e->coulombParams.embed)
   {  const vector3<>& c = e->coulombParams.embedCenter;
@@ -556,17 +556,17 @@ void Symmetries::initAtomMaps()
   if(shouldPrintMatrices) logPrintf("\nMapping of atoms according to symmetries:\n");
   atomMap.resize(iInfo.species.size());
   double datposSqSum = 0.; int nAtomsTot = 0; //counters for atom symmetrization statistics
-
+  
   for(unsigned sp = 0; sp < iInfo.species.size(); sp++)
   {  const SpeciesInfo& spInfo = *(iInfo.species[sp]);
     atomMap[sp].resize(spInfo.atpos.size());
     PeriodicLookup< vector3<> > plook(spInfo.atpos, (~e->gInfo.R) * e->gInfo.R);
     std::vector<vector3<> > datpos(spInfo.atpos.size()); //Displacements to exactly symmetrize atpos
-
+    
     for(size_t a1=0; a1<spInfo.atpos.size(); a1++)
     {  if(shouldPrintMatrices) logPrintf("%s %3lu: ", spInfo.name.c_str(), a1);
       atomMap[sp][a1].resize(sym.size());
-
+      
       for(unsigned iRot = 0; iRot<sym.size(); iRot++)
       {  vector3<> idealPos = sym[iRot].rot * spInfo.atpos[a1] + sym[iRot].a;
         size_t a2 = plook.find(idealPos);
@@ -577,7 +577,7 @@ void Symmetries::initAtomMaps()
           "but have different move scale factors or inconsistent move constraints.\n\n",
             spInfo.name.c_str(), a1, a2);
         if(shouldPrintMatrices) logPrintf(" %3u", atomMap[sp][a1][iRot]);
-
+        
         //Add contributions to symmetrization displacements:
         vector3<> dat = idealPos - spInfo.atpos[a2];
         for(int j=0; j<3; j++) dat[j] -= floor(0.5+dat[j]); //wrap to [-0.5,0.5)
@@ -585,7 +585,7 @@ void Symmetries::initAtomMaps()
       }
       if(shouldPrintMatrices) logPrintf("\n");
     }
-
+    
     //Symmetrize atoms:
     for(size_t a=0; a<spInfo.atpos.size(); a++)
     {  ((IonInfo&)e->iInfo).species[sp]->atpos[a] += datpos[a];
@@ -593,7 +593,7 @@ void Symmetries::initAtomMaps()
       nAtomsTot++;
     }
   }
-
+  
   //Print atom symmetrization statistics:
   logPrintf("Applied RMS atom displacement %lg bohrs to make symmetries exact.\n", sqrt(datposSqSum/nAtomsTot));
   logFlush();

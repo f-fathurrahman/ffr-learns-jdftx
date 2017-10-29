@@ -33,25 +33,19 @@ class matrix;
 
 //! Vector space entry for electronic minimization
 struct ElecGradient
-{
-  std::vector<ColumnBundle> C; //!< wavefunctions
+{  std::vector<ColumnBundle> C; //!< wavefunctions
   std::vector<matrix> Haux; //!< auxiliary Hamiltonian
   const ElecInfo* eInfo;
-
+  
   void init(const Everything& e); //!< initialize C and Haux with the correct sizes for everything
-
+  
   ElecGradient& operator*=(double alpha); //!< scalar multiply
 };
 
 //Functions required for minimize
-void axpy(double alpha, const ElecGradient& x, ElecGradient& y);
-//!< accumulate operation: y += alpha*x
-
-double dot(const ElecGradient& x, const ElecGradient& y, double* auxContrib=0);
-//!< inner product (optionally retrieve auxiliary contribution)
-
+void axpy(double alpha, const ElecGradient& x, ElecGradient& y); //!< accumulate operation: y += alpha*x
+double dot(const ElecGradient& x, const ElecGradient& y, double* auxContrib=0); //!< inner product (optionally retrieve auxiliary contribution)
 ElecGradient clone(const ElecGradient& x); //!< create a copy
-
 void randomize(ElecGradient& x); //!< Initialize to random numbers
 
 //! Variational total energy minimizer for electrons
@@ -59,14 +53,14 @@ class ElecMinimizer : public Minimizable<ElecGradient>
 {
 public:
   ElecMinimizer(Everything& e);
-
+  
   //Virtual functions from Minimizable:
   void step(const ElecGradient& dir, double alpha);
   double compute(ElecGradient* grad, ElecGradient* Kgrad);
   bool report(int iter);
   void constrain(ElecGradient&);
   double sync(double x) const; //!< All processes minimize together; make sure scalars are in sync to round-off error
-
+  
 private:
   Everything& e;
   class ElecVars& eVars;
@@ -75,7 +69,7 @@ private:
   std::vector<matrix> rotPrev; //!< cumulated unitary rotations of subspace
   std::vector<matrix> rotPrevC; //!< cumulated transormation of wavefunctions (including non-unitary orthonormalization components)
   std::vector<matrix> rotPrevCinv; //!< inverse of rotPrevC (which is not just dagger, since these are not exactly unitary)
-
+  
   bool rotExists; //!< whether rotPrev is non-trivial (not identity)
   std::shared_ptr<struct SubspaceRotationAdjust> sra; //!< Subspace rotation adjustment helper
 };

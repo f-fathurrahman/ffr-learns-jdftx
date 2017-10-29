@@ -38,16 +38,16 @@ inline double vdwPairEnergyAndGrad(double r, double C6, double R0, double& E_r)
   {  E_r = 0.;
     return 0.00114064201325433 * C6 * pow(invR0,6);
   }
-
+  
   const double d = 20.;
   double exponential = exp(-d*(rByR0-1.));
   double fdamp = 1./(1. + exponential);
   double fdamp_r = (fdamp*fdamp) * exponential * (d*invR0);
-
+  
   double invr = 1./r;
   double C6invr6 = C6 * pow(invr, 6);
   double C6invr6_r = (-6./r) * C6invr6;
-
+  
   E_r = C6invr6_r * fdamp + C6invr6 * fdamp_r;
   return C6invr6 * fdamp;
 }
@@ -56,7 +56,7 @@ VanDerWaals::VanDerWaals(const Everything& everything)
 {
   logPrintf("\nInitializing van der Waals corrections\n");
   e = &everything;
-
+  
   // Constructs the EXCorr -> scaling factor map
   scalingFactor["gga-PBE"] = 0.75;
   scalingFactor["hyb-gga-xc-b3lyp"] = 1.05;
@@ -118,9 +118,9 @@ VanDerWaals::VanDerWaals(const Everything& everything)
   atomParams[88] = AtomParams(55 , 1.844);
   for(int Z=89; Z<=atomicNumberMax; Z++)
     atomParams[Z] = AtomParams(55 , 1.75);
-
+  
   Citations::add("Van der Waals correction pair-potentials", "S. Grimme, J. Comput. Chem. 27, 1787 (2006)");
-
+  
   //Print vdw parameter info and check atomic numbers:
   if(!e->iInfo.vdWenable) logPrintf("\tNOTE: vdW corrections apply only for interactions with fluid.\n");
   for(size_t spIndex=0; spIndex<e->iInfo.species.size(); spIndex++)
@@ -141,7 +141,7 @@ double VanDerWaals::energyAndGrad(std::vector<Atom>& atoms, const double scaleFa
   vector3<int> n;
   for(int k=0; k<3; k++)
     n[k] = isTruncated[k] ? 0 : (int)ceil(200. / e->gInfo.R.column(k).length());
-
+  
   double Etot = 0.;  //Total VDW Energy
   for(int c1=0; c1<int(atoms.size()); c1++)
   {  const AtomParams& c1params = getParams(atoms[c1].atomicNumber, atoms[c1].sp);
@@ -173,18 +173,18 @@ double VanDerWaals::energyAndGrad(const std::vector< std::vector< vector3<> > >&
   double Etot = 0.;
   const GridInfo& gInfo = Ntilde[0]->gInfo;
   const std::vector< std::shared_ptr<SpeciesInfo> >& species = e->iInfo.species;
-
+  
   for(unsigned i=0; i<species.size(); i++) //Loop over species of explicit system
-  {
+  {  
     std::shared_ptr<SpeciesInfo> sp = species[i];
     ScalarFieldTilde SG(ScalarFieldTildeData::alloc(gInfo, isGpuEnabled()));
     ScalarFieldTilde ccgrad_SG; //set grad wrt structure factor
     int nAtoms = atpos[i].size(); //number of atoms of ith species
-
+    
     matrix atposTemp(3, ceildiv(nAtoms,2));
     memcpy(atposTemp.data(), atpos[i].data(), sizeof(vector3<>)*nAtoms);
     callPref(getSG)(gInfo.S, nAtoms, (const vector3<>*)atposTemp.dataPref(), 1./gInfo.detR, SG->dataPref()); //get structure factor SG for atom type i
-
+    
     for(unsigned j=0; j<atomicNumber.size(); j++) //Loop over sites in the fluid
       if(atomicNumber[j]) //Check to make sure fluid site should include van der Waals corrections
       {
@@ -249,13 +249,13 @@ const RadialFunctionG& VanDerWaals::getRadialFunction(int atomicNumber1, int ato
   auto radialFunctionIter = radialFunctions.find(atomicNumberPair);
   if(radialFunctionIter != radialFunctions.end())
     return radialFunctionIter->second;
-
+  
   //Get parameters for current pair of species:
   const AtomParams& params1 = getParams(atomicNumber1, sp1);
   const AtomParams& params2 = getParams(atomicNumber2, sp2);
   double C6 = sqrt(params1.C6 * params2.C6);
   double R0 = params1.R0 + params2.R0;
-
+  
   //Initialize function on real-space logarithmic radial grid:
   const double rMin = 1e-2;
   const double rMax = 1e+3;
@@ -269,7 +269,7 @@ const RadialFunctionG& VanDerWaals::getRadialFunction(int atomicNumber1, int ato
     func.f[i] = vdwPairEnergyAndGrad(r, C6, R0, E_r); //sample value
     r *= rRatio;
   }
-
+  
   //Transform to reciprocal space, cache and return:
   RadialFunctionG& funcTilde = ((VanDerWaals*)this)->radialFunctions[atomicNumberPair];
   const double dGloc = 0.02; //same as the default for SpeciesInfo

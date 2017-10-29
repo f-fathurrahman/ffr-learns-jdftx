@@ -24,14 +24,14 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 //! Length in bytes of Record markers used in Fortran sequential binary files
 //! Technically depends on the Fortran compiler, but it is 4 for gfortran as well as ifort,
 //! which covers what (almost) everyone uses to compile the USPP generator program.
-#define FORTRAN_RECORD_MARKER_LENGTH 4
+#define FORTRAN_RECORD_MARKER_LENGTH 4 
 
 
 //! Read the fortran sequential binary uspp format (need to skip record start/stop markers)
 struct UsppReader
 {  istream& is;
   char* recBuf;
-
+  
   UsppReader(istream& is)
   : is(is)
   {  recBuf = new char[FORTRAN_RECORD_MARKER_LENGTH];
@@ -39,7 +39,7 @@ struct UsppReader
   ~UsppReader()
   {  delete[] recBuf;
   }
-
+  
   //!Fortran record start
   void newRecord()
   {  is.read(recBuf, FORTRAN_RECORD_MARKER_LENGTH);  if(is.eof()) die("  File ended prematurely.\n");
@@ -48,7 +48,7 @@ struct UsppReader
   void endRecord()
   {  is.read(recBuf, FORTRAN_RECORD_MARKER_LENGTH);  if(is.eof()) die("  Error reading file.\n");
   }
-
+  
   //!Get a single element of type T
   template<typename T> void get(T& t)
   {  is.read((char*)&t, sizeof(T));
@@ -76,13 +76,13 @@ struct UsppReader
 void SpeciesInfo::readUspp(istream& is)
 {
   UsppReader reader(is);
-
+  
   //Header:
   reader.newRecord();
   int version[3]; reader.get(version, 3);
   int date[3]; reader.get(date, 3);
   reader.endRecord();
-
+  
   reader.newRecord();
   string title; reader.get<20>(title); trim(title);
   double Zae; reader.get(Zae); //total electron count
@@ -93,13 +93,13 @@ void SpeciesInfo::readUspp(istream& is)
   int nGrid; reader.get(nGrid); //number of grid points in log mesh
   double Etot; reader.get(Etot); Etot *= 0.5; //total energy of atom (convert Ryd to Eh)
   reader.endRecord();
-
+  
   logPrintf("  Title: %s.  Created by USPP %d.%d.%d on %d-%d-%d\n",
     title.c_str(), version[0], version[1], version[2], date[0], date[1], date[2]);
   logPrintf("  Reference state energy: %lf.  %lg valence electrons in orbitals:\n", Etot, Z);
   if(version[0]<7 || (version[0]==7 && version[1]<3))
     die("  Only USPP format 7.2 or newer is supported.\n");
-
+  
   //Valence orbital (vo) properties
   reader.newRecord();
   std::vector<int> voCode(nValence); //n,l,m
@@ -112,14 +112,14 @@ void SpeciesInfo::readUspp(istream& is)
     logPrintf("    |%d>  occupation: %lg  eigenvalue: %lf\n", voCode[v], voWeight[v], voEnergy[v]);
   }
   reader.endRecord();
-
+  
   //pseudopotential generation method (ignored), core presence
   reader.newRecord();
   int keyPS; reader.get(keyPS);
   int haveCore; reader.get(haveCore); //non-zero if core correction present
   double rInnerIgnored; reader.get(rInnerIgnored);
   reader.endRecord();
-
+  
   //Number of angular channels, Qij coefficients etc:
   reader.newRecord();
   int lMax; reader.get(lMax); lMax--;  //maximum projetcor angular momentum
@@ -131,12 +131,12 @@ void SpeciesInfo::readUspp(istream& is)
   reader.endRecord();
   logPrintf("  lMax: %d  lLocal: %d  QijEcut: %lg\n", lMax, lLocal, QijEcut);
   if(lMax>3) die("  Nonlocal projectors with l>3 not implemented (lMax = %d not supported).\n", lMax);
-
+  
   int nL = 2*lMax+1; //number of l-channels in pair products of Ylm's (0 to 2 lMax)
   reader.newRecord();
   std::vector<double> rInner(nL); reader.get(rInner); //radius upto which Qij is pseudized
   reader.endRecord();
-
+  
   reader.newRecord();
   int iRel; reader.get(iRel); //relativity type used in pseudopotential generation
   reader.endRecord();
@@ -150,7 +150,7 @@ void SpeciesInfo::readUspp(istream& is)
   int nGridBeta; reader.get(nGridBeta);
   reader.endRecord();
   logPrintf("  %d projectors sampled on a log grid with %d points:\n", nBeta, nGridBeta);
-
+  
   std::vector<int> lNL(nBeta); //l for each projector
   std::vector<std::vector<int> > lBeta(lMax+1); //Projector indices for each l
   std::vector<double> eigNL(nBeta); //eigenvalue for each projector
@@ -167,7 +167,7 @@ void SpeciesInfo::readUspp(istream& is)
     reader.get(Vnl[i].f);
     reader.endRecord();
     logPrintf("    l: %d  eig: %lf  rCut: %lg\n", lNL[i], eigNL[i], rcNL[lNL[i]]);
-
+    
     for(int j=i; j<nBeta; j++)
     {  Qcoeff[i][j].resize(nL, std::vector<double>(nCoeff));
       reader.newRecord();
@@ -204,7 +204,7 @@ void SpeciesInfo::readUspp(istream& is)
   reader.newRecord();
   RadialFunctionR Vloc(nGrid); reader.get(Vloc.f);
   reader.endRecord();
-
+  
   //Charge density
   reader.newRecord();
   RadialFunctionR rsAtom(nGrid); reader.get(rsAtom.f);
@@ -228,12 +228,12 @@ void SpeciesInfo::readUspp(istream& is)
   reader.newRecord();
   for(int v=0; v<nPsi; v++) reader.get(voPsi[v].f);
   reader.endRecord();
-
+  
   //-------------- Transform and store required quantities in SpeciesInfo ------------
   const double dG = e->gInfo.dGradial;
   int nGridLoc = int(ceil(e->gInfo.GmaxGrid/dG))+5;
   int nGridNL = int(ceil(e->gInfo.GmaxSphere/dG))+5;
-
+  
   //Core density:
   if(haveCore)
   {  nCore.set(rGrid, drGrid);
@@ -241,14 +241,14 @@ void SpeciesInfo::readUspp(istream& is)
       nCore.f[i] *= (rGrid[i] ? 1./(4*M_PI*rGrid[i]*rGrid[i]) : 0);
     setCore(nCore);
   }
-
+  
   //Local potential:
   Vloc0.set(rGrid, drGrid);
   logPrintf("  Transforming local potential to a uniform radial grid of dG=%lg with %d points.\n", dG, nGridLoc);
   for(int i=0; i<nGrid; i++)
     Vloc0.f[i] = (Vloc0.f[i]*0.5 + Z) * (rGrid[i] ? 1./rGrid[i] : 0); //Convert to Eh and remove the -Z/r part
   Vloc0.transform(0, dG, nGridLoc, VlocRadial);
-
+  
   //Projectors:
   if(nBeta)
   {  logPrintf("  Transforming nonlocal projectors to a uniform radial grid of dG=%lg with %d points.\n", dG, nGridNL);
@@ -290,7 +290,7 @@ void SpeciesInfo::readUspp(istream& is)
             std::vector<double>& coeff = Qcoeff[iBeta][jBeta][l];
             RadialFunctionR Qijl(nGridBeta); Qijl.set(rGrid, drGrid);
             bool isNonzero = false; int iLastNZ=0; double Qabs = 0.;
-            for(int i=0; i<nGridBeta; i++)
+            for(int i=0; i<nGridBeta; i++) 
             {  if(rGrid[i]<rInner[l])
               {  double val=0.0, rSq=rGrid[i]*rGrid[i], rPow=pow(rGrid[i],l);
                 for(auto c: coeff)
@@ -326,7 +326,7 @@ void SpeciesInfo::readUspp(istream& is)
     }
     if(!Qradial.size()) Qint.clear(); //Special case of norm-conserving PSP in USPP skin
   }
-
+  
   //Wavefunctions:
   if(nPsi == nValence) // <- this seems to always be the case, but just to be sure
   {  logPrintf("  Transforming atomic orbitals to a uniform radial grid of dG=%lg with %d points.\n", dG, nGridNL);
@@ -347,7 +347,7 @@ void SpeciesInfo::readUspp(istream& is)
       atomEigs[l].push_back(voEnergy[v]);
     }
   }
-
+  
   //Determine max core radius:
   std::set<double> coreRadii; //collection of all relevant radii that should not be allowed to overlap
   coreRadii.insert(rInner.begin(), rInner.end()); //Qij pesudization radius

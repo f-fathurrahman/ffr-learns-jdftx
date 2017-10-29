@@ -343,3 +343,4 @@ inline std::vector<YlmProdTerm> expandYlmProd(int l1, int m1, int l2, int m2)
 }
 
 #endif // JDFTX_ELECTRONIC_SPHERICALHARMONICS_H
+

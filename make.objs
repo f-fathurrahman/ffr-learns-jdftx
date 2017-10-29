@@ -126,4 +126,4 @@ objs/wannier/WannierMinimizer.o \
 objs/wannier/WannierMinimizerFD.o \
 objs/wannier/WannierMinimizer_init.o \
 objs/wannier/WannierMinimizerRS.o \
-objs/wannier/WannierMinimizer_save.o \
+objs/wannier/WannierMinimizer_save.o

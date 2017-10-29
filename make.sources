@@ -126,4 +126,4 @@ jdftx/wannier/WannierMinimizer.cpp \
 jdftx/wannier/WannierMinimizerFD.cpp \
 jdftx/wannier/WannierMinimizer_init.cpp \
 jdftx/wannier/WannierMinimizerRS.cpp \
-jdftx/wannier/WannierMinimizer_save.cpp \
+jdftx/wannier/WannierMinimizer_save.cpp

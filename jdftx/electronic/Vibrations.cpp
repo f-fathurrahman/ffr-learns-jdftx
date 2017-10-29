@@ -59,7 +59,7 @@ void Vibrations::calculate()
   SpeciesInfo::Constraint nullConstraint;
   nullConstraint.moveScale = 1.;
   nullConstraint.type = SpeciesInfo::Constraint::None;
-
+  
   //Determine number of degrees of freedom:
   struct Mode
   {  unsigned s; //!< species number
@@ -144,7 +144,7 @@ void Vibrations::calculate()
     logPrintf("\n");
     return;
   }
-
+  
   //Find inverse of each symmetry matrix:
   std::vector<unsigned> iRotInv(sym.size());
   for(unsigned iRot1=0; iRot1<sym.size(); iRot1++)
@@ -154,7 +154,7 @@ void Vibrations::calculate()
         iRotInv[iRot2] = iRot1;
         continue;
       }
-
+  
   //Initialize dipole measuring vector field
   nullToZero(Ptest, e->gInfo);
   threadLaunch(setPtest, e->gInfo.nr, e->gInfo.S, Ptest.data(), getSplit());
@@ -167,7 +167,7 @@ void Vibrations::calculate()
   imin.compute(&grad0, 0);
   vector3<> Pel0 = getPel(); //electronic dipole moment
   logPrintf("Completed %d of %d configurations.\n", ++iConfiguration, nConfigurations);
-
+  
   //Compute force matrix:
   matrix K = zeroes(nModes, nModes);
   matrix dP = zeroes(nModes, 3); //dipole derivative
@@ -184,7 +184,7 @@ void Vibrations::calculate()
       imin.compute(&gradPlus, 0);
       vector3<> PelPlus = getPel(), PelMinus, dPcur; //electronic dipole moment and derivative w.r.t mode
       logPrintf("Completed %d of %d configurations.\n", ++iConfiguration, nConfigurations);
-
+  
       if(centralDiff)
       {  d *= -1;
         imin.step(d-dPrev, dr); dPrev=d;
@@ -199,7 +199,7 @@ void Vibrations::calculate()
         dPcur = (PelPlus - Pel0) * (1./dr);
       }
       dPcur -= species[mode.s]->Z * mode.n; //ionic contribution to dipole derivative
-
+      
       //Collect contributions to force matrix from this mode and its symmetric counterparts:
       for(unsigned iRot=0; iRot<sym.size(); iRot++)
       {  matrix3<> rot = e->gInfo.R * sym[iRot].rot * inv(e->gInfo.R); //cartesian rotation matrix corresponding to symmetry
@@ -227,16 +227,16 @@ void Vibrations::calculate()
     }
     IonicGradient d; d.init(e->iInfo); //all zeroes
     imin.step(d-dPrev, dr); dPrev=d; //Restore original ionic positions
-
+    
     //Invert multiplicity matrixZero out  modes to be set by translational symmetry:
     for(int i=0; i<nModes; i++)
       mult[i] = modes[i].fromTranslation ? 0. : 1./mult[i];
-
+    
     //Correct for multiple counting:
     K = mult * K;
     dP = mult * dP;
   }
-
+  
   //Fill in modes set by translation symmetry, if any:
   for(int i1=0; i1<nModes; i1++) if(modes[i1].fromTranslation)
   {  //Create a uniform unit displacement of all atoms which moves current atom according to mode:
@@ -249,11 +249,11 @@ void Vibrations::calculate()
     //Simiarly polarization due to uniform displacement should be zero:
     dP.set(i1,i1+1, 0,3, -(x * dP));
   }
-
+  
   //Symmetrize force matrix:
   logPrintf("\nRelative symmetry error in force matrix = %lg\n", 0.5*nrm2(K - dagger(K))/nrm2(K));
   K = dagger_symmetrize(K);
-
+  
   //Project out translation / rotation modes:
   matrix projector(nModes, 6); int nProjectors=0;
   complex* projData = projector.data();
@@ -297,17 +297,17 @@ void Vibrations::calculate()
     //dP -= ppDag * dP;
     logPrintf("Projected out %d rotation+translation modes\n", nProjectors);
   }
-
+  
   //Initialize mass matrix:
   diagMatrix invsqrtM(nModes);
   for(int i=0; i<nModes; i++)
     invsqrtM[i] = 1./sqrt(species[modes[i].s]->mass * amu);
-
+  
   //Construct and diagonalize frequency-squared matrix:
   matrix omegaSq = invsqrtM * K * invsqrtM;
   diagMatrix omegaSqEigs; matrix omegaSqEvecs;
   omegaSq.diagonalize(omegaSqEvecs, omegaSqEigs);
-
+  
   //Determine number of modes of each type:
   int iZeroStart=0, iRealStart=nModes;
   double omegaMinSq = omegaMin*omegaMin;
@@ -319,7 +319,7 @@ void Vibrations::calculate()
     omegaSqEigPrev = omegaSqEig;
   }
   logPrintf("%d imaginary modes, %d modes within cutoff, %d real modes.\n", iZeroStart, iRealStart-iZeroStart, nModes-iRealStart);
-
+  
   //Detect degeneracies:
   std::set<int> iFreqChange; //index of modes whose energy differs (more than resolution) from previous one
   for(int i=1; i<nModes; i++)
@@ -329,7 +329,7 @@ void Vibrations::calculate()
   iFreqChange.insert(iZeroStart);
   iFreqChange.insert(iRealStart);
   iFreqChange.insert(nModes);
-
+  
   const double fineStructConst = 7.29735257e-3;
 
   //Print modes:
@@ -371,7 +371,7 @@ void Vibrations::calculate()
         logPrintf("disp %s %19.15lf %19.15lf %19.15lf\n", sp.name.c_str(), r[0], r[1], r[2]);
     }
   }
-
+  
   //Global quantities:
   double ZPE = 0., Evib = 0., Avib = 0.; //zero-point energy, average energy and free energy
   for(int i=iRealStart; i<nModes; i++)
@@ -387,7 +387,7 @@ void Vibrations::calculate()
   logPrintf("\tEvib:  %15.6lf\n", Evib);
   logPrintf("\tTSvib: %15.6lf\n", TSvib);
   logPrintf("\tAvib:  %15.6lf\n", Avib);
-
+  
   logPrintf("\n");
 }
 

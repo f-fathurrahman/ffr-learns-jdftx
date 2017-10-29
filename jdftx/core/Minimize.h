@@ -48,30 +48,30 @@ template<typename Vector> struct Minimizable
 {
   //! Move the state in parameter space along direction dir with scale alpha
   virtual void step(const Vector& dir, double alpha)=0;
-  
+
   //! Returns the objective function at the current state and store the gradient in grad and preconditioned gradient in Kgrad, if non-null.
   virtual double compute(Vector* grad, Vector* Kgrad)=0;
-  
+
   //! Override for optional processing/reporting after each/every few iterations
   //! It should return whether the state was modified
   virtual bool report(int iter) { return false; }
-  
+
   //! Constrain search directions to the space of free directions for minimize.
   virtual void constrain(Vector&) {}
-  
+
   //! Override to synchronize scalars over MPI processes (if the same minimization is happening in sync over many processes)
   virtual double sync(double x) const { return x; }
-  
+
   //! Override to return maximum safe step size along a given direction. Steps can be arbitrarily large by default.
   virtual double safeStepSize(const Vector& dir) const { return DBL_MAX; }
-  
+
   //! Minimize this objective function with algorithm controlled by params and return the minimized value
   double minimize(const MinimizeParams& params);
-  
+
   //! Checks the consistency of the value and gradient returned by compute.
   //! params is used primarily to control output
   void fdTest(const MinimizeParams& params);
-  
+
 private:
   typedef bool (*Linmin)(Minimizable<Vector>&, const MinimizeParams&, const Vector&, double, double&, double&, Vector&, Vector&);
   Linmin getLinmin(const MinimizeParams& params) const; //!< Return function pointer to appropriate linmin method based on MinimizeParams
@@ -86,16 +86,16 @@ private:
 template<typename Vector> struct LinearSolvable
 {
   Vector state; //!< the location of the minimum, obtained by solving hessian * state == rhs
-  
+
   //! Return vector multiplied by the hessian of the objective function
   virtual Vector hessian(const Vector&) const=0;
-  
+
   //! Override to enable preconditioning: return the preconditioned vector, given a vector
   virtual Vector precondition(const Vector& v) const { return clone(v); }
-  
+
   //! Override to synchronize scalars over MPI processes (if the same minimization is happening in sync over many processes)
   virtual double sync(double x) const { return x; }
-  
+
   //! Solve the linear system hessian * state == rhs using conjugate gradients:
   //! @return the number of iterations taken to achieve target tolerance
   int solve(const Vector& rhs, const MinimizeParams& params);
@@ -104,7 +104,8 @@ template<typename Vector> struct LinearSolvable
 
 //! Energy difference convergence check
 class EdiffCheck : std::deque<double>
-{  unsigned nDiff;
+{
+  unsigned nDiff;
   double threshold;
 public:
   EdiffCheck(unsigned nDiff, double threshold); //!< Energy change within threshold nDiff consecutive times
@@ -120,17 +121,36 @@ public:
 
 template<typename Vector> double Minimizable<Vector>::minimize(const MinimizeParams& p)
 {
-  if(p.fdTest) fdTest(p); // finite difference test
-  if(p.dirUpdateScheme == MinimizeParams::LBFGS) return lBFGS(p);
-  
+
+  printf("\n------------------------------------------\n");
+  printf("ffr: core::Minimizable::minimize is called\n");
+  printf("------------------------------------------\n");
+
+  if(p.fdTest) {
+    fdTest(p); // finite difference test
+  }
+
+  if(p.dirUpdateScheme == MinimizeParams::LBFGS) {
+    return lBFGS(p);
+  }
+
   Vector g, gPrev, Kg; //current, previous and preconditioned gradients
+
   double E = sync(compute(&g, &Kg)); //get initial energy and gradient
+  printf("Initial energy: E = %18.10f\n", E);
+
   EdiffCheck ediffCheck(p.nEnergyDiff, p.energyDiffThreshold); //list of past energies
-  
+
+  printf("ffr: cloning Kg\n");
   Vector d = clone(Kg); //step direction (will be reset in first iteration)
+
   constrain(d); //restrict search direction to allowed subspace
+
   bool forceGradDirection = true; //whether current direction is along the gradient
-  MinimizeParams::DirectionUpdateScheme currentDirUpdateScheme = p.dirUpdateScheme; //initially use the specified scheme, may switch to SD on trouble
+
+  MinimizeParams::DirectionUpdateScheme currentDirUpdateScheme = p.dirUpdateScheme;
+  //initially use the specified scheme, may switch to SD on trouble
+
   bool gPrevUsed;
   switch(currentDirUpdateScheme)
   {
@@ -141,26 +161,30 @@ template<typename Vector> double Minimizable<Vector>::minimize(const MinimizePar
     default:
       gPrevUsed = true;
   }
-  
+
   double alphaT = p.alphaTstart; //test step size
   double alpha = alphaT; //actual step size
   double beta = 0.0; //CG prev search direction mix factor
-  double gKNorm = 0.0, gKNormPrev = 0.0; //current and previous norms of the preconditioned gradient
+
+  double gKNorm = 0.0, gKNormPrev = 0.0;
+  //current and previous norms of the preconditioned gradient
 
   //Select the linmin method:
   Linmin linmin = getLinmin(p);
-  
+
   //Iterate until convergence, max iteration count or kill signal
   int iter=0;
   for(iter=0; !killFlag; iter++)
   {
     if(report(iter)) //optional reporting/processing
-    {  E = sync(compute(&g, &Kg)); //update energy and gradient if state was modified
+    {
+      printf("ffr: report(iter) is done\n");
+      E = sync(compute(&g, &Kg)); //update energy and gradient if state was modified
       fprintf(p.fpLog, "%s\tState modified externally: resetting search direction.\n", p.linePrefix);
       fflush(p.fpLog);
       forceGradDirection = true; //reset search direction
     }
-    
+
     gKNorm = sync(dot(g,Kg));
     fprintf(p.fpLog, "%sIter: %3d  %s: ", p.linePrefix, iter, p.energyLabel);
     fprintf(p.fpLog, p.energyFormat, E);
@@ -169,7 +193,8 @@ template<typename Vector> double Minimizable<Vector>::minimize(const MinimizePar
     //Print prev step stats and set CG direction parameter if necessary
     beta = 0.0;
     if(!forceGradDirection)
-    {  double dotgd = sync(dot(g,d));
+    {
+      double dotgd = sync(dot(g,d));
       double dotgPrevKg = gPrevUsed ? sync(dot(gPrev, Kg)) : 0.;
 
       fprintf(p.fpLog, "  linmin: %10.3le", dotgd/sqrt(sync(dot(g,g))*sync(dot(d,d))));
@@ -179,34 +204,40 @@ template<typename Vector> double Minimizable<Vector>::minimize(const MinimizePar
 
       //Update beta:
       switch(currentDirUpdateScheme)
-      {  case MinimizeParams::FletcherReeves:  beta = gKNorm/gKNormPrev; break;
+      {
+        case MinimizeParams::FletcherReeves:  beta = gKNorm/gKNormPrev; break;
         case MinimizeParams::PolakRibiere:    beta = (gKNorm-dotgPrevKg)/gKNormPrev; break;
         case MinimizeParams::HestenesStiefel: beta = (gKNorm-dotgPrevKg)/(dotgd-sync(dot(d,gPrev))); break;
         case MinimizeParams::SteepestDescent: beta = 0.0; break;
         case MinimizeParams::LBFGS: break; //Should never encounter since LBFGS handled separately; just to eliminate compiler warnings
       }
       if(beta<0.0)
-      {  fprintf(p.fpLog, "\n%sEncountered beta<0, resetting CG.", p.linePrefix);
+      {
+        fprintf(p.fpLog, "\n%sEncountered beta<0, resetting CG.", p.linePrefix);
         beta=0.0;
       }
     }
     forceGradDirection = false;
     fprintf(p.fpLog, "\n"); fflush(p.fpLog);
     if(sqrt(gKNorm/p.nDim) < p.knormThreshold)
-    {  fprintf(p.fpLog, "%sConverged (|grad|_K<%le).\n", p.linePrefix, p.knormThreshold);
+    {
+      fprintf(p.fpLog, "%sConverged (|grad|_K<%le).\n", p.linePrefix, p.knormThreshold);
       fflush(p.fpLog); return E;
     }
     if(ediffCheck.checkConvergence(E))
-    {  fprintf(p.fpLog, "%sConverged (|Delta %s|<%le for %d iters).\n",
-        p.linePrefix, p.energyLabel, p.energyDiffThreshold, p.nEnergyDiff);
+    {
+      fprintf(p.fpLog, "%sConverged (|Delta %s|<%le for %d iters).\n",
+              p.linePrefix, p.energyLabel, p.energyDiffThreshold, p.nEnergyDiff);
       fflush(p.fpLog); return E;
     }
     if(!std::isfinite(gKNorm))
-    {  fprintf(p.fpLog, "%s|grad|_K=%le. Stopping ...\n", p.linePrefix, gKNorm);
+    {
+      fprintf(p.fpLog, "%s|grad|_K=%le. Stopping ...\n", p.linePrefix, gKNorm);
       fflush(p.fpLog); return E;
     }
     if(!std::isfinite(E))
-    {  fprintf(p.fpLog, "%sE=%le. Stopping ...\n", p.linePrefix, E);
+    {
+      fprintf(p.fpLog, "%sE=%le. Stopping ...\n", p.linePrefix, E);
       fflush(p.fpLog); return E;
     }
     if(iter>=p.nIterations) break;
@@ -214,32 +245,40 @@ template<typename Vector> double Minimizable<Vector>::minimize(const MinimizePar
     gKNormPrev = gKNorm;
 
     //Update search direction
-    d *= beta; axpy(-1.0, Kg, d);  // d = beta*d - Kg
+    printf("ffr: Update search direction\n");
+    d *= beta;
+    axpy(-1.0, Kg, d);  // d = beta*d - Kg
     constrain(d); //restrict search direction to allowed subspace
-  
+    printf("ffr: Done Update search direction\n");
+
     //Line minimization
     alphaT = std::min(alphaT, safeStepSize(d));
     if(linmin(*this, p, d, alphaT, alpha, E, g, Kg))
-    {  //linmin succeeded:
+    {
+      //linmin succeeded:
       if(p.updateTestStepSize)
-      {  alphaT = alpha;
+      {
+        alphaT = alpha;
         if(alphaT<p.alphaTmin) //bad step size
           alphaT = p.alphaTstart; //make sure next test step size is not too bad
       }
     }
     else
-    {  //linmin failed:
+    {
+      //linmin failed:
       fprintf(p.fpLog, "%s\tUndoing step.\n", p.linePrefix);
       step(d, -alpha);
       E = sync(compute(&g, &Kg));
       if(beta)
-      {  //Failed, but not along the gradient direction:
+      {
+        //Failed, but not along the gradient direction:
         fprintf(p.fpLog, "%s\tStep failed: resetting search direction.\n", p.linePrefix);
         fflush(p.fpLog);
         forceGradDirection = true; //reset search direction
       }
       else
-      {  //Failed along the gradient direction
+      {
+        //Failed along the gradient direction
         fprintf(p.fpLog, "%s\tStep failed along negative gradient direction.\n", p.linePrefix);
         fprintf(p.fpLog, "%sProbably at roundoff error limit. (Stopping)\n", p.linePrefix);
         fflush(p.fpLog);
@@ -253,7 +292,7 @@ template<typename Vector> double Minimizable<Vector>::minimize(const MinimizePar
 
 
 template<typename Vector> void Minimizable<Vector>::fdTest(const MinimizeParams& p)
-{  
+{
   const double deltaMin = 1e-9;
   const double deltaMax = 1e+1;
   const double deltaScale = 1e+1;
@@ -262,9 +301,10 @@ template<typename Vector> void Minimizable<Vector>::fdTest(const MinimizeParams&
   fprintf(p.fpLog, "%s--------------------------------------\n", fdPrefix);
   Vector g, Kg;
   double E0 = sync(compute(&g, &Kg));
-  
+
   Vector dx;
-  {  // Set the direction to be a random vector of the same norm
+  {
+    // Set the direction to be a random vector of the same norm
     // as the preconditioned gradient times the initial test step size
     dx = clone(Kg);
     randomize(dx);

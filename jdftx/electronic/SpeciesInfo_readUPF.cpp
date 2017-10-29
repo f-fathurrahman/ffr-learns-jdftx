@@ -23,13 +23,13 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 #include <electronic/symbols.h>
 #include "SpeciesInfo_internal.h"
 
-//! Read an XML tag from the specified stream and parse any key-value pairs
+//! Read an XML tag from the specified stream and parse any key-value pairs 
 struct XMLtag
 {  istream& is;
   string name;
   std::map<string,string> attributes; //!< list of key-value pairs
   bool closed; //!< whether the tag has already been closed (either by the empty /> termination or by the matching closing tag)
-
+  
   XMLtag(istream& is) : is(is), closed(false)
   {  //Read tag name:
     while(true)
@@ -85,7 +85,7 @@ struct XMLtag
       attributes[key] = value;
     }
   }
-
+  
   void close() //!< if not already closed, read the closing tag
   {  if(!closed)
     {  char c = getNonSpace(); if(c != '<') die("  XML parse error: expecting '</%s'; found '%c' instead\n", name.c_str(), c);
@@ -96,7 +96,7 @@ struct XMLtag
       closed = true;
     }
   }
-
+  
   void ignoreAndClose() //!< Ignore any data or sub-tags till matching close tag is found
   {  if(!closed)
     {  while(true)
@@ -116,7 +116,7 @@ struct XMLtag
       }
     }
   }
-
+  
   string getAttribute(string key, bool required=true) //!< Wrapper to access attributes with error message
   {  auto iter = attributes.find(key);
     if(iter == attributes.end())
@@ -125,7 +125,7 @@ struct XMLtag
     }
     return iter->second;
   }
-
+  
   std::vector<double> readData(size_t nElem)
   {  std::vector<double> out(nElem);
     for(double& x: out)
@@ -134,7 +134,7 @@ struct XMLtag
     }
     return out;
   }
-
+  
 private:
   //! Get first character which is not whitespace
   char getNonSpace()
@@ -142,7 +142,7 @@ private:
     while(isspace(c)) c=is.get();
     return c;
   }
-
+  
   //! Read a valid XML tag or attribute name
   string readToken()
   {  string token;
@@ -160,7 +160,7 @@ private:
 };
 
 void SpeciesInfo::readUPF(istream& is)
-{
+{  
   int lMax = 0; //max angular momentum
   int nGrid = 0; //number of grid points in radial mesh
   int nBeta = 0; //number of projectors
@@ -169,7 +169,7 @@ void SpeciesInfo::readUPF(istream& is)
   std::set<double> coreRadii; //ordered list of various cutoff radii
   std::vector<int> lNL; std::vector<double> jNL; //orbital and total angular momentum per projector
   std::vector<int> lPsi; std::vector<double> jPsi; //orbital and total angular momentum per orbital
-
+  
   const double dG = e->gInfo.dGradial;
   int nGridLoc = int(ceil(e->gInfo.GmaxGrid/dG))+5;
   int nGridNL = int(ceil(e->gInfo.GmaxSphere/dG))+5;
@@ -250,7 +250,7 @@ void SpeciesInfo::readUPF(istream& is)
       std::vector<std::vector<std::vector<std::vector<double> > > > Qcoeff(nBeta, std::vector<std::vector<std::vector<double> > >(nBeta));
       std::vector<double> rInner; //Replace Qr / Qlr with Taylor expansion from Qcoeff within rInner
       bool q_with_l = false; //File contains Qlr if true and Qr if false (see above)
-
+      
       while(true)
       {  XMLtag tagNL(is);
         if(!tagNL.name.length()) break;
@@ -325,7 +325,7 @@ void SpeciesInfo::readUPF(istream& is)
         }
         tagNL.close();
       }
-
+      
       if(nBeta > 0)
       {  if(!D[0].size()) die("  Nonlocal pseudopotential 'D' matrix has not defined.\n");
         //Check and transform projectors:
@@ -505,7 +505,7 @@ void SpeciesInfo::readUPF(istream& is)
     tag.close();
   }
   tagUPF.ignoreAndClose();
-
+  
   //Process j's for relativistic pseudopotentials
   if(jNL.size())
   {  Vnl2j.resize(VnlRadial.size());
@@ -523,6 +523,6 @@ void SpeciesInfo::readUPF(istream& is)
       psi2j[l].push_back(j2);
     }
   }
-
+  
   coreRadius = *coreRadii.rbegin(); //max of all core radii above (used for overlap checks during geometry opt)
 }
