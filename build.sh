@@ -4,6 +4,6 @@ FLAGS="-Wall -O3 -ftemplate-depth-512 -std=c++0x"
 
 INCLUDE="-I./jdftx"
 
-LIBS=
+LIBS="libjdftx.a"
 
 g++ $INCLUDE $FLAGS $1 -o $prefix.x

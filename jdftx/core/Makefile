@@ -21,13 +21,14 @@ include make.objs
 
 # Libraries
 lib: $(OBJS)
-	cp -v *.o ../../objs
+  cp -v *.o ../../objs
 
 clean:
-	rm -rv *.o
+  rm -rv *.o
 
 %.o : %.cpp
-	$(CXX) $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) -c -o $(*F).o $<
+  $(CXX) $(CXX_INCLUDES) $(CXX_FLAGS) $(CXX_DEFINES) -c -o $(*F).o $<
 
 
 
+# DO NOT DELETE

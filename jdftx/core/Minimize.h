@@ -102,11 +102,6 @@ public:
 
 template<typename Vector> double Minimizable<Vector>::minimize(const MinimizeParams& p)
 {
-
-  printf("\n------------------------------------------\n");
-  printf("ffr: core::Minimizable::minimize is called\n");
-  printf("------------------------------------------\n");
-
   if(p.fdTest) {
     fdTest(p); // finite difference test
   }
@@ -118,11 +113,9 @@ template<typename Vector> double Minimizable<Vector>::minimize(const MinimizePar
   Vector g, gPrev, Kg; //current, previous and preconditioned gradients
 
   double E = sync(compute(&g, &Kg)); //get initial energy and gradient
-  printf("Initial energy: E = %18.10f\n", E);
 
   EdiffCheck ediffCheck(p.nEnergyDiff, p.energyDiffThreshold); //list of past energies
 
-  printf("ffr: cloning Kg\n");
   Vector d = clone(Kg); //step direction (will be reset in first iteration)
 
   constrain(d); //restrict search direction to allowed subspace
@@ -159,7 +152,6 @@ template<typename Vector> double Minimizable<Vector>::minimize(const MinimizePar
   {
     if(report(iter)) //optional reporting/processing
     {
-      printf("ffr: report(iter) is done\n");
       E = sync(compute(&g, &Kg)); //update energy and gradient if state was modified
       fprintf(p.fpLog, "%s\tState modified externally: resetting search direction.\n", p.linePrefix);
       fflush(p.fpLog);
@@ -226,11 +218,9 @@ template<typename Vector> double Minimizable<Vector>::minimize(const MinimizePar
     gKNormPrev = gKNorm;
 
     //Update search direction
-    printf("ffr: Update search direction\n");
     d *= beta;
     axpy(-1.0, Kg, d);  // d = beta*d - Kg
     constrain(d); //restrict search direction to allowed subspace
-    printf("ffr: Done Update search direction\n");
 
     //Line minimization
     alphaT = std::min(alphaT, safeStepSize(d));
@@ -296,7 +286,8 @@ template<typename Vector> void Minimizable<Vector>::fdTest(const MinimizeParams&
 
   double deltaPrev=0;
   for(double delta=deltaMin; delta<=deltaMax; delta*=deltaScale)
-  {  double dE = dE_ddelta*delta;
+  {
+    double dE = dE_ddelta*delta;
     step(dx, delta-deltaPrev); deltaPrev=delta;
     double deltaE = sync(compute(0,0)) - E0;
     fprintf(p.fpLog, "%s   delta=%le:\n", fdPrefix, delta);
