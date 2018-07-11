@@ -30,12 +30,16 @@ ScalarFieldData::ScalarFieldData(const GridInfo& gInfo, bool onGpu, PrivateTag)
 : FieldData<double>(gInfo, "ScalarField", gInfo.nr, onGpu)
 {
 }
+
 ScalarField ScalarFieldData::clone() const
-{  ScalarField copy(ScalarFieldData::alloc(gInfo, isOnGpu()));
+{
+  ScalarField copy(ScalarFieldData::alloc(gInfo, isOnGpu()));
   copy->copyData(*this);
   return copy;
 }
-ScalarField ScalarFieldData::alloc(const GridInfo& gInfo, bool onGpu) { return std::make_shared<ScalarFieldData>(gInfo, onGpu, PrivateTag()); }
+
+ScalarField ScalarFieldData::alloc(const GridInfo& gInfo, bool onGpu) {
+  return std::make_shared<ScalarFieldData>(gInfo, onGpu, PrivateTag()); }
  
 matrix ScalarFieldData::toMatrix() const
 {
@@ -52,12 +56,18 @@ ScalarFieldTildeData::ScalarFieldTildeData(const GridInfo& gInfo, bool onGpu, Pr
 : FieldData<complex>(gInfo, "ScalarFieldTilde", gInfo.nG, onGpu)
 {
 }
+
 ScalarFieldTilde ScalarFieldTildeData::clone() const
-{  ScalarFieldTilde copy(ScalarFieldTildeData::alloc(gInfo, isOnGpu()));
+{
+  ScalarFieldTilde copy(ScalarFieldTildeData::alloc(gInfo, isOnGpu()));
   copy->copyData(*this);
   return copy;
 }
-ScalarFieldTilde ScalarFieldTildeData::alloc(const GridInfo& gInfo, bool onGpu) { return std::make_shared<ScalarFieldTildeData>(gInfo, onGpu, PrivateTag()); }
+
+ScalarFieldTilde ScalarFieldTildeData::alloc(const GridInfo& gInfo, bool onGpu)
+{
+  return std::make_shared<ScalarFieldTildeData>(gInfo, onGpu, PrivateTag());
+}
 
 double ScalarFieldTildeData::getGzero() const
 {  

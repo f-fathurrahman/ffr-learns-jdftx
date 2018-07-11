@@ -1,0 +1,8 @@
+SRC = \
+commands.cpp \
+Wannier.cpp \
+WannierMinimizer.cpp \
+WannierMinimizerFD.cpp \
+WannierMinimizer_init.cpp \
+WannierMinimizerRS.cpp \
+WannierMinimizer_save.cpp

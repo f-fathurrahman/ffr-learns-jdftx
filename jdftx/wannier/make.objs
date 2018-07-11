@@ -1,0 +1,8 @@
+OBJS = \
+commands.o \
+Wannier.o \
+WannierMinimizer.o \
+WannierMinimizerFD.o \
+WannierMinimizer_init.o \
+WannierMinimizerRS.o \
+WannierMinimizer_save.o

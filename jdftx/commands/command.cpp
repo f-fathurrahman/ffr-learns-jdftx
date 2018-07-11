@@ -22,16 +22,20 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 using std::map;
 
 map<string,Command*>& updateCommandMap(Command* command=0)
-{  static map<string,Command*> commandMap; //make this local static for correct initialization order
+{
+  static map<string,Command*> commandMap; //make this local static for correct initialization order
   if(command) commandMap[command->name] = command;
   return commandMap;
 }
+
 map<string,Command*>& getCommandMap()
-{  return updateCommandMap(0);
+{
+  return updateCommandMap(0);
 }
 
 void fixCategoryName(string& name)
-{  //Replace spaces with underscore:
+{
+  //Replace spaces with underscore:
   for(char& c: name) if(c==' ') c='_';
   //Replace empty string with NULL:
   if(!name.length()) name = "NULL";
@@ -39,7 +43,8 @@ void fixCategoryName(string& name)
 
 Command::Command(string name, string path)
 : name(name), allowMultiple(false), hasDefault(false)
-{  updateCommandMap(this);
+{
+  updateCommandMap(this);
   
   //Parse the path to get section, category and subcategory:
   istringstream iss(path);
@@ -53,15 +58,22 @@ void Command::forbid(string name) { forbids.insert(name); }
 
 
 map<string,DeprecatedCommand*>& updateDeprecatedMap(DeprecatedCommand* dc=0)
-{  static map<string,DeprecatedCommand*> deprecatedMap; //make this local static for correct initialization order
+{
+  //make this local static for correct initialization order
+  static map<string,DeprecatedCommand*> deprecatedMap;
+  
   if(dc) deprecatedMap[dc->name] = dc;
   return deprecatedMap;
 }
+
 map<string,DeprecatedCommand*>& getDeprecatedMap()
-{  return updateDeprecatedMap(0);
+{
+  return updateDeprecatedMap(0);
 }
+
 DeprecatedCommand::DeprecatedCommand(string name) : name(name)
-{  updateDeprecatedMap(this);
+{
+  updateDeprecatedMap(this);
 }
 
 

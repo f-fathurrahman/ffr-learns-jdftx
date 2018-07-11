@@ -1,0 +1,5 @@
+OBJS = \
+commands.o \
+Phonon.o \
+Phonon_init.o \
+Phonon_supercell.o

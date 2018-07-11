@@ -11,24 +11,43 @@
 #include <electronic/SCF.h>
 
 void ElecGradient::init(const Everything& e)
-{  eInfo = &e.eInfo;
+{
+  eInfo = &e.eInfo;
   C.resize(eInfo->nStates);
   Haux.resize(eInfo->nStates);
 }
 
 ElecGradient& ElecGradient::operator*=(double alpha)
-{  for(int q=eInfo->qStart; q<eInfo->qStop; q++)
-  {  if(C[q]) C[q] *= alpha;
+{
+  for(int q=eInfo->qStart; q<eInfo->qStop; q++)
+  {
+    if(C[q]) C[q] *= alpha;
     if(Haux[q]) Haux[q] *= alpha;
   }
   return *this;
 }
 
 void axpy(double alpha, const ElecGradient& x, ElecGradient& y)
-{  assert(x.eInfo == y.eInfo);
+{
+  assert(x.eInfo == y.eInfo);
   for(int q=x.eInfo->qStart; q<x.eInfo->qStop; q++)
-  {  if(x.C[q]) { if(y.C[q]) axpy(alpha, x.C[q], y.C[q]); else y.C[q] = alpha*x.C[q]; }
-    if(x.Haux[q]) { if(y.Haux[q]) axpy(alpha, x.Haux[q], y.Haux[q]); else y.Haux[q] = alpha*x.Haux[q]; }
+  {
+    if(x.C[q]) {
+      if(y.C[q]) {
+        axpy(alpha, x.C[q], y.C[q]);
+      }
+      else {
+        y.C[q] = alpha*x.C[q];
+      }
+    }
+    if(x.Haux[q]) {
+      if(y.Haux[q]) {
+        axpy(alpha, x.Haux[q], y.Haux[q]);
+      }
+      else {
+        y.Haux[q] = alpha*x.Haux[q];
+      }
+    }
   }
 }
 
@@ -45,7 +64,8 @@ double dot(const ElecGradient& x, const ElecGradient& y, double* auxContrib)
 }
 
 ElecGradient clone(const ElecGradient& x)
-{  return x;
+{
+  return x;
 }
 
 void randomize(ElecGradient& x)
