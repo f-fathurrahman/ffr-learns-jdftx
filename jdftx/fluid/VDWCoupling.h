@@ -30,23 +30,23 @@ class VanDerWaals;
 
 //! Van der Waals coupling between atoms from electronic DFT and fluid density fields
 class VDWCoupling : public Fmix
-{  
+{	
 public:
-  VDWCoupling(FluidMixture* fluidMixture, const std::vector< std::vector< vector3<> > >& atpos, const std::shared_ptr<VanDerWaals>& vdW, double vdwScale); 
-  
-  //! Main energy and gradients function
-  double energyAndGrad(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray* Phi_Ntilde=0, IonicGradient* forces=0) const;
-  
-  //Interface to fluid side (virtual functions from Fmix):
-  double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const;
-  double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const;
-  string getName() const;
+	VDWCoupling(FluidMixture* fluidMixture, const std::vector< std::vector< vector3<> > >& atpos, const std::shared_ptr<VanDerWaals>& vdW, double vdwScale); 
+	
+	//! Main energy and gradients function
+	double energyAndGrad(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray* Phi_Ntilde=0, IonicGradient* forces=0) const;
+	
+	//Interface to fluid side (virtual functions from Fmix):
+	double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const;
+	double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const;
+	string getName() const;
 
 private:
-  const std::vector< std::vector< vector3<> > >& atpos;
-  const std::shared_ptr<VanDerWaals>& vdW;
-  double vdwScale;
-  std::vector<int> atomicNumber; 
+	const std::vector< std::vector< vector3<> > >& atpos;
+	const std::shared_ptr<VanDerWaals>& vdW;
+	double vdwScale;
+	std::vector<int> atomicNumber; 
 };
 
 //! @}

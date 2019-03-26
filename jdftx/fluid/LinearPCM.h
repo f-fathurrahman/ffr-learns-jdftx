@@ -30,28 +30,29 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class LinearPCM : public PCM, public LinearSolvable<ScalarFieldTilde>
 {
 public:
-  LinearPCM(const Everything& e, const FluidSolverParams& fsp); //!< Parameters same as createFluidSolver()
+	LinearPCM(const Everything& e, const FluidSolverParams& fsp); //!< Parameters same as createFluidSolver()
     virtual ~LinearPCM();
-  bool prefersGummel() const { return false; }
+	bool prefersGummel() const { return false; }
 
-  ScalarFieldTilde hessian(const ScalarFieldTilde&) const; //!< Implements #LinearSolvable::hessian for the dielectric poisson equation
-  ScalarFieldTilde precondition(const ScalarFieldTilde&) const; //!< Implements a modified inverse kinetic preconditioner
+	ScalarFieldTilde hessian(const ScalarFieldTilde&) const; //!< Implements #LinearSolvable::hessian for the dielectric poisson equation
+	ScalarFieldTilde precondition(const ScalarFieldTilde&) const; //!< Implements a modified inverse kinetic preconditioner
 
-  void minimizeFluid(); //!< Converge using linear conjugate gradients
-  void loadState(const char* filename); //!< Load state from file
-  void saveState(const char* filename) const; //!< Save state to file
+	void minimizeFluid(); //!< Converge using linear conjugate gradients
+	void loadState(const char* filename); //!< Load state from file
+	void saveState(const char* filename) const; //!< Save state to file
+	void dumpDensities(const char* filenamePattern) const; //!< Dump fluid densities to file
 
 protected:
-  void set_internal(const ScalarFieldTilde& rhoExplicitTilde, const ScalarFieldTilde& nCavityTilde);
-  double get_Adiel_and_grad_internal(ScalarFieldTilde& grad_rhoExplicitTilde, ScalarFieldTilde& grad_nCavityTilde, IonicGradient* extraForces, bool electricOnly) const;
+	void set_internal(const ScalarFieldTilde& rhoExplicitTilde, const ScalarFieldTilde& nCavityTilde);
+	double get_Adiel_and_grad_internal(ScalarFieldTilde& grad_rhoExplicitTilde, ScalarFieldTilde& grad_nCavityTilde, IonicGradient* extraForces) const;
 private:
-  RadialFunctionG Kkernel; ScalarField epsInv; // for preconditioner
-  void updatePreconditioner(const ScalarField& epsilon, const ScalarField& kappaSq);
-  
-  //Optionally override epsilon and kappaSq (when used as the inner solver in NonlinearPCM's SCF):
-  friend class NonlinearPCM;
-  ScalarField epsilonOverride, kappaSqOverride;
-  void override(const ScalarField& epsilon, const ScalarField& kappaSq);
+	RadialFunctionG Kkernel; ScalarField epsInv; // for preconditioner
+	void updatePreconditioner(const ScalarField& epsilon, const ScalarField& kappaSq);
+	
+	//Optionally override epsilon and kappaSq (when used as the inner solver in NonlinearPCM's SCF):
+	friend class NonlinearPCM;
+	ScalarField epsilonOverride, kappaSqOverride;
+	void override(const ScalarField& epsilon, const ScalarField& kappaSq);
 };
 
 //! @}

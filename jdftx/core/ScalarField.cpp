@@ -30,16 +30,12 @@ ScalarFieldData::ScalarFieldData(const GridInfo& gInfo, bool onGpu, PrivateTag)
 : FieldData<double>(gInfo, "ScalarField", gInfo.nr, onGpu)
 {
 }
-
 ScalarField ScalarFieldData::clone() const
-{
-  ScalarField copy(ScalarFieldData::alloc(gInfo, isOnGpu()));
-  copy->copyData(*this);
-  return copy;
+{	ScalarField copy(ScalarFieldData::alloc(gInfo, isOnGpu()));
+	copy->copyData(*this);
+	return copy;
 }
-
-ScalarField ScalarFieldData::alloc(const GridInfo& gInfo, bool onGpu) {
-  return std::make_shared<ScalarFieldData>(gInfo, onGpu, PrivateTag()); }
+ScalarField ScalarFieldData::alloc(const GridInfo& gInfo, bool onGpu) { return std::make_shared<ScalarFieldData>(gInfo, onGpu, PrivateTag()); }
  
 matrix ScalarFieldData::toMatrix() const
 {
@@ -56,40 +52,34 @@ ScalarFieldTildeData::ScalarFieldTildeData(const GridInfo& gInfo, bool onGpu, Pr
 : FieldData<complex>(gInfo, "ScalarFieldTilde", gInfo.nG, onGpu)
 {
 }
-
 ScalarFieldTilde ScalarFieldTildeData::clone() const
-{
-  ScalarFieldTilde copy(ScalarFieldTildeData::alloc(gInfo, isOnGpu()));
-  copy->copyData(*this);
-  return copy;
+{	ScalarFieldTilde copy(ScalarFieldTildeData::alloc(gInfo, isOnGpu()));
+	copy->copyData(*this);
+	return copy;
 }
-
-ScalarFieldTilde ScalarFieldTildeData::alloc(const GridInfo& gInfo, bool onGpu)
-{
-  return std::make_shared<ScalarFieldTildeData>(gInfo, onGpu, PrivateTag());
-}
+ScalarFieldTilde ScalarFieldTildeData::alloc(const GridInfo& gInfo, bool onGpu) { return std::make_shared<ScalarFieldTildeData>(gInfo, onGpu, PrivateTag()); }
 
 double ScalarFieldTildeData::getGzero() const
-{  
-  #ifdef GPU_ENABLED
-  if(isOnGpu())
-  {  double ret;
-    cudaMemcpy(&ret, dataGpu(false), sizeof(double), cudaMemcpyDeviceToHost);
-    return ret * scale;
-  }
-  #endif
-  return data(false)[0].real() * scale;
+{	
+	#ifdef GPU_ENABLED
+	if(isOnGpu())
+	{	double ret;
+		cudaMemcpy(&ret, dataGpu(false), sizeof(double), cudaMemcpyDeviceToHost);
+		return ret * scale;
+	}
+	#endif
+	return data(false)[0].real() * scale;
 }
 void ScalarFieldTildeData::setGzero(double Gzero)
-{  if(!scale) absorbScale(); //otherwise division by zero below
-  double scaledGzero = Gzero / scale;
-  #ifdef GPU_ENABLED
-  if(isOnGpu())
-  {  cudaMemcpy(dataGpu(false), &scaledGzero, sizeof(double), cudaMemcpyHostToDevice);
-    return;
-  }
-  #endif
-  data(false)[0].real() = scaledGzero;
+{	if(!scale) absorbScale(); //otherwise division by zero below
+	double scaledGzero = Gzero / scale;
+	#ifdef GPU_ENABLED
+	if(isOnGpu())
+	{	cudaMemcpy(dataGpu(false), &scaledGzero, sizeof(double), cudaMemcpyHostToDevice);
+		return;
+	}
+	#endif
+	data(false)[0].real() = scaledGzero;
 }
 
 
@@ -100,9 +90,9 @@ complexScalarFieldData::complexScalarFieldData(const GridInfo& gInfo, bool onGpu
 {
 }
 complexScalarField complexScalarFieldData::clone() const
-{  complexScalarField copy(complexScalarFieldData::alloc(gInfo, isOnGpu()));
-  copy->copyData(*this);
-  return copy;
+{	complexScalarField copy(complexScalarFieldData::alloc(gInfo, isOnGpu()));
+	copy->copyData(*this);
+	return copy;
 }
 complexScalarField complexScalarFieldData::alloc(const GridInfo& gInfo, bool onGpu) { return std::make_shared<complexScalarFieldData>(gInfo, onGpu, PrivateTag()); }
 
@@ -121,9 +111,9 @@ complexScalarFieldTildeData::complexScalarFieldTildeData(const GridInfo& gInfo, 
 {
 }
 complexScalarFieldTilde complexScalarFieldTildeData::clone() const
-{  complexScalarFieldTilde copy(complexScalarFieldTildeData::alloc(gInfo, isOnGpu()));
-  copy->copyData(*this);
-  return copy;
+{	complexScalarFieldTilde copy(complexScalarFieldTildeData::alloc(gInfo, isOnGpu()));
+	copy->copyData(*this);
+	return copy;
 }
 complexScalarFieldTilde complexScalarFieldTildeData::alloc(const GridInfo& gInfo, bool onGpu) { return std::make_shared<complexScalarFieldTildeData>(gInfo, onGpu, PrivateTag()); }
 

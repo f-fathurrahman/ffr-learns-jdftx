@@ -28,55 +28,55 @@ string rigidMoleculeCDFT_ScalarEOSpaper = "R. Sundararaman and T.A. Arias, arXiv
 Fex_ScalarEOS::Fex_ScalarEOS(const FluidMixture* fluidMixture, const FluidComponent* comp, const ScalarEOS& eos)
 : Fex(fluidMixture, comp), eos(eos)
 {
-  double Rhs = 0.;
-  for(const auto& s: molecule.sites)
-    if(s->Rhs)
-    {  assert(!Rhs); //Ensure single hard sphere site
-      Rhs = s->Rhs;
-    }
-  assert(Rhs);
-  Vhs = (4*M_PI/3) * pow(Rhs,3);
+	double Rhs = 0.;
+	for(const auto& s: molecule.sites)
+		if(s->Rhs)
+		{	assert(!Rhs); //Ensure single hard sphere site
+			Rhs = s->Rhs;
+		}
+	assert(Rhs);
+	Vhs = (4*M_PI/3) * pow(Rhs,3);
 
-  //Initialize the mean field kernel:
-  setLJatt(fex_LJatt, gInfo, -9.0/(32*sqrt(2)*M_PI*pow(eos.sigmaEOS,3)), eos.sigmaEOS);
-  Citations::add("Scalar-EOS liquid functional", rigidMoleculeCDFT_ScalarEOSpaper);
+	//Initialize the mean field kernel:
+	setLJatt(fex_LJatt, gInfo, -9.0/(32*sqrt(2)*M_PI*pow(eos.sigmaEOS,3)), eos.sigmaEOS);
+	Citations::add("Scalar-EOS liquid functional", rigidMoleculeCDFT_ScalarEOSpaper);
 }
 Fex_ScalarEOS::~Fex_ScalarEOS()
-{  fex_LJatt.free();
+{	fex_LJatt.free();
 }
 
 double Fex_ScalarEOS::compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const
-{  //Polarizability-averaged density:
-  double alphaTot = 0.;
-  ScalarFieldTilde NavgTilde;
-  for(unsigned i=0; i<molecule.sites.size(); i++)
-  {  const Molecule::Site& s = *(molecule.sites[i]);
-    NavgTilde += s.alpha * Ntilde[i];
-    alphaTot += s.alpha * s.positions.size();
-  }
-  NavgTilde *= (1./alphaTot);
-  //Compute LJatt weighted density:
-  ScalarField Nbar = I(fex_LJatt*NavgTilde);
-  //Evaluated weighted density functional:
-  ScalarField Aex, Aex_Nbar; nullToZero(Aex, gInfo); nullToZero(Aex_Nbar, gInfo);
-  callPref(eos.evaluate)(gInfo.nr, Nbar->dataPref(), Aex->dataPref(), Aex_Nbar->dataPref(), Vhs);
-  //Convert gradients:
-  ScalarField Navg = I(NavgTilde);
-  ScalarFieldTilde IdagAex = Idag(Aex);
-  for(unsigned i=0; i<molecule.sites.size(); i++)
-  {  const Molecule::Site& s = *(molecule.sites[i]);
-    Phi_Ntilde[i] += (fex_LJatt*Idag(Navg*Aex_Nbar) + IdagAex) * (s.alpha/alphaTot);
-  }
-  return gInfo.dV*dot(Navg,Aex);
+{	//Polarizability-averaged density:
+	double alphaTot = 0.;
+	ScalarFieldTilde NavgTilde;
+	for(unsigned i=0; i<molecule.sites.size(); i++)
+	{	const Molecule::Site& s = *(molecule.sites[i]);
+		NavgTilde += s.alpha * Ntilde[i];
+		alphaTot += s.alpha * s.positions.size();
+	}
+	NavgTilde *= (1./alphaTot);
+	//Compute LJatt weighted density:
+	ScalarField Nbar = I(fex_LJatt*NavgTilde);
+	//Evaluated weighted density functional:
+	ScalarField Aex, Aex_Nbar; nullToZero(Aex, gInfo); nullToZero(Aex_Nbar, gInfo);
+	callPref(eos.evaluate)(gInfo.nr, Nbar->dataPref(), Aex->dataPref(), Aex_Nbar->dataPref(), Vhs);
+	//Convert gradients:
+	ScalarField Navg = I(NavgTilde);
+	ScalarFieldTilde IdagAex = Idag(Aex);
+	for(unsigned i=0; i<molecule.sites.size(); i++)
+	{	const Molecule::Site& s = *(molecule.sites[i]);
+		Phi_Ntilde[i] += (fex_LJatt*Idag(Navg*Aex_Nbar) + IdagAex) * (s.alpha/alphaTot);
+	}
+	return gInfo.dV*dot(Navg,Aex);
 }
 
 double Fex_ScalarEOS::computeUniform(const double* N, double* Phi_N) const
-{  double AexPrime, Aex;
-  double invN0mult = 1./molecule.sites[0]->positions.size();
-  double Navg = N[0]*invN0mult; //in uniform fluid limit, all site densities are fully determined by N[0] (polarizability averaging has no effect)
-  eos.evaluate(1, &Navg, &Aex, &AexPrime, Vhs);
-  Phi_N[0] += (Aex + Navg*AexPrime)*invN0mult;
-  return Navg*Aex;
+{	double AexPrime, Aex;
+	double invN0mult = 1./molecule.sites[0]->positions.size();
+	double Navg = N[0]*invN0mult; //in uniform fluid limit, all site densities are fully determined by N[0] (polarizability averaging has no effect)
+	eos.evaluate(1, &Navg, &Aex, &AexPrime, Vhs);
+	Phi_N[0] += (Aex + Navg*AexPrime)*invN0mult;
+	return Navg*Aex;
 }
 
 
@@ -88,19 +88,19 @@ JeffereyAustinEOS::JeffereyAustinEOS(double T, double sigmaEOS)
 }
 
 double JeffereyAustinEOS::vdwRadius() const
-{  return eval->vdwRadius();
+{	return eval->vdwRadius();
 }
 
 void evalJeffereyAustinEOS_sub(size_t iStart, size_t iStop, const double* N, double* Aex, double* Aex_N, double Vhs, const JeffereyAustinEOS_eval& eval)
-{  for(size_t i=iStart; i<iStop; i++) eval(i, N, Aex, Aex_N, Vhs);
+{	for(size_t i=iStart; i<iStop; i++) eval(i, N, Aex, Aex_N, Vhs);
 }
 void JeffereyAustinEOS::evaluate(size_t nData, const double* N, double* Aex, double* Aex_N, double Vhs) const
-{  threadLaunch(evalJeffereyAustinEOS_sub, nData, N, Aex, Aex_N, Vhs, *eval);
+{	threadLaunch(evalJeffereyAustinEOS_sub, nData, N, Aex, Aex_N, Vhs, *eval);
 }
 #ifdef GPU_ENABLED
 void evalJeffereyAustinEOS_gpu(int nr, const double* Nbar, double* Fex, double* Phi_Nbar, double Vhs, const JeffereyAustinEOS_eval& eval);
 void JeffereyAustinEOS::evaluate_gpu(size_t nData, const double* N, double* Aex, double* Aex_N, double Vhs) const
-{  evalJeffereyAustinEOS_gpu(nData, N, Aex, Aex_N, Vhs, *eval);
+{	evalJeffereyAustinEOS_gpu(nData, N, Aex, Aex_N, Vhs, *eval);
 }
 #endif
 
@@ -112,18 +112,18 @@ TaoMasonEOS::TaoMasonEOS(double T, double Tc, double Pc, double omega, double si
 }
 
 double TaoMasonEOS::vdwRadius() const
-{  return eval->vdwRadius();
+{	return eval->vdwRadius();
 }
 
 void evalTaoMasonEOS_sub(size_t iStart, size_t iStop, const double* N, double* Aex, double* Aex_N, double Vhs, const TaoMasonEOS_eval& eval)
-{  for(size_t i=iStart; i<iStop; i++) eval(i, N, Aex, Aex_N, Vhs);
+{	for(size_t i=iStart; i<iStop; i++) eval(i, N, Aex, Aex_N, Vhs);
 }
 void TaoMasonEOS::evaluate(size_t nData, const double* N, double* Aex, double* Aex_N, double Vhs) const
-{  threadLaunch(evalTaoMasonEOS_sub, nData, N, Aex, Aex_N, Vhs, *eval);
+{	threadLaunch(evalTaoMasonEOS_sub, nData, N, Aex, Aex_N, Vhs, *eval);
 }
 #ifdef GPU_ENABLED
 void evalTaoMasonEOS_gpu(int nr, const double* Nbar, double* Fex, double* Phi_Nbar, double Vhs, const TaoMasonEOS_eval& eval);
 void TaoMasonEOS::evaluate_gpu(size_t nData, const double* N, double* Aex, double* Aex_N, double Vhs) const
-{  evalTaoMasonEOS_gpu(nData, N, Aex, Aex_N, Vhs, *eval);
+{	evalTaoMasonEOS_gpu(nData, N, Aex, Aex_N, Vhs, *eval);
 }
 #endif

@@ -27,61 +27,61 @@ Energies::Energies() : TS(0), muN(0), Eband(0)
 
 
 void Energies::print(FILE* fp) const
-{  if(Eband)
-    fprintf(fp, "Eband = %25.16lf\n\n", Eband);
-  else
-  {  E.print(fp, true, "%9s = %25.16lf\n");
-    fprintf(fp, "-------------------------------------\n");
-    fprintf(fp, "     Etot = %25.16lf\n", double(E));
-    if(TS)
-    {  fprintf(fp, "       TS = %25.16lf\n", TS);
-      fprintf(fp, "-------------------------------------\n");
-      fprintf(fp, "        F = %25.16lf\n", F());
-    }
-    if(muN)
-    {  fprintf(fp, "      muN = %25.16lf\n", muN);
-      fprintf(fp, "-------------------------------------\n");
-      fprintf(fp, "        G = %25.16lf\n", G());
-    }
-  }
-  fflush(fp);
+{	if(Eband)
+		fprintf(fp, "Eband = %25.16lf\n\n", Eband);
+	else
+	{	E.print(fp, true, "%9s = %25.16lf\n");
+		fprintf(fp, "-------------------------------------\n");
+		fprintf(fp, "     Etot = %25.16lf\n", double(E));
+		if(TS)
+		{	fprintf(fp, "       TS = %25.16lf\n", TS);
+			fprintf(fp, "-------------------------------------\n");
+			fprintf(fp, "        F = %25.16lf\n", F());
+		}
+		if(muN)
+		{	fprintf(fp, "      muN = %25.16lf\n", muN);
+			fprintf(fp, "-------------------------------------\n");
+			fprintf(fp, "        G = %25.16lf\n", G());
+		}
+	}
+	fflush(fp);
 }
 
 
 double relevantFreeEnergy(const Everything& e)
-{  if(e.cntrl.fixed_H) return e.ener.Eband;
-  else if(e.eInfo.fillingsUpdate==ElecInfo::FillingsConst) return double(e.ener.E);
-  else if(std::isnan(e.eInfo.mu)) return e.ener.F();
-  else return e.ener.G();
+{	if(e.cntrl.fixed_H) return e.ener.Eband;
+	else if(e.eInfo.fillingsUpdate==ElecInfo::FillingsConst) return double(e.ener.E);
+	else if(std::isnan(e.eInfo.mu)) return e.ener.F();
+	else return e.ener.G();
 }
 const char* relevantFreeEnergyName(const Everything& e)
-{  if(e.cntrl.fixed_H) return "Eband";
-  else if(e.eInfo.fillingsUpdate==ElecInfo::FillingsConst) return "Etot";
-  else if(std::isnan(e.eInfo.mu)) return "F";
-  else return "G";
+{	if(e.cntrl.fixed_H) return "Eband";
+	else if(e.eInfo.fillingsUpdate==ElecInfo::FillingsConst) return "Etot";
+	else if(std::isnan(e.eInfo.mu)) return "F";
+	else return "G";
 }
 
 
 
 void print_Hsub_eigs(const Everything &e)
 {
-  const ElecInfo &eInfo = e.eInfo;
-  const ElecVars &eVars = e.eVars;
+	const ElecInfo &eInfo = e.eInfo;
+	const ElecVars &eVars = e.eVars;
 
-  logPrintf("Band energies:\n"); //TODO: Head process should print all quantum numbers
-  for(int q=eInfo.qStart; q<eInfo.qStop; q++)
-  {  logPrintf("\nstate = %d   q_k = [ %lg %lg %lg ]   w = %lg",
-      q, eInfo.qnums[q].k[0],eInfo.qnums[q].k[1], eInfo.qnums[q].k[2], eInfo.qnums[q].weight);
-    logPrintf("   spin = %d\n",eInfo.qnums[q].spin);
-    logPrintf("%4s  %13s  %13s  %13s\n",
-      "band","filling   ","diag(Hsub) ","epsilon   ");
-    logPrintf("-------------------------------------------------\n");
-    //NOTE: fillings are always 0 to 1 internally, but read/write 0 to 2 for SpinNone
-    double spinFactor =  (eInfo.spinType==SpinNone ? 2 : 1);
-    const diagMatrix diagHsubq = diag(eVars.Hsub[q]);
-    for(int i=0; i < eInfo.nBands; i++)
-      logPrintf("%4d  %13.6le  %13.6le  %13.6le\n",
-        i, spinFactor*eVars.F[q][i], diagHsubq[i], eVars.Hsub_eigs[q][i]);
-  }
-  logFlush();
+	logPrintf("Band energies:\n"); //TODO: Head process should print all quantum numbers
+	for(int q=eInfo.qStart; q<eInfo.qStop; q++)
+	{	logPrintf("\nstate = %d   q_k = [ %lg %lg %lg ]   w = %lg",
+			q, eInfo.qnums[q].k[0],eInfo.qnums[q].k[1], eInfo.qnums[q].k[2], eInfo.qnums[q].weight);
+		logPrintf("   spin = %d\n",eInfo.qnums[q].spin);
+		logPrintf("%4s  %13s  %13s  %13s\n",
+			"band","filling   ","diag(Hsub) ","epsilon   ");
+		logPrintf("-------------------------------------------------\n");
+		//NOTE: fillings are always 0 to 1 internally, but read/write 0 to 2 for SpinNone
+		double spinFactor =  (eInfo.spinType==SpinNone ? 2 : 1);
+		const diagMatrix diagHsubq = diag(eVars.Hsub[q]);
+		for(int i=0; i < eInfo.nBands; i++)
+			logPrintf("%4d  %13.6le  %13.6le  %13.6le\n",
+				i, spinFactor*eVars.F[q][i], diagHsubq[i], eVars.Hsub_eigs[q][i]);
+	}
+	logFlush();
 }

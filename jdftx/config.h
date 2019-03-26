@@ -27,8 +27,8 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 #define PACKAGE_NAME "JDFTx"
 #define PACKAGE_DESCRIPTION "The playground for joint density functional theory"
 #define PACKAGE_SUMMARY "Toolkit for rapid development of density-functional methods"
-#define VERSION_MAJOR_MINOR_PATCH "1.3.1"
-#define VERSION_HASH "f9cd7e1"
-#define JDFTX_BUILD_DIR "/home/efefer/WORKS/JDFTX/build_15Sept2017"
+#define VERSION_MAJOR_MINOR_PATCH "1.4.2"
+#define VERSION_HASH ""
+#define JDFTX_BUILD_DIR "/home/efefer/WORKS/JDFTX/jdftx-1.4.2/build"
 
 #endif // JDFTX_CONFIG_H

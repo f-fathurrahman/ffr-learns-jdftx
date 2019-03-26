@@ -31,113 +31,113 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Real diagonal matrix
 class diagMatrix : public std::vector<double>
-{  
+{	
 public:
-  diagMatrix(int N=0, double d=0.) : std::vector<double>(N,d) {}
-  int nRows() const { return size(); }
-  int nCols() const { return size(); }
-  bool isScalar(double absTol=1e-14, double relTol=1e-14) const; //!< Check if all entries are identical within threshold
-  
-  diagMatrix& operator*=(double s) { for(double& d: *this) d*=s; return *this; }
-  
-  //Splicing operations:
-  diagMatrix operator()(int iStart, int iStop) const; //!< get submatrix of elements (iStart \<= i \< iStop)
-  diagMatrix operator()(int iStart, int iStep, int iStop) const; //!< get submatrix of elements (iStart \<= i \< iStop) with arbitrary increments
-  void set(int iStart, int iStop, const diagMatrix& m); //!< set submatrix to m
-  void set(int iStart, int iStep, int iStop, const diagMatrix& m); //!< set submatrix to m at arbitrary increments
+	diagMatrix(int N=0, double d=0.) : std::vector<double>(N,d) {}
+	int nRows() const { return size(); }
+	int nCols() const { return size(); }
+	bool isScalar(double absTol=1e-14, double relTol=1e-14) const; //!< Check if all entries are identical within threshold
+	
+	diagMatrix& operator*=(double s) { for(double& d: *this) d*=s; return *this; }
+	
+	//Splicing operations:
+	diagMatrix operator()(int iStart, int iStop) const; //!< get submatrix of elements (iStart \<= i \< iStop)
+	diagMatrix operator()(int iStart, int iStep, int iStop) const; //!< get submatrix of elements (iStart \<= i \< iStop) with arbitrary increments
+	void set(int iStart, int iStop, const diagMatrix& m); //!< set submatrix to m
+	void set(int iStart, int iStep, int iStop, const diagMatrix& m); //!< set submatrix to m at arbitrary increments
 
-  void scan(FILE* fp); //!< read (ascii) from stream
-  void print(FILE* fp, const char* fmt="%lg\t") const; //!< print (ascii) to stream
+	void scan(FILE* fp); //!< read (ascii) from stream
+	void print(FILE* fp, const char* fmt="%lg\t") const; //!< print (ascii) to stream
 
-  //Inter-process communication:
-  void send(int dest, int tag=0) const; //!< send to another process
-  void recv(int src, int tag=0); //!< receive from another process
-  void bcast(int root=0); //!< synchronize across processes (using value on specified root process)
-  void allReduce(MPIUtil::ReduceOp op, bool safeMode=false); //!< apply all-to-all reduction (see MPIUtil::allReduce)
+	//Inter-process communication:
+	void send(int dest, int tag=0) const; //!< send to another process
+	void recv(int src, int tag=0); //!< receive from another process
+	void bcast(int root=0); //!< synchronize across processes (using value on specified root process)
+	void allReduce(MPIUtil::ReduceOp op, bool safeMode=false); //!< apply all-to-all reduction (see MPIUtil::allReduce)
 };
 
 //! General complex matrix
 class matrix : public ManagedMemory<complex>
 {
-  int nr; //!< number of rows
-  int nc; //!< number of columns
+	int nr; //!< number of rows
+	int nc; //!< number of columns
 
 public:
-  int nRows() const { return nr; }
-  int nCols() const { return nc; }
-  int index(int i, int j) const { return nr*j+i; } //!< Index into data()
-  explicit operator bool() const { return nr*nc; } //!< Test null-ness of matrix
+	int nRows() const { return nr; }
+	int nCols() const { return nc; }
+	int index(int i, int j) const { return nr*j+i; } //!< Index into data()
+	explicit operator bool() const { return nr && nc; } //!< Test null-ness of matrix
 
-  void init(int nrows,int ncols, bool onGpu=false); //!< called by the constructors
-  void reshape(int nrows, int ncols); //!< change the dimensions without altering the data (zero dimensions are filled in to match size)
-  matrix(int nrows=0, int ncols=0, bool onGpu=false);
-  matrix(const matrix& m1); //!< copy constructor
-  matrix(matrix&& m1); //!< move constructor
-  matrix(const diagMatrix&); //!< convert from a real diagonal matrix
-  matrix(const std::vector<complex>&); //!< convert from a complex diagonal matrix
-  explicit matrix(const matrix3<>&); //!< convert from a 3x3 matrix
-  
-  matrix& operator=(const matrix& m1); //!< copy-assignment
-  matrix& operator=(matrix&& m1); //!< move-assignment
+	void init(int nrows,int ncols, bool onGpu=false); //!< called by the constructors
+	void reshape(int nrows, int ncols); //!< change the dimensions without altering the data (zero dimensions are filled in to match size)
+	matrix(int nrows=0, int ncols=0, bool onGpu=false);
+	matrix(const matrix& m1); //!< copy constructor
+	matrix(matrix&& m1); //!< move constructor
+	matrix(const diagMatrix&); //!< convert from a real diagonal matrix
+	matrix(const std::vector<complex>&); //!< convert from a complex diagonal matrix
+	explicit matrix(const matrix3<>&); //!< convert from a 3x3 matrix
+	
+	matrix& operator=(const matrix& m1); //!< copy-assignment
+	matrix& operator=(matrix&& m1); //!< move-assignment
 
-  //! get a specific element of the matrix
-  complex operator()(int i, int j) const;
-  
-  //! get submatrix of elements (iStart \<= i \< iStop, jStart \<= j \< jStop)
-  matrix operator()(int iStart, int iStop, int jStart, int jStop) const { return (*this)(iStart,1,iStop, jStart,1,jStop); }
-  
-  //! get submatrix of elements (iStart \<= i \< iStop, jStart \<= j \< jStop) with arbitrary increments
-  matrix operator()(int iStart, int iStep, int iStop, int jStart, int jStep, int jStop) const;
+	//! get a specific element of the matrix
+	complex operator()(int i, int j) const;
+	
+	//! get submatrix of elements (iStart \<= i \< iStop, jStart \<= j \< jStop)
+	matrix operator()(int iStart, int iStop, int jStart, int jStop) const { return (*this)(iStart,1,iStop, jStart,1,jStop); }
+	
+	//! get submatrix of elements (iStart \<= i \< iStop, jStart \<= j \< jStop) with arbitrary increments
+	matrix operator()(int iStart, int iStep, int iStop, int jStart, int jStep, int jStop) const;
 
-  //! set element to m
-  void set(int i, int j, complex m);
-  
-  //! set submatrix to m
-  void set(int iStart, int iStop, int jStart, int jStop, const matrix& m) { set(iStart,1,iStop, jStart,1,jStop, m); }
-  
-  //! set submatrix to m at arbitrary increments
-  void set(int iStart, int iStep, int iStop, int jStart, int jStep, int jStop, const matrix& m);
-  
-  void scan(FILE* fp, const char* fmt="%lg%+lgi"); //!< read (ascii) from stream
-  void scan_real(FILE* fp); //!< read (ascii) real parts from stream, setting imaginary parts to 0
-  void print(FILE* fp, const char* fmt="%lg%+lgi\t") const; //!< print (ascii) to stream
-  void print_real(FILE* fp, const char* fmt="%lg\t") const; //!< print (ascii) real parts to stream
-  
-  void diagonalize(matrix& evecs, diagMatrix& eigs) const; //!< diagonalize a hermitian matrix
-  void diagonalize(matrix& levecs, std::vector<complex>& eigs, matrix& revecs) const; //!< diagonalize an arbitrary matrix
-  void svd(matrix& U, diagMatrix& S, matrix& Vdag) const; //!< singular value decomposition (for dimensions of this: MxN, on output U: MxM, S: min(M,N), Vdag: NxN)
-  
-  //---------octave-like slicing operators on scalar fields converted to Nx*Ny*Nz x 1 matrices --------------
-  complex getElement(vector3<int> index, class GridInfo& gInfo); //!< get element at grid coordinate from a Nx*Ny*Nzx1 matrix
-  matrix getLine(vector3<int> line, vector3<int> point, class GridInfo& gInfo); //!< get a linear slice from a Nx*Ny*Nzx1 matrix
-  matrix getPlane(vector3<int> normal, vector3<int> point, class GridInfo& gInfo); //!< get a planar slice from a Nx*Ny*Nzx1 matrix
+	//! set element to m
+	void set(int i, int j, complex m);
+	
+	//! set submatrix to m
+	void set(int iStart, int iStop, int jStart, int jStop, const matrix& m) { set(iStart,1,iStop, jStart,1,jStop, m); }
+	
+	//! set submatrix to m at arbitrary increments
+	void set(int iStart, int iStep, int iStop, int jStart, int jStep, int jStop, const matrix& m);
+	
+	void scan(FILE* fp, const char* fmt="%lg%+lgi"); //!< read (ascii) from stream
+	void scan_real(FILE* fp); //!< read (ascii) real parts from stream, setting imaginary parts to 0
+	void print(FILE* fp, const char* fmt="%lg%+lgi\t") const; //!< print (ascii) to stream
+	void print_real(FILE* fp, const char* fmt="%lg\t") const; //!< print (ascii) real parts to stream
+	
+	void diagonalize(matrix& evecs, diagMatrix& eigs) const; //!< diagonalize a hermitian matrix
+	void diagonalize(matrix& levecs, std::vector<complex>& eigs, matrix& revecs) const; //!< diagonalize an arbitrary matrix
+	void svd(matrix& U, diagMatrix& S, matrix& Vdag) const; //!< singular value decomposition (for dimensions of this: MxN, on output U: MxM, S: min(M,N), Vdag: NxN)
+	
+	//---------octave-like slicing operators on scalar fields converted to Nx*Ny*Nz x 1 matrices --------------
+	complex getElement(vector3<int> index, class GridInfo& gInfo); //!< get element at grid coordinate from a Nx*Ny*Nzx1 matrix
+	matrix getLine(vector3<int> line, vector3<int> point, class GridInfo& gInfo); //!< get a linear slice from a Nx*Ny*Nzx1 matrix
+	matrix getPlane(vector3<int> normal, vector3<int> point, class GridInfo& gInfo); //!< get a planar slice from a Nx*Ny*Nzx1 matrix
 };
 
 //! Matrix with a pending scale and transpose operation
 struct matrixScaledTransOp
-{  const matrix& mat; //!< matrix
-  double scale; //!< pending scale factor
-  CBLAS_TRANSPOSE op; //!< pending operation (none, transpose or dagger)
-  
-  int nRows() const { return op==CblasNoTrans ? mat.nRows() : mat.nCols(); }
-  int nCols() const { return op==CblasNoTrans ? mat.nCols() : mat.nRows(); }
-  complex conjOp(complex a) const { return (op==CblasConjTrans) ? a.conj() : a; } //!< return conjugate if op requires it
-  int index(int i, int j) const { return op==CblasNoTrans ? mat.index(i,j) : mat.index(j,i); } //!< Index into data() with possible transpose
-  
-  //!Create from a matrix with an optional scale and op:
-  matrixScaledTransOp(const matrix& mat, double scale=1.0, CBLAS_TRANSPOSE op=CblasNoTrans)
-  : mat(mat), scale(scale), op(op) {}
-  
-  //! Create from a scaled matrix, with an optional op
-  matrixScaledTransOp(const scaled<matrix>& smat, CBLAS_TRANSPOSE op=CblasNoTrans)
-  : mat(smat.data), scale(smat.scale), op(op) {}
-  
-  operator matrix() const; //!< convert to matrix
-  
-  //Scaling:
-  matrixScaledTransOp& operator*=(double s) { scale *= s; return *this; }
-  matrixScaledTransOp operator*(double s) const { return matrixScaledTransOp(mat,scale*s,op); }
-  friend matrixScaledTransOp operator*(double s, const matrixScaledTransOp& A) { return A * s; }
+{	const matrix& mat; //!< matrix
+	double scale; //!< pending scale factor
+	CBLAS_TRANSPOSE op; //!< pending operation (none, transpose or dagger)
+	
+	int nRows() const { return op==CblasNoTrans ? mat.nRows() : mat.nCols(); }
+	int nCols() const { return op==CblasNoTrans ? mat.nCols() : mat.nRows(); }
+	complex conjOp(complex a) const { return (op==CblasConjTrans) ? a.conj() : a; } //!< return conjugate if op requires it
+	int index(int i, int j) const { return op==CblasNoTrans ? mat.index(i,j) : mat.index(j,i); } //!< Index into data() with possible transpose
+	
+	//!Create from a matrix with an optional scale and op:
+	matrixScaledTransOp(const matrix& mat, double scale=1.0, CBLAS_TRANSPOSE op=CblasNoTrans)
+	: mat(mat), scale(scale), op(op) {}
+	
+	//! Create from a scaled matrix, with an optional op
+	matrixScaledTransOp(const scaled<matrix>& smat, CBLAS_TRANSPOSE op=CblasNoTrans)
+	: mat(smat.data), scale(smat.scale), op(op) {}
+	
+	operator matrix() const; //!< convert to matrix
+	
+	//Scaling:
+	matrixScaledTransOp& operator*=(double s) { scale *= s; return *this; }
+	matrixScaledTransOp operator*(double s) const { return matrixScaledTransOp(mat,scale*s,op); }
+	friend matrixScaledTransOp operator*(double s, const matrixScaledTransOp& A) { return A * s; }
 };
 matrix conj(const scaled<matrix>& A); //!< return element-wise complex conjugate of A
 matrixScaledTransOp dagger(const scaled<matrix>& A); //!< return hermitian adjoint of A
@@ -160,8 +160,9 @@ inline diagMatrix operator*(const diagMatrix &m, double s) { diagMatrix ret(m); 
 inline diagMatrix operator-(const diagMatrix &m) { return m * (-1); }
 
 matrix operator*(const matrixScaledTransOp&, const matrixScaledTransOp&);
-matrix operator*(const matrix&, const diagMatrix&);
 matrix operator*(const diagMatrix&, const matrix&);
+matrix operator*(const matrix&, const diagMatrix&);
+matrix operator*(const matrix& m, const std::vector<complex>& d);
 diagMatrix operator*(const diagMatrix&, const diagMatrix&);
 
 inline matrix& operator+=(matrix &m1, const matrix &m2) { if(m1) axpy(1.0, m2, m1); else m1 = m2; return m1; }
@@ -207,11 +208,13 @@ complex det(const matrix& A);
 //! Compute the determinant of an diagonal matrix A
 double det(const diagMatrix& A);
 
-//! Compute matrix A^exponent, and optionally the eigensystem of A (if non-null)
-matrix pow(const matrix& A, double exponent, matrix* Aevecs=0, diagMatrix* Aeigs=0);
+//! Compute matrix A^exponent, and optionally the eigensystem of A (if non-null).
+//! If isSingular is provided, function will set it to true and return rather than stack-tracing in singular cases.
+matrix pow(const matrix& A, double exponent, matrix* Aevecs=0, diagMatrix* Aeigs=0, bool* isSingular=0);
 
-//! Compute matrix A^-0.5 and optionally the eigensystem of A (if non-null)
-matrix invsqrt(const matrix& A, matrix* Aevecs=0, diagMatrix* Aeigs=0);
+//! Compute matrix A^-0.5 and optionally the eigensystem of A (if non-null).
+//! If isSingular is provided, function will set it to true and return rather than stack-tracing in singular cases.
+matrix invsqrt(const matrix& A, matrix* Aevecs=0, diagMatrix* Aeigs=0, bool* isSingular=0);
 
 //! Compute cis(A) = exp(iota A) and optionally the eigensystem of A (if non-null)
 matrix cis(const matrix& A, matrix* Aevecs=0, diagMatrix* Aeigs=0);
@@ -238,14 +241,16 @@ matrix zeroes(int nRows, int nCols); //!< a dense-matrix of zeroes
 //! A block matrix formed by repeating (tiling) a dense matrix along the diagonal
 class tiledBlockMatrix
 {
-  const matrix& mBlock; //!< dense matrix for each block
-  int nBlocks; //!< number of blocks
-  const std::vector<complex>* phaseArr; //!< optional phase for each block
+	const matrix& mBlock; //!< dense matrix for each block
+	int nBlocks; //!< number of blocks
+	const std::vector<complex>* phaseArr; //!< optional phase for each block
 public:
-  tiledBlockMatrix(const matrix& mBlock, int nBlocks, const std::vector<complex>* phaseArr=0);
-  
-  matrix operator*(const matrix&) const; //!< multiply block matrix by dense matrix
+	tiledBlockMatrix(const matrix& mBlock, int nBlocks, const std::vector<complex>* phaseArr=0);
+	
+	matrix operator*(const matrix&) const; //!< multiply block matrix by dense matrix
+	friend matrix operator*(const matrix& m, const tiledBlockMatrix& tbm);
 };
+matrix operator*(const matrix& m, const tiledBlockMatrix& tbm);  //!< multiply dense matrix by block matrix
 
 //! @}
 #endif  // JDFTX_CORE_MATRIX_H

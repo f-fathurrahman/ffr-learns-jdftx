@@ -28,15 +28,15 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class Fex_H2O_BondedVoids : public Fex
 {
 public:
-  Fex_H2O_BondedVoids(const FluidMixture*, const FluidComponent*);
+	Fex_H2O_BondedVoids(const FluidMixture*, const FluidComponent*);
     virtual ~Fex_H2O_BondedVoids();
-  
-  double compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const;
-  double computeUniform(const double* N, double* Phi_N) const;
+	
+	double compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const;
+	double computeUniform(const double* N, double* Phi_N) const;
 
-  static const double RV0, TV, kappa, RO, sigmaU; //!< Functional parameters
+	static const double RV0, TV, kappa, RO, sigmaU; //!< Functional parameters
 private:
-  RadialFunctionG Ua;
+	RadialFunctionG Ua;
 };
 
 //! @}

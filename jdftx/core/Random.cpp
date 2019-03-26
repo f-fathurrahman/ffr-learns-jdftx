@@ -22,25 +22,25 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Random
 {
-  std::mt19937_64 generator;
-  std::normal_distribution<double> normdist;
-  std::uniform_real_distribution<double> uniformDist;
-  
-  void seed(int i)
-  {  generator.seed(i);
-  }
-  
-  double uniform(double start, double end)
-  {  return start + (end-start)*uniformDist(generator);
-  }
+	std::mt19937_64 generator;
+	std::normal_distribution<double> normdist;
+	std::uniform_real_distribution<double> uniformDist;
+	
+	void seed(int i)
+	{	generator.seed(i);
+	}
+	
+	double uniform(double start, double end)
+	{	return start + (end-start)*uniformDist(generator);
+	}
 
-  double normal(double mean, double sigma, double cap)
-  {  double r = sigma*normdist(generator);
-    if(cap>0.0) while(fabs(r)>cap) r = sigma*normdist(generator); //regenerate till cap is satisfied
-    return mean + r;
-  }
+	double normal(double mean, double sigma, double cap)
+	{	double r = sigma*normdist(generator);
+		if(cap>0.0) while(fabs(r)>cap) r = sigma*normdist(generator); //regenerate till cap is satisfied
+		return mean + r;
+	}
 
-  complex normalComplex(double sigma)
-  {  return sigma * complex(normdist(generator), normdist(generator));
-  }
+	complex normalComplex(double sigma)
+	{	return sigma * complex(normdist(generator), normdist(generator));
+	}
 }

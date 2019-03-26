@@ -22,6 +22,6 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 Fmix::Fmix(FluidMixture* fluidMixture)
 : gInfo(fluidMixture->gInfo), T(fluidMixture->T)
-{  fluidMixture->addFmix(this);
+{	fluidMixture->addFmix(this);
 }
 

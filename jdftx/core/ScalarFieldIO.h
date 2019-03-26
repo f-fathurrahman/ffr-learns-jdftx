@@ -33,37 +33,37 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Save the data in raw binary format to stream
 template<typename T> void saveRawBinary(const Tptr& X, FILE* fp)
-{  int nWrote = fwriteLE(X->data(), sizeof(typename T::DataType), X->nElem, fp);
-  if(nWrote < X->nElem) die("Write failed after %d of %d records.\n", nWrote, X->nElem)
+{	int nWrote = fwriteLE(X->data(), sizeof(typename T::DataType), X->nElem, fp);
+	if(nWrote < X->nElem) die("Write failed after %d of %d records.\n", nWrote, X->nElem)
 }
 //! Save the data in raw binary format to file
 template<typename T> void saveRawBinary(const Tptr& X, const char* filename)
-{  FILE* fp = fopen(filename, "wb");
-  if(!fp) die("Could not open '%s' for writing.\n", filename)
-  saveRawBinary(X, fp);
-  fclose(fp);
+{	FILE* fp = fopen(filename, "wb");
+	if(!fp) die("Could not open '%s' for writing.\n", filename)
+	saveRawBinary(X, fp);
+	fclose(fp);
 }
 
 //! Load the data in raw binary format from stream
 template<typename T> void loadRawBinary(Tptr& X, FILE* fp)
-{  int nRead = freadLE(X->data(), sizeof(typename T::DataType), X->nElem, fp);
-  if(nRead < X->nElem) die("Read failed after %d of %d records.\n", nRead, X->nElem)
+{	int nRead = freadLE(X->data(), sizeof(typename T::DataType), X->nElem, fp);
+	if(nRead < X->nElem) die("Read failed after %d of %d records.\n", nRead, X->nElem)
 }
 //! Load the data in raw binary format from file
 template<typename T> void loadRawBinary(Tptr& X, const char* filename)
-{  FILE* fp = fopen(filename, "rb");
-  if(!fp) die("Could not open '%s' for reading.\n", filename)
-  
-  off_t fLen = fileSize(filename);
-  off_t expectedLen = sizeof(typename T::DataType) * X->nElem;
-  if(fLen != expectedLen)
-  {  die("\nLength of '%s' was %ld instead of the expected %ld bytes.\n"
-        "Hint: Are you really reading the correct file?\n\n",
-        filename, (unsigned long)fLen, (unsigned long)expectedLen);
-  }
-  
-  loadRawBinary(X, fp);
-  fclose(fp);
+{	FILE* fp = fopen(filename, "rb");
+	if(!fp) die("Could not open '%s' for reading.\n", filename)
+	
+	off_t fLen = fileSize(filename);
+	off_t expectedLen = sizeof(typename T::DataType) * X->nElem;
+	if(fLen != expectedLen)
+	{	die("\nLength of '%s' was %ld instead of the expected %ld bytes.\n"
+				"Hint: Are you really reading the correct file?\n\n",
+				filename, (unsigned long)fLen, (unsigned long)expectedLen);
+	}
+	
+	loadRawBinary(X, fp);
+	fclose(fp);
 }
 
 #undef Tptr

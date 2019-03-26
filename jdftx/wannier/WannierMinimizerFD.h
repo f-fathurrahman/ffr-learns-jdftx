@@ -29,23 +29,23 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class WannierMinimizerFD : public WannierMinimizer
 {
 public:
-  WannierMinimizerFD(const Everything& e, const Wannier& wannier);
+	WannierMinimizerFD(const Everything& e, const Wannier& wannier);
 
-  void initialize(int iSpin);
-  double getOmega(bool grad);
-  double getOmegaI(bool grad);
-  WannierGradient precondition(const WannierGradient& grad);
-  
-  //!An edge of the k-mesh involved in the finite difference formula
-  struct Edge
-  {  double wb; //!< weight of neighbour
-    vector3<> b; //!< displacement to neighbour
-    unsigned ik; //!< index of neighbour in kMesh
-    Kpoint point; //!< description of neighbour (source state, rotation, translation etc.)
-    matrix M0; //!< initial overlap matrix for this pair
-  };
-  std::vector< std::vector<Edge> > edges; //!< set of all edges
-  matrix kHelmholtzInv; //!< inverse Helmholtz preconditioner
+	void initialize(int iSpin);
+	double getOmega(bool grad);
+	double getOmegaI(bool grad);
+	WannierGradient precondition(const WannierGradient& grad);
+	
+	//!An edge of the k-mesh involved in the finite difference formula
+	struct Edge
+	{	double wb; //!< weight of neighbour
+		vector3<> b; //!< displacement to neighbour
+		unsigned ik; //!< index of neighbour in kMesh
+		Kpoint point; //!< description of neighbour (source state, rotation, translation etc.)
+		matrix M0; //!< initial overlap matrix for this pair
+	};
+	std::vector< std::vector<Edge> > edges; //!< set of all edges
+	matrix kHelmholtzInv; //!< inverse Helmholtz preconditioner
 };
 
 //! @}

@@ -33,28 +33,28 @@ class IonInfo;
 class Basis
 {
 public:
-  const GridInfo* gInfo; //!< pointer to the grid specs
-  const IonInfo* iInfo; //!< pointer to the ion information (basis is conceptually ultrasoft-pseudopotential dependent)
-  
-  size_t nbasis; //!< number of basis elements (i.e. G-vectors)
-  IndexVecArray iGarr;
-  IndexArray index;
-  std::vector<int> head; //!< short list of low G basis locations (used for phase fixing)
-  
-  Basis();
-  Basis(const Basis&); //!< copy by reference
-  Basis& operator=(const Basis&); //!< copy by reference
+	const GridInfo* gInfo; //!< pointer to the grid specs
+	const IonInfo* iInfo; //!< pointer to the ion information (basis is conceptually ultrasoft-pseudopotential dependent)
+	
+	size_t nbasis; //!< number of basis elements (i.e. G-vectors)
+	IndexVecArray iGarr;
+	IndexArray index;
+	std::vector<int> head; //!< short list of low G basis locations (used for phase fixing)
+	
+	Basis();
+	Basis(const Basis&); //!< copy by reference
+	Basis& operator=(const Basis&); //!< copy by reference
 
-  //! Setup the indices and integer G-vectors within Ecut for kpoint k
-  void setup(const GridInfo& gInfo, const IonInfo& iInfo, double Ecut, const vector3<> k);
+	//! Setup the indices and integer G-vectors within Ecut for kpoint k
+	void setup(const GridInfo& gInfo, const IonInfo& iInfo, double Ecut, const vector3<> k);
 
-  //! Create a custom basis with an arbitrary indexing scheme
-  void setup(const GridInfo& gInfo, const IonInfo& iInfo, const std::vector<int>& indexVec);
-  
+	//! Create a custom basis with an arbitrary indexing scheme
+	void setup(const GridInfo& gInfo, const IonInfo& iInfo, const std::vector<int>& indexVec);
+	
 private:
-  void setup(const GridInfo& gInfo, const IonInfo& iInfo,
-    const std::vector<int>& indexVec,
-    const std::vector< vector3<int> >& iGvec); //set the data arrays from vectors
+	void setup(const GridInfo& gInfo, const IonInfo& iInfo,
+		const std::vector<int>& indexVec,
+		const std::vector< vector3<int> >& iGvec); //set the data arrays from vectors
 };
 
 //! @}

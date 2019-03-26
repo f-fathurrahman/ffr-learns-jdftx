@@ -27,79 +27,81 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 Basis::Basis()
-{  gInfo = 0;
-  nbasis = 0;
+{	gInfo = 0;
+	nbasis = 0;
 }
 
 Basis::Basis(const Basis& basis)
-{  *this = basis;
+{	*this = basis;
 }
 
 Basis& Basis::operator=(const Basis& basis)
-{  gInfo = basis.gInfo;
-  iInfo = basis.iInfo;
-  nbasis = basis.nbasis;
-  iGarr = basis.iGarr;
-  index = basis.index;
-  head = basis.head;
-  return *this;
+{	gInfo = basis.gInfo;
+	iInfo = basis.iInfo;
+	nbasis = basis.nbasis;
+	iGarr = basis.iGarr;
+	index = basis.index;
+	head = basis.head;
+	return *this;
 }
 
 
 void Basis::setup(const GridInfo& gInfo, const IonInfo& iInfo, double Ecut, const vector3<> k)
-{  //Find the indices within Ecut:
-  vector3<int> iGbox; for(int i=0; i<3; i++) iGbox[i] = 1 + int(sqrt(2*Ecut) * gInfo.R.column(i).length() / (2*M_PI));
-  std::vector< vector3<int> > iGvec;
-  std::vector<int> indexVec;
-  vector3<int> iG;
-  for(iG[0]=-iGbox[0]; iG[0]<=iGbox[0]; iG[0]++)
-    for(iG[1]=-iGbox[1]; iG[1]<=iGbox[1]; iG[1]++)
-      for(iG[2]=-iGbox[2]; iG[2]<=iGbox[2]; iG[2]++)
-        if(0.5*dot(iG+k, gInfo.GGT*(iG+k)) <= Ecut)
-        {  iGvec.push_back(iG);
-          indexVec.push_back(gInfo.fullGindex(iG));
-        }
-  setup(gInfo, iInfo, indexVec, iGvec);
-  logPrintf("nbasis = %lu for k = ", nbasis); k.print(globalLog, " %6.3f ");
+{	//Find the indices within Ecut:
+	vector3<int> iGbox;
+	for(int i=0; i<3; i++)
+		iGbox[i] = 1 + int(sqrt(2*Ecut) * gInfo.R.column(i).length() / (2*M_PI)) + ceil(fabs(k[i]));
+	std::vector< vector3<int> > iGvec;
+	std::vector<int> indexVec;
+	vector3<int> iG;
+	for(iG[0]=-iGbox[0]; iG[0]<=iGbox[0]; iG[0]++)
+		for(iG[1]=-iGbox[1]; iG[1]<=iGbox[1]; iG[1]++)
+			for(iG[2]=-iGbox[2]; iG[2]<=iGbox[2]; iG[2]++)
+				if(0.5*dot(iG+k, gInfo.GGT*(iG+k)) <= Ecut)
+				{	iGvec.push_back(iG);
+					indexVec.push_back(gInfo.fullGindex(iG));
+				}
+	setup(gInfo, iInfo, indexVec, iGvec);
+	logPrintf("nbasis = %lu for k = ", nbasis); k.print(globalLog, " %6.3f ");
 }
 
 void Basis::setup(const GridInfo& gInfo, const IonInfo& iInfo, const std::vector<int>& indexVec)
-{  //Compute the integer G-vectors for the specified indices:
-  std::vector< vector3<int> > iGvec(indexVec.size());
-  int stride1 = gInfo.S[2];
-  int stride0 = gInfo.S[1] * stride1;
-  for(unsigned j=0; j<indexVec.size(); j++)
-  {  int index = indexVec[j];
-    vector3<int> iG;
-    iG[0] = index/stride0; index -= stride0*iG[0];
-    iG[1] = index/stride1; index -= stride1*iG[1];
-    iG[2] = index;
-    for(int k=0; k<3; k++)
-      if(2*iG[k] > gInfo.S[k])
-        iG[k] -= gInfo.S[k];
-    iGvec[j] = iG;
-  }
-  setup(gInfo, iInfo, indexVec, iGvec);
+{	//Compute the integer G-vectors for the specified indices:
+	std::vector< vector3<int> > iGvec(indexVec.size());
+	int stride1 = gInfo.S[2];
+	int stride0 = gInfo.S[1] * stride1;
+	for(unsigned j=0; j<indexVec.size(); j++)
+	{	int index = indexVec[j];
+		vector3<int> iG;
+		iG[0] = index/stride0; index -= stride0*iG[0];
+		iG[1] = index/stride1; index -= stride1*iG[1];
+		iG[2] = index;
+		for(int k=0; k<3; k++)
+			if(2*iG[k] > gInfo.S[k])
+				iG[k] -= gInfo.S[k];
+		iGvec[j] = iG;
+	}
+	setup(gInfo, iInfo, indexVec, iGvec);
 }
 
 
 
 void Basis::setup(const GridInfo& gInfo, const IonInfo& iInfo,
-  const std::vector<int>& indexVec, const std::vector< vector3<int> >& iGvec)
+	const std::vector<int>& indexVec, const std::vector< vector3<int> >& iGvec)
 {
-  this->gInfo = &gInfo;
-  this->iInfo = &iInfo;
-  
-  nbasis = iGvec.size();
-  iGarr.init(nbasis);
-  index.init(nbasis);
-  memcpy(iGarr.data(), &iGvec[0], sizeof(vector3<int>)*nbasis);
-  memcpy(index.data(), &indexVec[0], sizeof(int)*nbasis);
+	this->gInfo = &gInfo;
+	this->iInfo = &iInfo;
+	
+	nbasis = iGvec.size();
+	iGarr.init(nbasis);
+	index.init(nbasis);
+	memcpy(iGarr.data(), &iGvec[0], sizeof(vector3<int>)*nbasis);
+	memcpy(index.data(), &indexVec[0], sizeof(int)*nbasis);
 
-  //Initialize head:
-  head.clear();
-  for(size_t n=0; n<nbasis; n++)
-    if(iGvec[n].length_squared() < 4) //selects 27 entries (basically [-1,+1]^3)
-      head.push_back(n);
+	//Initialize head:
+	head.clear();
+	for(size_t n=0; n<nbasis; n++)
+		if(iGvec[n].length_squared() < 4) //selects 27 entries (basically [-1,+1]^3)
+			head.push_back(n);
 }
 

@@ -30,22 +30,22 @@ string IdealGasMuEps::representationName() const
 }
 
 void IdealGasMuEps::initState_o(int o, const matrix3<>& rot, double scale, const ScalarField& Eo, ScalarField* mueps) const
-{  vector3<> pVec = rot * pMol;
-  mueps[0] += (-quad.weight(o)*scale/T) * Eo;
-  for(int k=0; k<3; k++)
-    mueps[k+1] += (-pVec[k]*quad.weight(o)*scale/T) * Eo;
+{	vector3<> pVec = rot * pMol;
+	mueps[0] += (-quad.weight(o)*scale/T) * Eo;
+	for(int k=0; k<3; k++)
+		mueps[k+1] += (-pVec[k]*quad.weight(o)*scale/T) * Eo;
 }
 
 void IdealGasMuEps::getDensities_o(int o, const matrix3<>& rot, const ScalarField* mueps, ScalarField& logPomega_o) const
-{  vector3<> pVec = rot * pMol;
-  logPomega_o += mueps[0];
-  for(int k=0; k<3; k++)
-    logPomega_o += pVec[k]*mueps[k+1];
+{	vector3<> pVec = rot * pMol;
+	logPomega_o += mueps[0];
+	for(int k=0; k<3; k++)
+		logPomega_o += pVec[k]*mueps[k+1];
 }
 
 void IdealGasMuEps::convertGradients_o(int o, const matrix3<>& rot, const ScalarField& Phi_logPomega_o, ScalarField* Phi_mueps) const
-{  vector3<> pVec = rot * pMol;
-  Phi_mueps[0] += Phi_logPomega_o;
-  for(int k=0; k<3; k++)
-    Phi_mueps[k+1] += pVec[k] * Phi_logPomega_o;
+{	vector3<> pVec = rot * pMol;
+	Phi_mueps[0] += Phi_logPomega_o;
+	for(int k=0; k<3; k++)
+		Phi_mueps[k+1] += pVec[k] * Phi_logPomega_o;
 }

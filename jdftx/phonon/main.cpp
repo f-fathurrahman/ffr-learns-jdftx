@@ -26,23 +26,23 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //Program entry point
 int main(int argc, char** argv)
-{  //Parse command line, initialize system and logs:
-  string inputFilename; bool dryRun, printDefaults;
-  Phonon phonon;
-  initSystemCmdline(argc, argv, "Compute maximally-localized Phonon functions.", inputFilename, dryRun, printDefaults, &phonon.e);
+{	//Parse command line, initialize system and logs:
+	Phonon phonon;
+	InitParams ip("Compute phonon band-structures and e-ph matrix elements.", &phonon.e);
+	initSystemCmdline(argc, argv, ip);
 
-  phonon.input = readInputFile(inputFilename);
-  phonon.dryRun = dryRun;
-  
-  //Read input file and setup unit cell:
-  phonon.setup(printDefaults);
-  Citations::print();
-  
-  //Calculate:
-  phonon.dump();
-  if(dryRun)
-    logPrintf("Dry run successful: commands are valid and initialization succeeded.\n");
-  
-  finalizeSystem();
-  return 0;
+	phonon.input = readInputFile(ip.inputFilename);
+	phonon.dryRun = ip.dryRun;
+	
+	//Read input file and setup unit cell:
+	phonon.setup(ip.printDefaults);
+	Citations::print();
+	
+	//Calculate:
+	phonon.dump();
+	if(ip.dryRun)
+		logPrintf("Dry run successful: commands are valid and initialization succeeded.\n");
+	
+	finalizeSystem();
+	return 0;
 }

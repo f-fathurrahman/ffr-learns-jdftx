@@ -28,25 +28,25 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 //! Parameters to control Pulay mixing
 struct PulayParams
 {
-  FILE* fpLog; //!< Stream to log iterations to
-  const char* linePrefix; //!< prefix for each output line of Pulay (default "Pulay: ")
-  const char* energyLabel; //!< Label for the minimized quantity (default "E")
-  const char* energyFormat; //!< printf format for the minimized quantity (default "%22.15le")
+	FILE* fpLog; //!< Stream to log iterations to
+	const char* linePrefix; //!< prefix for each output line of Pulay (default "Pulay: ")
+	const char* energyLabel; //!< Label for the minimized quantity (default "E")
+	const char* energyFormat; //!< printf format for the minimized quantity (default "%22.15le")
 
-  int nIterations; //!< maximum iterations (single point calculation if 0)
-  double energyDiffThreshold; //!< convergence threshold for energy difference between successive iterations
-  double residualThreshold; //!< convergence threshold on the residual
+	int nIterations; //!< maximum iterations (single point calculation if 0)
+	double energyDiffThreshold; //!< convergence threshold for energy difference between successive iterations
+	double residualThreshold; //!< convergence threshold on the residual
 
-  int history; //!< Number of past residuals and vectors that are cached and used for mixing
-  double mixFraction;  //!< Mixing fraction for total density / potential
-  double qMetric; //!< Wavevector controlling the metric for overlaps
-  
-  PulayParams()
-  : fpLog(stdout), linePrefix("Pulay: "), energyLabel("E"), energyFormat("%22.15le"),
-    nIterations(50), energyDiffThreshold(1e-8), residualThreshold(1e-7),
-    history(10), mixFraction(0.5), qMetric(0.8)
-  {
-  }
+	int history; //!< Number of past residuals and vectors that are cached and used for mixing
+	double mixFraction;  //!< Mixing fraction for total density / potential
+	double qMetric; //!< Wavevector controlling the metric for overlaps
+	
+	PulayParams()
+	: fpLog(stdout), linePrefix("Pulay: "), energyLabel("E"), energyFormat("%22.15le"),
+		nIterations(50), energyDiffThreshold(1e-8), residualThreshold(1e-7),
+		history(10), mixFraction(0.5), qMetric(0.8)
+	{
+	}
 };
 
 //! @}

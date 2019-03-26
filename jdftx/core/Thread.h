@@ -80,20 +80,20 @@ void threadLaunch(Callable* func, size_t nJobs, Args... args);
 class AutoThreadCount
 {
 public:
-  //! @param minThreads minimum number of threads to try
-  //! @param minStats minimum number of tries for each thread count
-  //! @param name if given, print debug messages & stats with that header
-  //! @param fpLog debug logging stream
-  AutoThreadCount(int minThreads=1, int minStats=3, const char* name=0, FILE* fpLog=stdout);
-  ~AutoThreadCount();
+	//! @param minThreads minimum number of threads to try
+	//! @param minStats minimum number of tries for each thread count
+	//! @param name if given, print debug messages & stats with that header
+	//! @param fpLog debug logging stream
+	AutoThreadCount(int minThreads=1, int minStats=3, const char* name=0, FILE* fpLog=stdout);
+	~AutoThreadCount();
 private:
-  template<typename Callable,typename ... Args>
-  friend void threadLaunch(AutoThreadCount*, Callable*, size_t, Args... args);
+	template<typename Callable,typename ... Args>
+	friend void threadLaunch(AutoThreadCount*, Callable*, size_t, Args... args);
 
-  int getThreadCount();
-  void submitTime(int, double);
-  double* time; int* count; int minThreads, nMax, nOpt, minStats; bool settled;
-  char* name; FILE* fpLog;
+	int getThreadCount();
+	void submitTime(int, double);
+	double* time; int* count; int minThreads, nMax, nOpt, minStats; bool settled;
+	char* name; FILE* fpLog;
 };
 
 /**
@@ -145,64 +145,64 @@ double threadedAccumulate(Callable* func, size_t nIter, Args... args);
 
 template<typename Callable,typename ... Args>
 void threadLaunch(int nThreads, Callable* func, size_t nJobs, Args... args)
-{  if(nThreads<=0) nThreads = shouldThreadOperators() ? nProcsAvailable : 1;
-  if(nThreads>1) suspendOperatorThreading(); //Prevent func and anything it calls from launching nested threads
-  std::thread** tArr = new std::thread*[nThreads-1];
-  for(int t=0; t<nThreads; t++)
-  {  size_t i1 = (nJobs>0 ? (  t   * nJobs)/nThreads : t);
-    size_t i2 = (nJobs>0 ? ((t+1) * nJobs)/nThreads : nThreads);
-    if(t<nThreads-1) tArr[t] = new std::thread(func, i1, i2, args...);
-    else (*func)(i1, i2, args...);
-  }
-  for(int t=0; t<nThreads-1; t++)
-  {  tArr[t]->join();
-    delete tArr[t];
-  }
-  delete[] tArr;
-  if(nThreads>1) resumeOperatorThreading(); //End nested threading guard section
+{	if(nThreads<=0) nThreads = shouldThreadOperators() ? nProcsAvailable : 1;
+	if(nThreads>1) suspendOperatorThreading(); //Prevent func and anything it calls from launching nested threads
+	std::thread** tArr = new std::thread*[nThreads-1];
+	for(int t=0; t<nThreads; t++)
+	{	size_t i1 = (nJobs>0 ? (  t   * nJobs)/nThreads : t);
+		size_t i2 = (nJobs>0 ? ((t+1) * nJobs)/nThreads : nThreads);
+		if(t<nThreads-1) tArr[t] = new std::thread(func, i1, i2, args...);
+		else (*func)(i1, i2, args...);
+	}
+	for(int t=0; t<nThreads-1; t++)
+	{	tArr[t]->join();
+		delete tArr[t];
+	}
+	delete[] tArr;
+	if(nThreads>1) resumeOperatorThreading(); //End nested threading guard section
 }
 
 template<typename Callable,typename ... Args>
 void threadLaunch(Callable* func, size_t nJobs, Args... args)
-{  threadLaunch(0, func, nJobs, args...);
+{	threadLaunch(0, func, nJobs, args...);
 }
 
 
 template<typename Callable,typename ... Args>
 void threadLaunch(AutoThreadCount* atc, Callable* func, size_t nJobs, Args... args)
-{  if(!atc)
-    threadLaunch(func, nJobs, args...);
-  else
-  {  int nThreads = atc->getThreadCount();
-    double runTime = clock_us();
-    threadLaunch(nThreads, func, nJobs, args...);
-    runTime = clock_us() - runTime;
-    atc->submitTime(nThreads, runTime);
-  }
+{	if(!atc)
+		threadLaunch(func, nJobs, args...);
+	else
+	{	int nThreads = atc->getThreadCount();
+		double runTime = clock_us();
+		threadLaunch(nThreads, func, nJobs, args...);
+		runTime = clock_us() - runTime;
+		atc->submitTime(nThreads, runTime);
+	}
 }
 
 
 template<typename Callable,typename ... Args>
 void threadedLoop_sub(size_t iMin, size_t iMax, Callable* func, Args... args)
-{  for(size_t i=iMin; i<iMax; i++) (*func)(i, args...);
+{	for(size_t i=iMin; i<iMax; i++) (*func)(i, args...);
 }
 template<typename Callable,typename ... Args>
 void threadedLoop(Callable* func, size_t nIter, Args... args)
-{  threadLaunch(threadedLoop_sub<Callable,Args...>, nIter, func, args...);
+{	threadLaunch(threadedLoop_sub<Callable,Args...>, nIter, func, args...);
 }
 
 template<typename Callable,typename ... Args>
 void threadedAccumulate_sub(size_t iMin, size_t iMax, Callable* func, double* accumTot, std::mutex* m, Args... args)
-{  double accum=0.0;
-  for(size_t i=iMin; i<iMax; i++) accum += (*func)(i, args...);
-  m->lock(); *accumTot += accum; m->unlock();
+{	double accum=0.0;
+	for(size_t i=iMin; i<iMax; i++) accum += (*func)(i, args...);
+	m->lock(); *accumTot += accum; m->unlock();
 }
 template<typename Callable,typename ... Args>
 double threadedAccumulate(Callable* func, size_t nIter, Args... args)
-{  double accumTot=0.0;
-  std::mutex m;
-  threadLaunch(threadedAccumulate_sub<Callable,Args...>, nIter, func, &accumTot, &m, args...);
-  return accumTot;
+{	double accumTot=0.0;
+	std::mutex m;
+	threadLaunch(threadedAccumulate_sub<Callable,Args...>, nIter, func, &accumTot, &m, args...);
+	return accumTot;
 }
 
 //!@endcond

@@ -31,38 +31,38 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class TranslationOperator
 {
 public:
-  const GridInfo& gInfo;
+	const GridInfo& gInfo;
 
-  TranslationOperator(const GridInfo& gInfo);
-  virtual ~TranslationOperator() {}
+	TranslationOperator(const GridInfo& gInfo);
+	virtual ~TranslationOperator() {}
 
-  //! Compute @f$ y += alpha T_t(x) @f$ ,
-  //! where @f$ T_t @f$  is the translation operator @f$ T_t(x(r)) = x(r+t) @f$ modulo the lattice vectors
-  //! T must conserve integral(x) and satisfy @f$ T^{\dagger}_t = T_{-t} @f$ exactly for gradient correctness
-  //! Note that @f$ T^{-1}_t = T_{-t} @f$ may only be approximately true for some implementations.
-  virtual void taxpy(const vector3<>& t, double alpha, const ScalarField& x, ScalarField& y) const=0;
+	//! Compute @f$ y += alpha T_t(x) @f$ ,
+	//! where @f$ T_t @f$  is the translation operator @f$ T_t(x(r)) = x(r+t) @f$ modulo the lattice vectors
+	//! T must conserve integral(x) and satisfy @f$ T^{\dagger}_t = T_{-t} @f$ exactly for gradient correctness
+	//! Note that @f$ T^{-1}_t = T_{-t} @f$ may only be approximately true for some implementations.
+	virtual void taxpy(const vector3<>& t, double alpha, const ScalarField& x, ScalarField& y) const=0;
 };
 
 //! Translation operator which works in real space using interpolating splines
 class TranslationOperatorSpline : public TranslationOperator
 {
 public:
-  //! Types of interpolating spline available for translation
-  const enum SplineType
-  {  Constant, //!< 0th order spline i.e. nearest neighbour interpolation
-    Linear //!< 1st order spline i.e. linear interpolation
-  } splineType;
+	//! Types of interpolating spline available for translation
+	const enum SplineType
+	{	Constant, //!< 0th order spline i.e. nearest neighbour interpolation
+		Linear //!< 1st order spline i.e. linear interpolation
+	} splineType;
 
-  TranslationOperatorSpline(const GridInfo& gInfo, SplineType splineType);
-  void taxpy(const vector3<>& t, double alpha, const ScalarField& x, ScalarField& y) const;
+	TranslationOperatorSpline(const GridInfo& gInfo, SplineType splineType);
+	void taxpy(const vector3<>& t, double alpha, const ScalarField& x, ScalarField& y) const;
 };
 
 //! The exact translation operator in PW basis, although much slower and with potential ringing issues
 class TranslationOperatorFourier : public TranslationOperator
 {
 public:
-  TranslationOperatorFourier(const GridInfo& gInfo);
-  void taxpy(const vector3<>& t, double alpha, const ScalarField& x, ScalarField& y) const;
+	TranslationOperatorFourier(const GridInfo& gInfo);
+	void taxpy(const vector3<>& t, double alpha, const ScalarField& x, ScalarField& y) const;
 };
 
 //! @}

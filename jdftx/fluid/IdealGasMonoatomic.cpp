@@ -21,36 +21,36 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 #include <core/BlasExtra.h>
 
 IdealGasMonoatomic::IdealGasMonoatomic(const FluidMixture* fluidMixture, const FluidComponent* comp): IdealGas(1,fluidMixture,comp)
-{  assert(molecule.isMonoatomic()); //IdealGasMonoatomic must be used only with single site molecules.
+{	assert(molecule.isMonoatomic()); //IdealGasMonoatomic must be used only with single site molecules.
 }
 
 void IdealGasMonoatomic::initState(const ScalarField* Vex, ScalarField* psi, double scale, double Elo, double Ehi) const
-{  ScalarField Veff; nullToZero(Veff, gInfo);
-  Veff += V[0];
-  Veff += Vex[0];
-  //Statistics and min/max capping
-  double Emin, Emax, Emean = sum(Veff)/gInfo.nr;
-  callPref(eblas_capMinMax)(gInfo.nr, Veff->dataPref(), Emin, Emax, Elo, Ehi);
-  logPrintf("\tIdealGasMonoatomic[%s] single molecule energy: min = %le, max = %le, mean = %le\n",
-       molecule.name.c_str(), Emin, Emax, Emean);
-  //Set state:
-  psi[0] = (-scale/T)*Veff;
+{	ScalarField Veff; nullToZero(Veff, gInfo);
+	Veff += V[0];
+	Veff += Vex[0];
+	//Statistics and min/max capping
+	double Emin, Emax, Emean = sum(Veff)/gInfo.nr;
+	callPref(eblas_capMinMax)(gInfo.nr, Veff->dataPref(), Emin, Emax, Elo, Ehi);
+	logPrintf("\tIdealGasMonoatomic[%s] single molecule energy: min = %le, max = %le, mean = %le\n",
+		   molecule.name.c_str(), Emin, Emax, Emean);
+	//Set state:
+	psi[0] = (-scale/T)*Veff;
 }
 
 void IdealGasMonoatomic::getDensities(const ScalarField* psi, ScalarField* N, vector3<>& P0) const
-{  N[0] = Nbulk * exp(psi[0]);
-  P0 = vector3<>();
+{	N[0] = Nbulk * exp(psi[0]);
+	P0 = vector3<>();
 }
 
 double IdealGasMonoatomic::compute(const ScalarField* psi, const ScalarField* N, ScalarField* Phi_N, const double Nscale, double& Phi_Nscale) const
-{  ScalarField PhiNI_N = T*psi[0] + V[0] - (mu + T);
-  Phi_N[0] += PhiNI_N;
-  Phi_N[0] += T;
-  return gInfo.dV*dot(N[0], PhiNI_N);
+{	ScalarField PhiNI_N = T*psi[0] + V[0] - (mu + T);
+	Phi_N[0] += PhiNI_N;
+	Phi_N[0] += T;
+	return gInfo.dV*dot(N[0], PhiNI_N);
 }
 
 void IdealGasMonoatomic::convertGradients(const ScalarField* psi, const ScalarField* N, const ScalarField* Phi_N, const vector3<>& Phi_P0, ScalarField* Phi_psi, const double Nscale) const
-{  Phi_psi[0] = N[0]*Phi_N[0];
+{	Phi_psi[0] = N[0]*Phi_N[0];
 }
 
 

@@ -30,23 +30,23 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //! PW to blip conversion utility
 //! To use, create an object:
-//!   BlipConverter convert(Nx,Ny,Nz);
+//! 	BlipConverter convert(Nx,Ny,Nz);
 //! and conversions can be done as:
-//!   vBlip = convert(vPW);
+//! 	vBlip = convert(vPW);
 class BlipConverter
 {
-  vector3<int> S;
-  std::vector<double> gamma[3];
+	vector3<int> S;
+	std::vector<double> gamma[3];
 public:
-  BlipConverter(const vector3<int>& S);
+	BlipConverter(const vector3<int>& S);
 
-  //! Given a PW basis object (in real or reciprocal space) v,
-  //! return corresponding real-space Blip coefficient set
-  //! (for double or complex vectors)
-  ScalarField operator()(const ScalarFieldTilde& v) const;
-  ScalarField operator()(const ScalarField& v) const;
-  complexScalarField operator()(const complexScalarFieldTilde& v) const;
-  complexScalarField operator()(const complexScalarField& v) const;
+	//! Given a PW basis object (in real or reciprocal space) v,
+	//! return corresponding real-space Blip coefficient set
+	//! (for double or complex vectors)
+	ScalarField operator()(const ScalarFieldTilde& v) const;
+	ScalarField operator()(const ScalarField& v) const;
+	complexScalarField operator()(const complexScalarFieldTilde& v) const;
+	complexScalarField operator()(const complexScalarField& v) const;
 };
 
 //! Resample a scalar field from one grid to another using BLIPs
@@ -54,15 +54,15 @@ public:
 //! and the values in the input WS outside the output WS are truncated, while the region in the
 //! output WS outside the input WS is set to zero.
 class BlipResampler
-{  const GridInfo& gInfoOut;
-  BlipConverter converter;
-  WignerSeitz wsIn;
-  WignerSeitz wsOut;
+{	const GridInfo& gInfoOut;
+	BlipConverter converter;
+	WignerSeitz wsIn;
+	WignerSeitz wsOut;
 public:
-  BlipResampler(const GridInfo& gInfoIn, const GridInfo& gInfoOut);
-  
-  ScalarField operator()(const ScalarFieldTilde& v) const;
-  complexScalarField operator()(const complexScalarFieldTilde& v) const;
+	BlipResampler(const GridInfo& gInfoIn, const GridInfo& gInfoOut);
+	
+	ScalarField operator()(const ScalarFieldTilde& v) const;
+	complexScalarField operator()(const complexScalarFieldTilde& v) const;
 };
 
 //! Compute the kinetic energy for a blip orbital phi (and set max local KE and location in unit cell)

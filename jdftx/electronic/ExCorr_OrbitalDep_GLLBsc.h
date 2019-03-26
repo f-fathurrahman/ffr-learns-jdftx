@@ -27,14 +27,14 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Orbital-dependent GLLBsc functional
 struct ExCorr_OrbitalDep_GLLBsc : public ExCorr::OrbitalDep
-{  ExCorr_OrbitalDep_GLLBsc(const Everything&);
-  bool ignore_nCore() const { return true; }
-  ScalarFieldArray getPotential() const;
-  void dump() const;
+{	ExCorr_OrbitalDep_GLLBsc(const Everything&);
+	bool ignore_nCore() const { return true; }
+	ScalarFieldArray getPotential() const;
+	void dump() const;
 private:
-  double smearingWidth; //smearing width
-  std::vector<double> getExtremalEnergy(bool HOMO) const; //!<  get HOMO or LUMO energy (depending on HOMO=true/false), optionally accounting for smearing (depending on T)
-  ScalarFieldArray getPotential(std::vector<double> eHOMO, std::vector<double>* eLUMO=0) const; //!< get the orbital dep potential (or discontinuity contribution if eLUMO is non-null)
+	double smearingWidth; //smearing width
+	std::vector<double> getExtremalEnergy(bool HOMO) const; //!<  get HOMO or LUMO energy (depending on HOMO=true/false), optionally accounting for smearing (depending on T)
+	ScalarFieldArray getPotential(std::vector<double> eHOMO, std::vector<double>* eLUMO=0) const; //!< get the orbital dep potential (or discontinuity contribution if eLUMO is non-null)
 };
 
 //! @}

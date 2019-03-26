@@ -35,7 +35,7 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 #include <core/Thread.h>
 
 #ifdef GPU_ENABLED
-#include <cublas.h>
+#include <cublas_v2.h>
 #include <cuda_runtime.h>
 #endif
 
@@ -104,28 +104,28 @@ void eblas_zdivd_gpu(const int N, const double* X, const int incX, complex* Y, c
 //! @param Z Data pointer for input Z
 //! @param incZ Pointer increment for input Z
 void eblas_lincomb(const int N,
-  const complex& sX, const complex* X, const int incX,
-  const complex& sY, const complex* Y, const int incY,
-  complex* Z, const int incZ);
+	const complex& sX, const complex* X, const int incX,
+	const complex& sY, const complex* Y, const int incY,
+	complex* Z, const int incZ);
 
 #ifdef GPU_ENABLED
 //! @brief Equivalent of eblas_lincomb() for GPU data pointers
 void eblas_lincomb_gpu(const int N,
-  const complex& sX, const complex* X, const int incX,
-  const complex& sY, const complex* Y, const int incY,
-  complex* Z, const int incZ);
+	const complex& sX, const complex* X, const int incX,
+	const complex& sY, const complex* Y, const int incY,
+	complex* Z, const int incZ);
 #endif
 
 //! @brief Threaded complex matrix multiply (threaded wrapper around zgemm)
 //! All the parameters have the same meaning as in cblas_zgemm, except element order is always Column Major (FORTRAN order!)
 void eblas_zgemm(CBLAS_TRANSPOSE TransA, CBLAS_TRANSPOSE TransB, int M, int N, int K,
-  const complex& alpha, const complex *A, const int lda, const complex *B, const int ldb,
-  const complex& beta, complex *C, const int ldc);
+	const complex& alpha, const complex *A, const int lda, const complex *B, const int ldb,
+	const complex& beta, complex *C, const int ldc);
 #ifdef GPU_ENABLED
 //! @brief Wrap cublasZgemm to provide the same interface as eblas_zgemm()
 void eblas_zgemm_gpu(CBLAS_TRANSPOSE TransA, CBLAS_TRANSPOSE TransB, int M, int N, int K,
-  const complex& alpha, const complex *A, const int lda, const complex *B, const int ldb,
-  const complex& beta, complex *C, const int ldc);
+	const complex& alpha, const complex *A, const int lda, const complex *B, const int ldb,
+	const complex& beta, complex *C, const int ldc);
 #endif
 
 //Sparse<->dense vector operations:
@@ -262,31 +262,30 @@ template<typename T> void eblas_copy_gpu(T* dest, const T* src, int N) { cudaMem
 //! @brief Equivalent of eblas_zero() for GPU data pointers
 template<typename T> void eblas_zero_gpu(int N, T* x) { cudaMemset(x, 0, N*sizeof(T)); }
 //! @brief Equivalent of eblas_dscal() for GPU data pointers
-#define eblas_dscal_gpu cublasDscal
+void eblas_dscal_gpu(int N, double a, double* x, int incx);
 //! @brief Equivalent of eblas_zdscal() for GPU data pointers
 void eblas_zdscal_gpu(int N, double a, complex* x, int incx);
 //! @brief Equivalent of eblas_zscal for GPU data pointers
 void eblas_zscal_gpu(int N, const complex& a, complex* x, int incx);
 //! @brief Equivalent of eblas_daxpy() for GPU data pointers
-#define eblas_daxpy_gpu cublasDaxpy
+void eblas_daxpy_gpu(int N, double a, const double* x, int incx, double* y, int incy);
 //! @brief Equivalent of eblas_zaxpy() for GPU data pointers
 void eblas_zaxpy_gpu(int N, const complex& a, const complex* x, int incx, complex* y, int incy);
 //! @brief Equivalent of eblas_zdotc() for GPU data pointers
 complex eblas_zdotc_gpu(int N, const complex* x, int incx, const complex* y, int incy);
 //! @brief Equivalent of eblas_ddot() for GPU data pointers
-#define eblas_ddot_gpu cublasDdot
+double eblas_ddot_gpu(int N, const double* x, int incx, const double* y, int incy);
 //! @brief Equivalent of eblas_dznrm2() for GPU data pointers
 double eblas_dznrm2_gpu(int N, const complex* x, int incx);
 //! @brief Equivalent of eblas_dnrm2() for GPU data pointers
-#define eblas_dnrm2_gpu cublasDnrm2
-
+double eblas_dnrm2_gpu(int N, const double* x, int incx);
 #endif
 
 //! @brief Select between functionName and functionName_gpu for the CPU and GPU executables respectively
 #ifdef GPU_ENABLED
-  #define callPref(functionName) functionName##_gpu //gpu versions available, so use them preferentially
+	#define callPref(functionName) functionName##_gpu //gpu versions available, so use them preferentially
 #else
-  #define callPref(functionName) functionName //only cpu version available
+	#define callPref(functionName) functionName //only cpu version available
 #endif
 
 
@@ -314,26 +313,26 @@ void eblas_capMinMax_gpu(const int N, double* x, double& xMin, double& xMax, dou
 //Elementwise multiply implementation:
 template<typename Ty, typename Tx>
 void eblas_mul_sub(size_t iMin, size_t iMax, const Tx* X, const int incX, Ty* Y, const int incY)
-{  for(size_t i=iMin; i<iMax; i++) Y[incY*i] *= X[incX*i];
+{	for(size_t i=iMin; i<iMax; i++) Y[incY*i] *= X[incX*i];
 }
 
 template<typename Ty, typename Tx>
 void eblas_mul(const int N, const Tx* X, const int incX, Ty* Y, const int incY)
-{  if(incY==0) die("incY cannot be = 0")
-  threadLaunch((N<100000) ? 1 : 0, //force single threaded for small problem sizes
-    eblas_mul_sub<Ty,Tx>, N, X, incX, Y, incY);
+{	if(incY==0) die("incY cannot be = 0")
+	threadLaunch((N<100000) ? 1 : 0, //force single threaded for small problem sizes
+		eblas_mul_sub<Ty,Tx>, N, X, incX, Y, incY);
 }
 
 //Elementwise divide implementation:
 template<typename Ty, typename Tx>
 void eblas_div_sub(size_t iMin, size_t iMax, const Tx* X, const int incX, Ty* Y, const int incY)
-{  for(size_t i=iMin; i<iMax; i++) Y[incY*i] /= X[incX*i];
+{	for(size_t i=iMin; i<iMax; i++) Y[incY*i] /= X[incX*i];
 }
 template<typename Ty, typename Tx>
 void eblas_div(const int N, const Tx* X, const int incX, Ty* Y, const int incY)
-{  if(incY==0) die("incY cannot be = 0")
-  threadLaunch((N<100000) ? 1 : 0, //force single threaded for small problem sizes
-    eblas_div_sub<Ty,Tx>, N, X, incX, Y, incY);
+{	if(incY==0) die("incY cannot be = 0")
+	threadLaunch((N<100000) ? 1 : 0, //force single threaded for small problem sizes
+		eblas_div_sub<Ty,Tx>, N, X, incX, Y, incY);
 }
 //!@endcond
 

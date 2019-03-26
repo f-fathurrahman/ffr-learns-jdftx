@@ -31,28 +31,28 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 class CoulombWire : public Coulomb
 {
 public:
-  CoulombWire(const GridInfo& gInfoOrig, const CoulombParams& params);
+	CoulombWire(const GridInfo& gInfoOrig, const CoulombParams& params);
 protected:
-  ScalarFieldTilde apply(ScalarFieldTilde&&) const;
-  std::shared_ptr<Ewald> createEwald(matrix3<> R, size_t nAtoms) const;
+	ScalarFieldTilde apply(ScalarFieldTilde&&) const;
+	std::shared_ptr<Ewald> createEwald(matrix3<> R, size_t nAtoms) const;
 private:
-  WignerSeitz ws;
-  RealKernel Vc;
+	WignerSeitz ws;
+	RealKernel Vc;
 };
 
 //! Coulomb interaction for a 1D periodic system, truncated on a cylinder
 class CoulombCylindrical : public Coulomb
 {
 public:
-  CoulombCylindrical(const GridInfo& gInfoOrig, const CoulombParams& params);
+	CoulombCylindrical(const GridInfo& gInfoOrig, const CoulombParams& params);
 protected:
-  ScalarFieldTilde apply(ScalarFieldTilde&&) const;
-  std::shared_ptr<Ewald> createEwald(matrix3<> R, size_t nAtoms) const;
+	ScalarFieldTilde apply(ScalarFieldTilde&&) const;
+	std::shared_ptr<Ewald> createEwald(matrix3<> R, size_t nAtoms) const;
 private:
-  WignerSeitz ws;
-  double Rc; //!< radius of truncation (set to Wigner-Seitz in-radius if params.Rc=0)
-  RealKernel Vc;
-  friend struct ExchangeEval;
+	WignerSeitz ws;
+	double Rc; //!< radius of truncation (set to Wigner-Seitz in-radius if params.Rc=0)
+	RealKernel Vc;
+	friend struct ExchangeEval;
 };
 
 //! @}

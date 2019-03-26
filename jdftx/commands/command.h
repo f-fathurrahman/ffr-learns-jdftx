@@ -40,77 +40,77 @@ automatically during static initialization, just create an object of the
 new derived Command class at file scope. However, for coherent documentation,
 edit doc/commands.dox and link to the command in the appropriate section.
 
-  struct CommandDummy : public Command
-  {
-    CommandDummy() : Command("dummy")
-    {
-      format = "";
-      comments = "";
-    }
+	struct CommandDummy : public Command
+	{
+		CommandDummy() : Command("dummy")
+		{
+			format = "";
+			comments = "";
+		}
 
-    void process(ParamList& pl, Everything& e)
-    {
-    }
+		void process(ParamList& pl, Everything& e)
+		{
+		}
 
-    void printStatus(Everything& e, int iRep)
-    {
-    }
-  }
-  commandDummy;
+		void printStatus(Everything& e, int iRep)
+		{
+		}
+	}
+	commandDummy;
 */
 
 //! @brief Abstract base class for all commands
 class Command
 {
 public:
-  string name; //!< Identifier for the command in the input file. Must be unique!
-  string format; //!< Usage syntax for the command (excluding the command name)
-  string comments; //!< Detailed help for the command which goes into jdftx -t as well as the Doxygen manual. Please check formatting in both versions.
-  string section; //!< Which executable the command belongs to, and hence which section it must be documented under.
-  string category; //!< Category of command under which to list the documentation
-  string subcategory; //!< Subcategory of command under which to list the documentation
-  
-  std::set<string> requires; //!< Names of other commands that this one requires; those commands will be processed before this one.
-  std::set<string> forbids; //!< Names of other commands that this one is incompatibile with.
+	string name; //!< Identifier for the command in the input file. Must be unique!
+	string format; //!< Usage syntax for the command (excluding the command name)
+	string comments; //!< Detailed help for the command which goes into jdftx -t as well as the Doxygen manual. Please check formatting in both versions.
+	string section; //!< Which executable the command belongs to, and hence which section it must be documented under.
+	string category; //!< Category of command under which to list the documentation
+	string subcategory; //!< Subcategory of command under which to list the documentation
+	
+	std::set<string> requires; //!< Names of other commands that this one requires; those commands will be processed before this one.
+	std::set<string> forbids; //!< Names of other commands that this one is incompatibile with.
 
-  bool allowMultiple; //!< Whether this command can occur multiple times in an input file (default: false).
-  bool hasDefault; //!< Whether this command has a default (default: false). If true, process() will be called with an empty parameter list.
-  string emptyParamError; //!< Error message if command is manually issued with no parameters. Ddefault: empty i.e. allow empty parameter list.
-  
-  //! @brief Process the command from its command line
-  //! @param pl Parser utility object that simplifies extraction of parameters from the commandline
-  //! @param e Object of class Everything into which the settings extracted form this command should be stored
-  //! @throw string On any syntax / parse errors, throw a string containing a brief error (preferably single phrase) error message.
-  virtual void process(ParamList& pl, Everything& e)=0;
+	bool allowMultiple; //!< Whether this command can occur multiple times in an input file (default: false).
+	bool hasDefault; //!< Whether this command has a default (default: false). If true, process() will be called with an empty parameter list.
+	string emptyParamError; //!< Error message if command is manually issued with no parameters. Ddefault: empty i.e. allow empty parameter list.
+	
+	//! @brief Process the command from its command line
+	//! @param pl Parser utility object that simplifies extraction of parameters from the commandline
+	//! @param e Object of class Everything into which the settings extracted form this command should be stored
+	//! @throw string On any syntax / parse errors, throw a string containing a brief error (preferably single phrase) error message.
+	virtual void process(ParamList& pl, Everything& e)=0;
 
-  //! @brief Print a command line that would result in the current status
-  //! @param e Objct of class Everything whose status to reproduce
-  //! @param iRep For commands with allowMultiple=true, printStatus will be called multiple times and iRep is the index of the present call
-  virtual void printStatus(Everything& e, int iRep)=0;
+	//! @brief Print a command line that would result in the current status
+	//! @param e Objct of class Everything whose status to reproduce
+	//! @param iRep For commands with allowMultiple=true, printStatus will be called multiple times and iRep is the index of the present call
+	virtual void printStatus(Everything& e, int iRep)=0;
 
 protected:
-  //! This base class constructor adds the current command to a map from names to Command pointers
-  //! which can be accessed using getCommandMap(). This enables safe static initialization of the command list.
-  //! @param name Unique name of the command
-  //! @param path Documentation path for the command in the format
-  //!   "section/category/subcategory", where section is the name
-  //!   of the executable (jdftx, phonon or wannier),
-  //!   and the remaining help organize commands in the doc
-  Command(string name, string path);
+	//! This base class constructor adds the current command to a map from names to Command pointers
+	//! which can be accessed using getCommandMap(). This enables safe static initialization of the command list.
+	//! @param name Unique name of the command
+	//! @param path Documentation path for the command in the format
+	//!   "section/category/subcategory", where section is the name
+	//!   of the executable (jdftx, phonon or wannier),
+	//!   and the remaining help organize commands in the doc
+	Command(string name, string path);
 
-  void require(string); //!< utility to add a command to the requires list
-  void forbid(string); //!< utility to add a command to the forbids list
+	void require(string); //!< utility to add a command to the requires list
+	void forbid(string); //!< utility to add a command to the forbids list
 };
 
 //! Base class for a deprecated command which will translate old syntax into the new command that replaces it
 class DeprecatedCommand
 {
 public:
-  string name;
-  DeprecatedCommand(string name);
-  
-  //Return a replacement command and arguments pair
-  virtual std::pair<string,string> replace(ParamList& pl) const=0;
+	string name;
+	DeprecatedCommand(string name);
+	
+	//Return a replacement command and arguments pair
+	virtual std::pair<string,string> replace(ParamList& pl) const=0;
 };
 
 std::map<string,Command*>& getCommandMap(); //!< Retrieve the map from command names to objects created during static initialization
@@ -128,63 +128,63 @@ static EnumStringMap<bool> boolMap(false, "no", true, "yes"); //!< utility to pa
 template<typename GetDescription>
 string addDescriptions(string optionList, const GetDescription& getDescription, string spacer="\n+ ")
 {
-  //Determine max width of name, so as to align:
-  istringstream iss(optionList);
-  size_t nameWidth=0;
-  while(!iss.eof())
-  {  string name;
-    getline(iss, name, '|');
-    trim(name);
-    nameWidth = std::max(name.length(),nameWidth);
-  }
-  //Process decsription list:
-  iss.seekg(0, std::ios::beg); //rewind;
-  string ret;
-  while(!iss.eof())
-  {  //Get a name from the option list:
-    string name;
-    getline(iss, name, '|');
-    trim(name);
-    if(!name.length()) break;
-    //Get the description:
-    string desc = getDescription(name);
-    //Pad the name to required width:
-    if(name.length()<nameWidth)
-      name.resize(nameWidth, ' ');
-    ret += spacer + name;
-    if(desc.length()) ret += ": " + desc;
-  }
-  return ret;
+	//Determine max width of name, so as to align:
+	istringstream iss(optionList);
+	size_t nameWidth=0;
+	while(!iss.eof())
+	{	string name;
+		getline(iss, name, '|');
+		trim(name);
+		nameWidth = std::max(name.length(),nameWidth);
+	}
+	//Process decsription list:
+	iss.seekg(0, std::ios::beg); //rewind;
+	string ret;
+	while(!iss.eof())
+	{	//Get a name from the option list:
+		string name;
+		getline(iss, name, '|');
+		trim(name);
+		if(!name.length()) break;
+		//Get the description:
+		string desc = getDescription(name);
+		//Pad the name to required width:
+		if(name.length()<nameWidth)
+			name.resize(nameWidth, ' ');
+		ret += spacer + name;
+		if(desc.length()) ret += ": " + desc;
+	}
+	return ret;
 }
 
 //! @brief Null description function that can be used with addDescriptions().
 //! This can be useful for simply reformatting EnumStringMap::optionList() 
 inline string nullDescription(const string&)
-{  return string();
+{	return string();
 }
 
 //! @brief Generate a description functor for addDescriptions() from an EnumStringMap
 //! @tparam Enum The template parameter of EnumStringMap
 template<typename Enum> struct LinkDescription
-{  const EnumStringMap<Enum>& nameMap;
-  const EnumStringMap<Enum>& descMap;
-  
-  //! @param nameMap Link between enum members to corresponding name strings
-  //! @param descMap Link between enum members to corresponding description strings
-  LinkDescription(const EnumStringMap<Enum>& nameMap, const EnumStringMap<Enum>& descMap)
-  : nameMap(nameMap), descMap(descMap)
-  {
-  }
-  
-  //! @brief Look name up in nameMap, and return the corresponding description in descMap
-  //! @param name One of the string entries in nameMap
-  //! @return The corresponding string in descMap
-  string operator()(const string& name) const
-  {  Enum type = Enum();
-    bool nameFound = nameMap.getEnum(name.c_str(), type);
-    assert(nameFound);
-    return descMap.getString(type);
-  }
+{	const EnumStringMap<Enum>& nameMap;
+	const EnumStringMap<Enum>& descMap;
+	
+	//! @param nameMap Link between enum members to corresponding name strings
+	//! @param descMap Link between enum members to corresponding description strings
+	LinkDescription(const EnumStringMap<Enum>& nameMap, const EnumStringMap<Enum>& descMap)
+	: nameMap(nameMap), descMap(descMap)
+	{
+	}
+	
+	//! @brief Look name up in nameMap, and return the corresponding description in descMap
+	//! @param name One of the string entries in nameMap
+	//! @return The corresponding string in descMap
+	string operator()(const string& name) const
+	{	Enum type = Enum();
+		bool nameFound = nameMap.getEnum(name.c_str(), type);
+		assert(nameFound);
+		return descMap.getString(type);
+	}
 };
 
 //! @brief Helper function to select appropriate LinkDescription<> by overloading
@@ -193,7 +193,7 @@ template<typename Enum> struct LinkDescription
 //! @param descMap Link between enum members to corresponding description strings
 template<typename Enum>
 LinkDescription<Enum> linkDescription(const EnumStringMap<Enum>& nameMap, const EnumStringMap<Enum>& descMap)
-{  return LinkDescription<Enum>(nameMap, descMap);
+{	return LinkDescription<Enum>(nameMap, descMap);
 }
 
 //! @brief Find species matching an id (and create it from a wildcard if necessary)

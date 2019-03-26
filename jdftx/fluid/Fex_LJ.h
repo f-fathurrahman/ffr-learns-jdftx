@@ -37,54 +37,54 @@ class Fex_LJ : public Fex
 {
 public:
 
-  //! Create a fluid of Lennard-Jones particles with well-depth eps
-  //! The range parameter sigma is set to the hard sphere diameter of the first site
+	//! Create a fluid of Lennard-Jones particles with well-depth eps
+	//! The range parameter sigma is set to the hard sphere diameter of the first site
   Fex_LJ(const FluidMixture*, const FluidComponent*, double eps, double sigmaOverride = 0.0);
     virtual ~Fex_LJ();
-  
-  double compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const;
-  double computeUniform(const double* N, double* Phi_N) const;
+	
+	double compute(const ScalarFieldTilde* Ntilde, ScalarFieldTilde* Phi_Ntilde) const;
+	double computeUniform(const double* N, double* Phi_N) const;
 private:
-  friend class Fmix_LJ; //allow Fmix_LJ to peek at eps and sigma to select coupling parameters
-  double sigma;
-  RadialFunctionG ljatt;
+	friend class Fmix_LJ; //allow Fmix_LJ to peek at eps and sigma to select coupling parameters
+	double sigma;
+	RadialFunctionG ljatt;
 };
 
 //! Lennard-Jones interaction functional
 class Fmix_LJ : public Fmix
 {
 public:
-  //! Add a lennard-jones coupling between two LJ fluid
-  //! Could set parameters using the Lorentz-Berthelot Mixing Rules if desired
-  Fmix_LJ(FluidMixture*, std::shared_ptr<FluidComponent> fluid1, std::shared_ptr<FluidComponent> fluid2, double eps, double sigma);
-  virtual ~Fmix_LJ();
-  string getName() const;
+	//! Add a lennard-jones coupling between two LJ fluid
+	//! Could set parameters using the Lorentz-Berthelot Mixing Rules if desired
+	Fmix_LJ(FluidMixture*, std::shared_ptr<FluidComponent> fluid1, std::shared_ptr<FluidComponent> fluid2, double eps, double sigma);
+	virtual ~Fmix_LJ();
+	string getName() const;
 
-  double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const;
-  double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const;
+	double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const;
+	double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const;
 private:
-  std::shared_ptr<FluidComponent> fluid1, fluid2;
-  RadialFunctionG ljatt;
+	std::shared_ptr<FluidComponent> fluid1, fluid2;
+	RadialFunctionG ljatt;
 };
 
 //! Gaussian Kernel interaction functional
 class Fmix_GaussianKernel : public Fmix
 {
 public:
-  //! Add a gaussian coupling potential between two fluids
-  //!< mixing parameter Esolv: depth of interaction potential in hartree
-  //!< mixing parameter Rsolv; width of gaussian kernel interaction potential in bohr
-  Fmix_GaussianKernel(FluidMixture*, std::shared_ptr<FluidComponent> fluid1, std::shared_ptr<FluidComponent> fluid2, double Esolv, double Rsolv);
-  virtual ~Fmix_GaussianKernel();
-  string getName() const;
+	//! Add a gaussian coupling potential between two fluids
+	//!< mixing parameter Esolv: depth of interaction potential in hartree
+	//!< mixing parameter Rsolv; width of gaussian kernel interaction potential in bohr
+	Fmix_GaussianKernel(FluidMixture*, std::shared_ptr<FluidComponent> fluid1, std::shared_ptr<FluidComponent> fluid2, double Esolv, double Rsolv);
+	virtual ~Fmix_GaussianKernel();
+	string getName() const;
 
-  double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const;
-  double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const;
+	double compute(const ScalarFieldTildeArray& Ntilde, ScalarFieldTildeArray& Phi_Ntilde) const;
+	double computeUniform(const std::vector<double>& N, std::vector<double>& Phi_N) const;
 private:
-  std::shared_ptr<FluidComponent> fluid1, fluid2;
-  RadialFunctionG Ksolv; //shape function for interaction
-  double Kmul; //prefactor to interaction
-  
+	std::shared_ptr<FluidComponent> fluid1, fluid2;
+	RadialFunctionG Ksolv; //shape function for interaction
+	double Kmul; //prefactor to interaction
+	
 };
 
 //! @}

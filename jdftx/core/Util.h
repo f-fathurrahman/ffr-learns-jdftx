@@ -38,13 +38,32 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 //------------- Common Initialization -----------------
 
+extern string inputBasename; //!< Basename of input file or "stdin" that can be used as a default run-name
 extern bool killFlag; //!< Flag set by signal handlers - all compute loops should quit cleanly when this is set
-extern MPIUtil* mpiUtil;
+extern MPIUtil* mpiWorld; //!< MPI across all processes
+extern MPIUtil* mpiGroup; //!< MPI within current group of processes
+extern MPIUtil* mpiGroupHead; //!< MPI across equal ranks in each group
 extern bool mpiDebugLog; //!< If true, all processes output to seperate debug log files, otherwise only head process outputs (set before calling initSystem())
 extern size_t mempoolSize; //!< If non-zero, size of memory pool managed internally by JDFTx
-void printVersionBanner(); //!< Print package name, version, revision etc. to log
-void initSystem(int argc, char** argv); //!< Init MPI (if not already done), print banner, set up threads (play nice with job schedulers), GPU and signal handlers
-void initSystemCmdline(int argc, char** argv, const char* description, string& inputFilename, bool& dryRun, bool& printDefaults, class Everything* e=0); //!< initSystem along with commandline options
+
+//! Parameters used for common initialization functions
+struct InitParams
+{	//Input parameters:
+	const char* description; //!< description of program used when printing usage
+	class Everything* e; //!< pointer to use when calling template
+	InitParams(const char* description=0, class Everything* e=0);
+	//Output parameters retrieved from command-line:
+	string inputFilename; //!< name of input file
+	bool dryRun; //!< whether this is a dry run
+	bool printDefaults; //!< whether to print default commands
+	//Optional parameters useful when calling from outside JDFTx:
+	const char* packageName; //!< package name dispalyed in banner
+	const char* versionString; //!< version string displayed in banner
+	const char* versionHash; //!< git hash displayed in banner (if any)
+};
+void printVersionBanner(const InitParams* ip=0); //!< Print package name, version, revision etc. to log
+void initSystem(int argc, char** argv, const InitParams* ip=0); //!< Init MPI (if not already done), print banner, set up threads (play nice with job schedulers), GPU and signal handlers
+void initSystemCmdline(int argc, char** argv, InitParams& ip); //!< initSystem along with commandline options
 void finalizeSystem(bool successful=true); //!< Clean-up corresponding to initSystem(), final messages (depending on successful) and clean-up MPI
 
 //----------------- Profiling --------------------------
@@ -59,10 +78,10 @@ Code must be self-contained as a scope, as it will be surrounded by { }, and sho
 @param code The code block to time (must be a self-contained scope)
 */
 #define TIME(title,fp,code) \
-{  double runTime = clock_us(); \
-  { code } \
-  runTime = clock_us() - runTime; \
-  fprintf(fp, "%s took %.2le s.\n", title, runTime*1e-6); \
+{	double runTime = clock_us(); \
+	{ code } \
+	runTime = clock_us() - runTime; \
+	fprintf(fp, "%s took %.2le s.\n", title, runTime*1e-6); \
 }
 
 //! Quick drop-in profiler for any function. Usage:
@@ -73,22 +92,22 @@ Code must be self-contained as a scope, as it will be surrounded by { }, and sho
 class StopWatch
 {
 public:
-  StopWatch(string name);
-  void start();
-  void stop();
-  void print() const;
+	StopWatch(string name);
+	void start();
+	void stop();
+	void print() const;
 private:
-  double tPrev, Ttot, TsqTot; int nT;
-  string name;
+	double tPrev, Ttot, TsqTot; int nT;
+	string name;
 };
 #else //ENABLE_PROFILING
 //Version which does no profiling for release versions
 class StopWatch
 {
 public:
-  StopWatch(string name) {}
-  void start() {}
-  void stop() {}
+	StopWatch(string name) {}
+	void start() {}
+	void stop() {}
 };
 #endif //ENABLE_PROFILING
 
@@ -100,7 +119,7 @@ void stackTraceExit(int code); //!< Exit on error with stack trace
 int assertStackTraceExit(const char* expr, const char* function, const char* file, long line); //!< stack trace on failed assertions
 //! A custom assertion with stack trace (NOTE: enabled in release modes as well)
 #define assert(expr) \
-  (void)((expr) ? 0 : assertStackTraceExit(#expr, __func__, __FILE__, __LINE__))
+	(void)((expr) ? 0 : assertStackTraceExit(#expr, __func__, __FILE__, __LINE__))
 
 
 // -----------  Logging ---------------
@@ -114,31 +133,30 @@ void logResume(); //!< re-enable logging after a logSuspend() call
 
 //! @brief Quit with an error message (formatted using printf()). Must be called from all processes.
 #define die(...) \
-  {  fprintf(globalLog, __VA_ARGS__); \
-    if(mpiUtil->isHead() && globalLog != stdout) \
-      fprintf(stderr, __VA_ARGS__); \
-    finalizeSystem(false); \
-    exit(1); \
-  }
+	{	fprintf(globalLog, __VA_ARGS__); \
+		if(mpiWorld->isHead() && globalLog != stdout) \
+			fprintf(stderr, __VA_ARGS__); \
+		finalizeSystem(false); \
+		exit(1); \
+	}
 
 //! @brief Version of die that should only be used when it is impossible to guarantee synchronized calls from all processes
 #define die_alone(...) \
-  {  fprintf(globalLog, __VA_ARGS__); \
-    fflush(globalLog); \
-    if(mpiUtil->isHead() && globalLog != stdout) \
-      fprintf(stderr, __VA_ARGS__); \
-    if(mpiUtil->nProcesses() == 1) finalizeSystem(false); /* Safe to call only if no other process */ \
-    mpiUtil->exit(1); \
-  }
+	{	fprintf(globalLog, __VA_ARGS__); \
+		fflush(globalLog); \
+		if(mpiWorld->isHead() && globalLog != stdout) \
+			fprintf(stderr, __VA_ARGS__); \
+		mpiWorld->exit(1); \
+	}
 
 //--------------- Citations --------------------
 namespace Citations
-{  //!Add a citation to a paper with a reason
-  //!(The same paper could be cited multiple times for different reasons)
-  void add(string reason, string paper);
-  
-  //!Print the list of citations (with reasons) to the specified stream
-  void print(FILE* fp=globalLog);
+{	//!Add a citation to a paper with a reason
+	//!(The same paper could be cited multiple times for different reasons)
+	void add(string reason, string paper);
+	
+	//!Print the list of citations (with reasons) to the specified stream
+	void print(FILE* fp=globalLog);
 }
 
 
@@ -151,7 +169,7 @@ off_t fileSize(const char *filename);
 
 #include <inttypes.h>
 #ifndef PRIdPTR
-  #define PRIdPTR "zd" //For pre-C++11 compilers
+	#define PRIdPTR "zd" //For pre-C++11 compilers
 #endif
 
 //Endianness utilities (all binary I/O is from little-endian files regardless of operating endianness):
@@ -162,58 +180,58 @@ size_t fwriteLE(const void *ptr, size_t size, size_t nmemb, FILE *fp); //!< Writ
 
 //! For any x and y>0, compute z = x % y such that 0 <= z < y
 inline uint16_t positiveRemainder(int16_t x, uint16_t y)
-{  int16_t xMody = x % y;
-  if(xMody < 0) return uint16_t(y + xMody);
-  else return xMody;
+{	int16_t xMody = x % y;
+	if(xMody < 0) return uint16_t(y + xMody);
+	else return xMody;
 }
 
 //! Check if an integer is suitable for Fast Fourier Transforms (small prime factors only)
 inline bool fftSuitable(int N)
-{  static std::array<int,4> primes = {{2,3,5,7}};
-  int tmpN = N;
-  for(int p: primes) while(tmpN % p == 0) tmpN /= p;
-  //All suitable prime factors taken out, we should be left with 1 for a suitable N:
-  return (tmpN==1);
+{	static std::array<int,4> primes = {{2,3,5,7}};
+	int tmpN = N;
+	for(int p: primes) while(tmpN % p == 0) tmpN /= p;
+	//All suitable prime factors taken out, we should be left with 1 for a suitable N:
+	return (tmpN==1);
 }
 
 //! A template to ease option parsing (maps enums <--> strings)
 template<typename Enum>
 class EnumStringMap
 {
-  std::map<string,Enum> stringToEnum;
-  std::map<Enum,string> enumToString;
-  void addEntry() {}
-  template<typename...Args> void addEntry(Enum e, const string& s, Args...args)
-  {  stringToEnum[s]=e; enumToString[e]=s;
-    addEntry(args...);
-  }
+	std::map<string,Enum> stringToEnum;
+	std::map<Enum,string> enumToString;
+	void addEntry() {}
+	template<typename...Args> void addEntry(Enum e, const string& s, Args...args)
+	{	stringToEnum[s]=e; enumToString[e]=s;
+		addEntry(args...);
+	}
 public:
-  //Initialize using the convenient syntax:
-  // EnumStringMap mapname(enum1, string1, enum2, string2, ... as many as needed!)
-  template<typename...Args> EnumStringMap(Args...args) { addEntry(args...); }
+	//Initialize using the convenient syntax:
+	// EnumStringMap mapname(enum1, string1, enum2, string2, ... as many as needed!)
+	template<typename...Args> EnumStringMap(Args...args) { addEntry(args...); }
 
-  //Match a key string to an enum, return false if not found
-  bool getEnum(const char* key, Enum& e) const
-  {  typename std::map<string,Enum>::const_iterator i = stringToEnum.find(key);
-    if(i==stringToEnum.end()) return false;
-    else
-    {  e = i->second;
-      return true;
-    }
-  }
+	//Match a key string to an enum, return false if not found
+	bool getEnum(const char* key, Enum& e) const
+	{	typename std::map<string,Enum>::const_iterator i = stringToEnum.find(key);
+		if(i==stringToEnum.end()) return false;
+		else
+		{	e = i->second;
+			return true;
+		}
+	}
 
-  //Return the string representation of the enum:
-  const char* getString(Enum e) const
-  {  typename std::map<Enum,string>::const_iterator i = enumToString.find(e);
-    return i->second.c_str();
-  }
+	//Return the string representation of the enum:
+	const char* getString(Enum e) const
+	{	typename std::map<Enum,string>::const_iterator i = enumToString.find(e);
+		return i->second.c_str();
+	}
 
-  string optionList() const
-  {  typename std::map<string,Enum>::const_iterator i=stringToEnum.begin();
-    string ret = i->first; i++;
-    for(; i!=stringToEnum.end(); i++) ret += ("|"+i->first);
-    return ret;
-  }
+	string optionList() const
+	{	typename std::map<string,Enum>::const_iterator i=stringToEnum.begin();
+		string ret = i->first; i++;
+		for(; i!=stringToEnum.end(); i++) ret += ("|"+i->first);
+		return ret;
+	}
 };
 
 //! @}

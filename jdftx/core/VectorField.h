@@ -45,44 +45,45 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 //! @tparam T ScalarFieldData or ScalarFieldTildeData
 //! @tparam N Number of elements in multiplet
 template<class T, int N> struct ScalarFieldMultiplet
-{  std::vector<Tptr> component; //!< the array of components (also accessible via #operator[])
+{	std::vector<Tptr> component; //!< the array of components (also accessible via #operator[])
 
-  //! @brief Construct multiplet from an array of data sets (or default: initialize to null)
-  //! @param in Pointer to array, or null to initialize each component to null
-  ScalarFieldMultiplet(const Tptr* in=0) : component(N) { Nloop( component[i] = (in ? in[i] : 0); ) }
+	//! @brief Construct multiplet from an array of data sets (or default: initialize to null)
+	//! @param in Pointer to array, or null to initialize each component to null
+	ScalarFieldMultiplet(const Tptr* in=0) : component(N) { Nloop( component[i] = (in ? in[i] : 0); ) }
 
-  //! @brief Construct a multiplet with allocated data
-  //! @param gInfo Simulation grid info / memory manager to use to allocate the data
-  ScalarFieldMultiplet(const GridInfo& gInfo, bool onGpu=false) : component(N) { Nloop( component[i] = Tptr(T::alloc(gInfo,onGpu)); ) }
+	//! @brief Construct a multiplet with allocated data
+	//! @param gInfo Simulation grid info / memory manager to use to allocate the data
+	//! @param onGpu Boolean flag to indicate whether memory is on GPU
+	ScalarFieldMultiplet(const GridInfo& gInfo, bool onGpu=false) : component(N) { Nloop( component[i] = Tptr(T::alloc(gInfo,onGpu)); ) }
 
-  Tptr& operator[](int i) { return component[i]; } //!< Retrieve a reference to the i'th component (no bound checks)
-  const Tptr& operator[](int i) const { return component[i]; } //!< Retrieve a const reference to the i'th component (no bound checks)
-  ScalarFieldMultiplet clone() const { TptrMul out; Nloop( out[i] = component[i]->clone(); ) return out; } //!< Clone data (note assignment will be reference for the actual data)
+	Tptr& operator[](int i) { return component[i]; } //!< Retrieve a reference to the i'th component (no bound checks)
+	const Tptr& operator[](int i) const { return component[i]; } //!< Retrieve a const reference to the i'th component (no bound checks)
+	ScalarFieldMultiplet clone() const { TptrMul out; Nloop( out[i] = component[i]->clone(); ) return out; } //!< Clone data (note assignment will be reference for the actual data)
 
-  std::vector<typename T::DataType*> data(); //!< Get the component data pointers in an std::vector
-  std::vector<const typename T::DataType*> data() const; //!< Get the component data pointers in an std::vector (const version)
-  std::vector<const typename T::DataType*> const_data() const { return data(); } //!< Get the component data pointers in an std::vector (const version)
-  #ifdef GPU_ENABLED
-  std::vector<typename T::DataType*> dataGpu(); //!< Get the component GPU data pointers in an std::vector
-  std::vector<const typename T::DataType*> dataGpu() const; //!< Get the component GPU data pointers in an std::vector (const version)
-  std::vector<const typename T::DataType*> const_dataGpu() const { return dataGpu(); } //!< Get the component GPU data pointers in an std::vector (const version)
-  #endif
+	std::vector<typename T::DataType*> data(); //!< Get the component data pointers in an std::vector
+	std::vector<const typename T::DataType*> data() const; //!< Get the component data pointers in an std::vector (const version)
+	std::vector<const typename T::DataType*> const_data() const { return data(); } //!< Get the component data pointers in an std::vector (const version)
+	#ifdef GPU_ENABLED
+	std::vector<typename T::DataType*> dataGpu(); //!< Get the component GPU data pointers in an std::vector
+	std::vector<const typename T::DataType*> dataGpu() const; //!< Get the component GPU data pointers in an std::vector (const version)
+	std::vector<const typename T::DataType*> const_dataGpu() const { return dataGpu(); } //!< Get the component GPU data pointers in an std::vector (const version)
+	#endif
 
-  //Preferred data access (on GPU if available, on CPU otherwise)
-  #ifdef GPU_ENABLED
-  std::vector<typename T::DataType*> dataPref() { return dataGpu(); }
-  std::vector<const typename T::DataType*> dataPref() const { return dataGpu(); }
-  std::vector<const typename T::DataType*> const_dataPref() const { return dataGpu(); }
-  #else
-  std::vector<typename T::DataType*> dataPref()  { return data(); }
-  std::vector<const typename T::DataType*> dataPref() const { return data(); }
-  std::vector<const typename T::DataType*> const_dataPref() const { return data(); }
-  #endif
+	//Preferred data access (on GPU if available, on CPU otherwise)
+	#ifdef GPU_ENABLED
+	std::vector<typename T::DataType*> dataPref() { return dataGpu(); }
+	std::vector<const typename T::DataType*> dataPref() const { return dataGpu(); }
+	std::vector<const typename T::DataType*> const_dataPref() const { return dataGpu(); }
+	#else
+	std::vector<typename T::DataType*> dataPref()  { return data(); }
+	std::vector<const typename T::DataType*> dataPref() const { return data(); }
+	std::vector<const typename T::DataType*> const_dataPref() const { return data(); }
+	#endif
 
-  
-  explicit operator bool() const { bool ret=true; Nloop(ret = ret && component[i];) return ret; } //!< Cast to bool: true if all components are non-null
-  void loadFromFile(const char* fileName); //!< Load all components from a single binary file
-  void saveToFile(const char* fileName) const; //!< Save all components from a single binary file
+	
+	explicit operator bool() const { bool ret=true; Nloop(ret = ret && component[i];) return ret; } //!< Cast to bool: true if all components are non-null
+	void loadFromFile(const char* fileName); //!< Load all components from a single binary file
+	void saveToFile(const char* fileName) const; //!< Save all components from a single binary file
 };
 typedef ScalarFieldMultiplet<ScalarFieldData,3> VectorField; //!< Real space vector field
 typedef ScalarFieldMultiplet<ScalarFieldTildeData,3> VectorFieldTilde; //!< Reciprocal space vector field
@@ -206,123 +207,123 @@ template<int N> void printStats(const RptrMul&, const char* name, FILE* fpLog=st
 
 template<class T, int N>
 std::vector<typename T::DataType*> TptrMul::data()
-{  std::vector<typename T::DataType*> ret(N, (typename T::DataType*)0);
-  Nloop( if(component[i]) ret[i] = component[i]->data(); )
-  return ret;
+{	std::vector<typename T::DataType*> ret(N, (typename T::DataType*)0);
+	Nloop( if(component[i]) ret[i] = component[i]->data(); )
+	return ret;
 }
 template<class T, int N>
 std::vector<const typename T::DataType*> TptrMul::data() const
-{  std::vector<const typename T::DataType*> ret(N, (const typename T::DataType*)0);
-  Nloop( if(component[i]) ret[i] = component[i]->data(); )
-  return ret;
+{	std::vector<const typename T::DataType*> ret(N, (const typename T::DataType*)0);
+	Nloop( if(component[i]) ret[i] = component[i]->data(); )
+	return ret;
 }
 #ifdef GPU_ENABLED
 template<class T, int N>
 std::vector<typename T::DataType*> TptrMul::dataGpu()
-{  std::vector<typename T::DataType*> ret(N, (typename T::DataType*)0);
-  Nloop( if(component[i]) ret[i] = component[i]->dataGpu(); )
-  return ret;
+{	std::vector<typename T::DataType*> ret(N, (typename T::DataType*)0);
+	Nloop( if(component[i]) ret[i] = component[i]->dataGpu(); )
+	return ret;
 }
 template<class T, int N>
 std::vector<const typename T::DataType*> TptrMul::dataGpu() const
-{  std::vector<const typename T::DataType*> ret(N, (typename T::DataType*)0);
-  Nloop( if(component[i]) ret[i] = component[i]->dataGpu(); )
-  return ret;
+{	std::vector<const typename T::DataType*> ret(N, (typename T::DataType*)0);
+	Nloop( if(component[i]) ret[i] = component[i]->dataGpu(); )
+	return ret;
 }
 #endif
 
 template<class T, int N>
 void TptrMul::loadFromFile(const char* filename)
-{  //Checks for the correct filesize
-  off_t expectedLen = 0;
-  Nloop(expectedLen += sizeof(typename T::DataType) * component[i]->nElem;)
-  off_t fLen = fileSize(filename);
-  if(fLen != expectedLen)
-  {  die("\nLength of '%s' was %ld instead of the expected %ld bytes.\n"
-        "Hint: Are you really reading the correct file?\n\n",
-        filename, (unsigned long)fLen, (unsigned long)expectedLen);
-  }
-  
-  FILE* fp = fopen(filename, "rb");
-  if(!fp) die("Could not open %s for reading.\n", filename)
-  Nloop(
-    if(!component[i]) die("Component %d was null in loadFromFile(\"%s\").\n", i, filename)  
-    if(freadLE(component[i]->data(), sizeof(typename T::DataType), component[i]->nElem, fp) < unsigned(component[i]->nElem))
-      die("File ended too soon while reading component %d in loadFromFile(\"%s\").\n", i, filename)
-  )
-  fclose(fp);
+{	//Checks for the correct filesize
+	off_t expectedLen = 0;
+	Nloop(expectedLen += sizeof(typename T::DataType) * component[i]->nElem;)
+	off_t fLen = fileSize(filename);
+	if(fLen != expectedLen)
+	{	die("\nLength of '%s' was %ld instead of the expected %ld bytes.\n"
+				"Hint: Are you really reading the correct file?\n\n",
+				filename, (unsigned long)fLen, (unsigned long)expectedLen);
+	}
+	
+	FILE* fp = fopen(filename, "rb");
+	if(!fp) die("Could not open %s for reading.\n", filename)
+	Nloop(
+		if(!component[i]) die("Component %d was null in loadFromFile(\"%s\").\n", i, filename)	
+		if(freadLE(component[i]->data(), sizeof(typename T::DataType), component[i]->nElem, fp) < unsigned(component[i]->nElem))
+			die("File ended too soon while reading component %d in loadFromFile(\"%s\").\n", i, filename)
+	)
+	fclose(fp);
 }
 template<class T, int N>
 void TptrMul::saveToFile(const char* filename) const
-{  FILE* fp = fopen(filename, "wb");
-  if(!fp) die("Could not open %s for writing.\n", filename)
-  Nloop(
-    if(!component[i]) die("Component %d was null in saveToFile(\"%s\").\n", i, filename)
-    fwriteLE(component[i]->data(), sizeof(typename T::DataType), component[i]->nElem, fp);
-  )
-  fclose(fp);
+{	FILE* fp = fopen(filename, "wb");
+	if(!fp) die("Could not open %s for writing.\n", filename)
+	Nloop(
+		if(!component[i]) die("Component %d was null in saveToFile(\"%s\").\n", i, filename)
+		fwriteLE(component[i]->data(), sizeof(typename T::DataType), component[i]->nElem, fp);
+	)
+	fclose(fp);
 }
 
 namespace ScalarFieldMultipletPrivate
 {
-  template<typename FuncOut, typename FuncIn, typename Out, typename In>
-  void threadUnary_sub(int iOpThread, int nOpThreads, int nThreadsTot, int N, FuncOut (*func)(FuncIn,int), Out* out, In in)
-  {  //Divide jobs amongst operator threads:
-    int iStart = (iOpThread*N)/nOpThreads;
-    int iStop = ((iOpThread+1)*N)/nOpThreads;
-    //Divide total threads amongst operator threads:
-    int nThreads = ((iOpThread+1)*nThreadsTot)/nOpThreads - (iOpThread*nThreadsTot)/nOpThreads;
-    for(int i=iStart; i<iStop; i++)
-      (*out)[i] = func((FuncIn)in[i], nThreads);
-  }
+	template<typename FuncOut, typename FuncIn, typename Out, typename In>
+	void threadUnary_sub(int iOpThread, int nOpThreads, int nThreadsTot, int N, FuncOut (*func)(FuncIn,int), Out* out, In in)
+	{	//Divide jobs amongst operator threads:
+		int iStart = (iOpThread*N)/nOpThreads;
+		int iStop = ((iOpThread+1)*N)/nOpThreads;
+		//Divide total threads amongst operator threads:
+		int nThreads = ((iOpThread+1)*nThreadsTot)/nOpThreads - (iOpThread*nThreadsTot)/nOpThreads;
+		for(int i=iStart; i<iStop; i++)
+			(*out)[i] = func((FuncIn)in[i], nThreads);
+	}
 
-  template<typename FuncOut, typename FuncIn, typename Out, typename In>
-  void threadUnary(FuncOut (*func)(FuncIn,int), int N, Out* out, In in)
-  {  int nThreadsTot = (isGpuEnabled() || !shouldThreadOperators()) ? 1 : nProcsAvailable;
-    int nOperatorThreads = std::min(nThreadsTot, N);
-    threadLaunch(nOperatorThreads, threadUnary_sub<FuncOut,FuncIn,Out,In>, 0, nThreadsTot, N, func, out, in);
-  }
+	template<typename FuncOut, typename FuncIn, typename Out, typename In>
+	void threadUnary(FuncOut (*func)(FuncIn,int), int N, Out* out, In in)
+	{	int nThreadsTot = (isGpuEnabled() || !shouldThreadOperators()) ? 1 : nProcsAvailable;
+		int nOperatorThreads = std::min(nThreadsTot, N);
+		threadLaunch(nOperatorThreads, threadUnary_sub<FuncOut,FuncIn,Out,In>, 0, nThreadsTot, N, func, out, in);
+	}
 };
 
 template<int N>
 RptrMul I(GptrMul&& X)
-{  using namespace ScalarFieldMultipletPrivate;
-  RptrMul out;
-  ScalarField (*func)(ScalarFieldTilde&&,int) = I;
-  threadUnary<ScalarField,ScalarFieldTilde&&>(func, N, &out, X);
-  return out;
+{	using namespace ScalarFieldMultipletPrivate;
+	RptrMul out;
+	ScalarField (*func)(ScalarFieldTilde&&,int) = I;
+	threadUnary<ScalarField,ScalarFieldTilde&&>(func, N, &out, X);
+	return out;
 }
 
 template<int N>
 GptrMul J(const RptrMul& X)
-{  using namespace ScalarFieldMultipletPrivate;
-  GptrMul out;
-  ScalarFieldTilde (*func)(const ScalarField&,int) = J;
-  threadUnary(func, N, &out, X);
-  return out;
+{	using namespace ScalarFieldMultipletPrivate;
+	GptrMul out;
+	ScalarFieldTilde (*func)(const ScalarField&,int) = J;
+	threadUnary(func, N, &out, X);
+	return out;
 }
 
 template<int N>
 GptrMul Idag(const RptrMul& X)
-{  using namespace ScalarFieldMultipletPrivate;
-  GptrMul out;
-  ScalarFieldTilde (*func)(const ScalarField&,int) = Idag;
-  threadUnary(func, N, &out, X);
-  return out;
+{	using namespace ScalarFieldMultipletPrivate;
+	GptrMul out;
+	ScalarFieldTilde (*func)(const ScalarField&,int) = Idag;
+	threadUnary(func, N, &out, X);
+	return out;
 }
 
 template<int N>
 RptrMul Jdag(GptrMul&& X)
-{  using namespace ScalarFieldMultipletPrivate;
-  RptrMul out;
-  ScalarField (*func)(ScalarFieldTilde&&,int) = Jdag;
-  threadUnary<ScalarField,ScalarFieldTilde&&>(func, N, &out, X);
-  return out;
+{	using namespace ScalarFieldMultipletPrivate;
+	RptrMul out;
+	ScalarField (*func)(ScalarFieldTilde&&,int) = Jdag;
+	threadUnary<ScalarField,ScalarFieldTilde&&>(func, N, &out, X);
+	return out;
 }
 
 template<int N> void printStats(const RptrMul& X, const char* namePrefix, FILE* fpLog)
-{  char name[256];
-  Nloop( sprintf(name, "%s[%d]", namePrefix, i); printStats(X[i], name, fpLog); )
+{	char name[256];
+	Nloop( sprintf(name, "%s[%d]", namePrefix, i); printStats(X[i], name, fpLog); )
 }
 
 #undef Tptr
