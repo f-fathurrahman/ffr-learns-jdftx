@@ -1,5 +1,0 @@
-SRC = \
-commands.cpp \
-Phonon.cpp \
-Phonon_init.cpp \
-Phonon_supercell.cpp

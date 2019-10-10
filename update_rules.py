@@ -8,7 +8,6 @@ lines = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE).stdout.read()
 
 # remove various unwanted files
 lines = lines.replace('jdftx/electronic/Blip.cpp','')
-lines = lines.replace('jdftx/electronic/matrix.cpp','')
 lines = lines.replace('jdftx/electronic/operators.cpp','')
 lines = lines.replace('jdftx/electronic/RadialFunction.cpp','')
 lines = lines.replace('jdftx/wannier/main.cpp','')

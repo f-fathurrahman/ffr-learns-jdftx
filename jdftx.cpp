@@ -19,7 +19,7 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <electronic/Everything.h>
 #include <electronic/ColumnBundle.h>
-//#include <electronic/matrix.h>
+#include <core/matrix.h>
 #include <electronic/Dump.h>
 #include <electronic/ElecMinimizer.h>
 #include <electronic/LatticeMinimizer.h>
@@ -29,30 +29,30 @@ along with JDFTx.  If not, see <http://www.gnu.org/licenses/>.
 #include <core/Util.h>
 #include <commands/parser.h>
 
+#include <iostream>
+using namespace std;
+
 //Program entry point
 int main(int argc, char** argv)
 {
   //Parse command line, initialize system and logs:
-  string inputFilename; bool dryRun, printDefaults;
-  initSystemCmdline(argc, argv,
-                    "Performs Joint Density Functional Theory calculations.",
-                    inputFilename, dryRun, printDefaults);
+  Everything e; //the parent data structure for, well, everything
+  InitParams ip("Performs Joint Density Functional Theory calculations.", &e);
+  initSystemCmdline(argc, argv, ip);
   
   //Parse input file and setup
-  Everything e; //the parent data structure for, well, everything
-  
   ElecVars& eVars = e.eVars;
-  parse(readInputFile(inputFilename), e, printDefaults);
-  
-  if(dryRun) eVars.skipWfnsInit = true;
-  
+
+  cout << "Filename = " << ip.inputFilename << endl;
+  parse(readInputFile(ip.inputFilename), e, ip.printDefaults);
+ 
+ /* 
+  if(ip.dryRun) eVars.skipWfnsInit = true;
   e.setup();
-  
+  e.dump(DumpFreq_Init, 0);
   Citations::print();
-  
-  if(dryRun)
-  {
-    logPrintf("Dry run successful: commands are valid and initialization succeeded.\n");
+  if(ip.dryRun)
+  {  logPrintf("Dry run successful: commands are valid and initialization succeeded.\n");
     finalizeSystem();
     return 0;
   }
@@ -60,36 +60,36 @@ int main(int argc, char** argv)
   logFlush();
   
   if(e.cntrl.dumpOnly)
-  {
-    //Single energy calculation so that all dependent quantities have been initialized:
-    logPrintf("\n----------- Energy evaluation at fixed state -------------\n");
-    logFlush();
-    
-    //calculate Hsub so that eigenvalues are available (used by many dumps)
-    eVars.elecEnergyAndGrad(e.ener, 0, 0, true);
-    
+  {  //Single energy calculation so that all dependent quantities have been initialized:
+    logPrintf("\n----------- Energy evaluation at fixed state -------------\n"); logFlush();
+    eVars.elecEnergyAndGrad(e.ener, 0, 0, true); //calculate Hsub so that eigenvalues are available (used by many dumps)
     logPrintf("# Energy components:\n"); e.ener.print(); logPrintf("\n");
   }
   else if(e.cntrl.fixed_H)
-  {
-    //Band structure calculation - ion and fluid minimization need to be handled differently
+  {  //Band structure calculation - ion and fluid minimization need to be handled differently
     if(eVars.nFilenamePattern.length())
-    {
-      //If starting from density, compute potential:
+    {  //If starting from density, compute potential:
       eVars.EdensityAndVscloc(e.ener);
       if(eVars.fluidSolver && eVars.fluidSolver->useGummel())
-      {
-        //Relies on the gummel loop, so EdensityAndVscloc would not have invoked minimize
+      {  //Relies on the gummel loop, so EdensityAndVscloc would not have invoked minimize
         eVars.fluidSolver->minimizeFluid();
         eVars.EdensityAndVscloc(e.ener); //update Vscloc
       }
     }
-
-    //update Vscloc atom projections for ultrasoft psp's 
-    e.iInfo.augmentDensityGridGrad(eVars.Vscloc);
-    
+    e.iInfo.augmentDensityGridGrad(eVars.Vscloc); //update Vscloc atom projections for ultrasoft psp's 
     logPrintf("\n----------- Band structure minimization -------------\n"); logFlush();
     bandMinimize(e); // Do the band-structure minimization
+    //Update fillings if necessary:
+    if(e.eInfo.fillingsUpdate == ElecInfo::FillingsHsub)
+    {  //Calculate mu from nElectrons:
+      double Bz, mu = e.eInfo.findMu(eVars.Hsub_eigs, e.eInfo.nElectrons, Bz);
+      //Update fillings:
+      for(int q=e.eInfo.qStart; q<e.eInfo.qStop; q++)
+        eVars.F[q] = e.eInfo.smear(e.eInfo.muEff(mu,Bz,q), eVars.Hsub_eigs[q]);
+      //Update TS and muN:
+      e.eInfo.updateFillingsEnergies(eVars.Hsub_eigs, e.ener);
+      e.eInfo.smearReport();
+    }
   }
   else if(e.vibrations) //Bypasses ionic/lattice minimization, calls electron/fluid minimization loops at various ionic configurations
   {  e.vibrations->calculate();
@@ -114,5 +114,8 @@ int main(int argc, char** argv)
   e.dump(DumpFreq_End, 0);
   
   finalizeSystem();
+*/
+
+
   return 0;
 }

@@ -1,11 +1,13 @@
 TEMPLATE.inp
 print
+jdftx
 jdftx_orig
 works
 *.swp
 *.swo
 *~
 *.x
+TEMP_*
 
 # Prerequisites
 *.d

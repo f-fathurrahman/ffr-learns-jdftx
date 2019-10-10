@@ -4,6 +4,7 @@ FLAGS="-Wall -O0 -g -ftemplate-depth-512 -std=c++0x"
 
 INCLUDE="-I./jdftx"
 
-LIBS="libjdftx.a"
+#LIBS="libjdftx.a -lgsl -lfftw3_threads -lfftw3 -lcblas -lopenblas -lpthread"
+LIBS="-L ./ -ljdftx -lgsl -lfftw3_threads -lfftw3 -lcblas -lopenblas -lpthread"
 
-g++ $INCLUDE $FLAGS $1 -o $prefix.x
+mpic++ $INCLUDE $FLAGS $1 -o $prefix.x $LIBS
