@@ -1,1 +1,1 @@
-sed -i 's/\t/  /g' jdftx/*/*
+sed -i 's/\t/    /g' jdftx/*/*
