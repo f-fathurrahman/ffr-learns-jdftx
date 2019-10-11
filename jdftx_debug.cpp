@@ -1,5 +1,6 @@
 #include <electronic/Everything.h>
 #include <electronic/ColumnBundle.h>
+#include <electronic/ElecVars.h>
 #include <core/Util.h>
 #include <commands/parser.h>
 
@@ -53,7 +54,6 @@ void debug_operator_O( Everything* e )
 
 void debug_dot( Everything* e )
 {
-    size_t Ngw = e->eVars.C[0].colLength();
     ColumnBundle c0 = e->eVars.C[0].getSub(0,1);
     ColumnBundle c1 = e->eVars.C[0].getSub(1,2);
 
@@ -62,6 +62,33 @@ void debug_dot( Everything* e )
 
     logPrintf("d = %18.10f\n", d*detR/2);
 
+    return;
+}
+
+void debug_elecEnergyAndGrad( Everything& e )
+{
+
+    if(!e.eVars.HauxInitialized && e.eInfo.fillingsUpdate==ElecInfo::FillingsHsub)
+    {   
+        e.eInfo.fillingsUpdate = ElecInfo::FillingsConst;
+        e.eVars.elecEnergyAndGrad(e.ener, 0, 0, true);
+        e.eInfo.fillingsUpdate = ElecInfo::FillingsHsub;
+        //Update B:
+        for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) e.eVars.Haux_eigs[q] = e.eVars.Hsub_eigs[q];
+        e.eVars.HauxInitialized = true;
+    }
+    e.eVars.elecEnergyAndGrad( e.ener );
+
+    logPrintf("KE     = %18.10f\n", e.ener.E["KE"]);
+    logPrintf("Eloc   = %18.10f\n", e.ener.E["Eloc"]);
+    logPrintf("EH     = %18.10f\n", e.ener.E["EH"]);
+    logPrintf("Exc    = %18.10f\n", e.ener.E["Exc"]);
+    logPrintf("Enl    = %18.10f\n", e.ener.E["Enl"]);    
+    logPrintf("Epulay = %18.10f\n", e.ener.E["Epulay"]);
+    logPrintf("Ewald  = %18.10f\n", e.ener.E["Eewald"]);
+    //logPrintf("Total  = %18.10f\n", e.ener);
+    cout << e.ener.E << endl;    
+    
     return;
 }
 
@@ -135,7 +162,8 @@ int main( int argc, char** argv )
     //debug_ColumnBundle_v01(&e);
     //debug_operators(&e);
     //debug_operator_O(&e);
-    debug_dot(&e);
+    //debug_dot(&e);
+    debug_elecEnergyAndGrad(e);
 
     return 0;
 }
