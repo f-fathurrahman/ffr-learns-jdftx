@@ -31,7 +31,28 @@ void debug_ColumnBundle_v01( Everything* e )
         logPrintf("%4lu %4d %4lu\n", i+1, e->eVars.C[i].nCols(), e->eVars.C[i].colLength());
     }
 
-/*
+    return;
+
+}
+
+
+void debug_operator_O( Everything* e )
+{
+    size_t Ngw = e->eVars.C[0].colLength();
+    ColumnBundle c0 = e->eVars.C[0].getSub(0,1);
+    ColumnBundle c1 = O(c0);
+
+    double detR = c0.basis->gInfo->detR;
+
+    for(size_t i = 0; i < Ngw; i++) {
+        logPrintf("%18.10f %18.10f %18.10f\n", c0.data()[i].x, c1.data()[i].x, c1.data()[i].x/detR);
+    }
+
+    return;
+}
+
+void debug_operators( Everything* e )
+{
     // data
     //complex* dt = e->eVars.C[0].data();
     //for(unsigned int i=0; i < e->eVars.C[0].colLength(); i++) {
@@ -62,7 +83,7 @@ void debug_ColumnBundle_v01( Everything* e )
     
     cout << "dot evars.C[1] = " << dot(e->eVars.C[1], e->eVars.C[1])/e->eVars.C[1].nCols() << endl;
     cout << "dot Oc         = " << dot(Oc, Oc) << endl; 
-*/
+
     return;
 }
 
@@ -98,6 +119,8 @@ int main( int argc, char** argv )
     e.setup();
     //debug_Everything(&e);
     //debug_ColumnBundle_v01(&e);
+    //debug_operators(&e);
+    debug_operator_O(&e);
 
     return 0;
 }
