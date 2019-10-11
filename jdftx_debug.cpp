@@ -51,6 +51,20 @@ void debug_operator_O( Everything* e )
     return;
 }
 
+void debug_dot( Everything* e )
+{
+    size_t Ngw = e->eVars.C[0].colLength();
+    ColumnBundle c0 = e->eVars.C[0].getSub(0,1);
+    ColumnBundle c1 = e->eVars.C[0].getSub(1,2);
+
+    double detR = c0.basis->gInfo->detR;
+    double d = dot(c0,c0);
+
+    logPrintf("d = %18.10f\n", d*detR/2);
+
+    return;
+}
+
 void debug_operators( Everything* e )
 {
     // data
@@ -120,7 +134,8 @@ int main( int argc, char** argv )
     //debug_Everything(&e);
     //debug_ColumnBundle_v01(&e);
     //debug_operators(&e);
-    debug_operator_O(&e);
+    //debug_operator_O(&e);
+    debug_dot(&e);
 
     return 0;
 }
