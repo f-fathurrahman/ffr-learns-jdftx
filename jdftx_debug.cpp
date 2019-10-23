@@ -9,12 +9,6 @@
 
 using namespace std;
 
-// important: use pass by reference
-void debug_Everything( Everything* e )
-{
-    logPrintf("cntrl.ecut = %f\n", e->cntrl.Ecut);
-}
-
 // Dimensions of eVars and ColumnBundle
 void debug_ColumnBundle_v01( Everything* e )
 {
@@ -68,6 +62,7 @@ void debug_dot( Everything* e )
 void debug_elecEnergyAndGrad( Everything& e )
 {
 
+    // This is required to properly initilizing ElecVars for metallic system.
     if(!e.eVars.HauxInitialized && e.eInfo.fillingsUpdate==ElecInfo::FillingsHsub)
     {   
         e.eInfo.fillingsUpdate = ElecInfo::FillingsConst;
@@ -158,7 +153,7 @@ int main( int argc, char** argv )
 
     parse(readInputFile(ip.inputFilename), e, ip.printDefaults);
     e.setup();
-    //debug_Everything(&e);
+
     //debug_ColumnBundle_v01(&e);
     //debug_operators(&e);
     //debug_operator_O(&e);
