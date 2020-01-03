@@ -1,3 +1,6 @@
+#include <cstdio>
+#include <iostream>
+
 #include <electronic/Everything.h>
 #include <electronic/ElecMinimizer.h>
 #include <electronic/ColumnBundle.h>
@@ -17,6 +20,10 @@ int main( int argc, char** argv )
     // elecFluidMinimize( e );
 
     my_elecFluidMinimize( e );
+
+    printf("\n");
+    printf("%s is finished\n", argv[0]);
+    printf("\n");
 
     return 0;
 }

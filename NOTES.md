@@ -1,3 +1,33 @@
+# Print out energy components
+
+```
+e.ener.print()
+```
+
+# Calculate energy, gradient, and/or Hsub
+
+Using the function elecEnergyAndGrad:
+
+```
+double ElecVars::elecEnergyAndGrad(Energies& ener, ElecGradient* grad, ElecGradient* Kgrad, bool calc_Hsub)
+```
+
+# Print out band energies (Hsub eigenvalues, with occupations, for all k-points)
+
+```cpp
+void print_Hsub_eigs(const Everything&);
+```
+
+# Finding Fermi energy or chemical potential
+
+Defined in ElecInfo:
+```cpp
+double findMu(const std::vector<diagMatrix>& eps, double nElectrons, double& Bz) const; 
+```
+
+
+
+
 # Investigating `Everything`
 
 
