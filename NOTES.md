@@ -26,6 +26,16 @@ double findMu(const std::vector<diagMatrix>& eps, double nElectrons, double& Bz)
 ```
 
 
+# Effective mu (need more investigations)
+
+```cpp
+std::vector<QuantumNumber> qnums; //!< k-points, spins and weights for each state
+
+//!< effective mu for each spin
+inline double muEff(double mu, double Bz, int q) const { return mu + Bz*qnums[q].spin; }
+```
+
+
 
 
 # Investigating `Everything`
