@@ -22,6 +22,7 @@ void debug_ColumnBundle_v01( Everything* e )
     logPrintf("%d\n", e->eVars.C[0].nCols()); // int
     logPrintf("%lu\n", e->eVars.C[0].colLength()); // unsigned long
 
+    // Print number of plane waves for each kpoint
     for(unsigned long i = 0; i < Nkspin; i++) {
         logPrintf("%4lu %4d %4lu\n", i+1, e->eVars.C[i].nCols(), e->eVars.C[i].colLength());
     }

@@ -46,3 +46,37 @@ It is the same as `Nkspin` in `PWDFT.jl`. In JDFTX it is named `nStates`.
 One wave function in a k-point is represented by `ColumnBundle`.
 Number of electronic states can be accessed using `.nCols()` method.
 Number of basis function can be accessed using `.colLength()` method.
+
+# Calculating electron density
+
+```c++
+//! Calculate density using current orthonormal wavefunctions (C)
+ScalarFieldArray calcDensity() const;
+```
+
+# Electronic minimization
+
+For my normal use case IonicMinize is used.
+
+It seems that ElecMinimize can not be used directly, at least for metallic case.
+For metallic case, the function `elecFluidMininimize()` should be used.
+
+```cpp
+#include <electronic/Everything.h>
+#include <electronic/ElecMinimizer.h>
+#include <electronic/ColumnBundle.h>
+#include <commands/parser.h>
+
+int main( int argc, char** argv )
+{
+    Everything e;
+    InitParams ip("Performs Joint DFT calculations.", &e);
+    initSystemCmdline(argc, argv, ip);
+    parse(readInputFile(ip.inputFilename), e, ip.printDefaults);
+    e.setup();
+
+    elecFluidMinimize(e);
+
+    return 0;
+}
+```
