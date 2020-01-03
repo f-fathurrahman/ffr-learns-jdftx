@@ -20,7 +20,7 @@ int main( int argc, char** argv )
     parse(readInputFile(ip.inputFilename), e, ip.printDefaults);
     e.setup();
 
-    my_elecEnergyAndGrad( e, e.ener, 0, 0, false );
+    my_elecEnergyAndGrad( e, 0, 0, false ); // ener is included in e
 
     printf("\n");
     printf("%s is finished\n", argv[0]);
