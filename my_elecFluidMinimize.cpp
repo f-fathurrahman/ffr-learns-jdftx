@@ -83,5 +83,8 @@ void my_elecFluidMinimize( Everything & e )
     logPrintf("zz = %18.10f\n", zz);
     ener.print();
 
+    logPrintf("\n-------- Electronic minimization -----------\n"); logFlush();
+    elecMinimize(e);
+
     return;
 }
