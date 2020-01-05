@@ -20,7 +20,14 @@ int main( int argc, char** argv )
     parse(readInputFile(ip.inputFilename), e, ip.printDefaults);
     e.setup();
 
-    my_elecEnergyAndGrad( e, 0, 0, false ); // ener is included in e
+    ElecGradient g, Kg;
+    
+    g.init(e);
+    Kg.init(e);
+
+    double Etot = my_elecEnergyAndGrad( e, &g, &Kg, false ); // ener is included in e
+
+    logPrintf("Etot = %18.10f\n", Etot);
 
     printf("\n");
     printf("%s is finished\n", argv[0]);

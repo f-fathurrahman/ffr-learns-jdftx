@@ -1,4 +1,4 @@
-void my_elecEnergyAndGrad( Everything& e, 
+double my_elecEnergyAndGrad( Everything& e, 
     ElecGradient* grad, ElecGradient* Kgrad, bool calc_Hsub )
 {
 
@@ -158,6 +158,8 @@ void my_elecEnergyAndGrad( Everything& e,
 
     // whether magnetization needs to be constrained
     bool Mconstrain = (eInfo.spinType==SpinZ) and std::isnan(eInfo.Bz);
+
+    logPrintf("Mconstrain  = %d\n", Mconstrain);
     
     // contribution due to N/M constraint via the mu/Bz gradient 
     if( grad and eInfo.fillingsUpdate==ElecInfo::FillingsHsub and (std::isnan(eInfo.mu) or Mconstrain) )
@@ -201,7 +203,7 @@ void my_elecEnergyAndGrad( Everything& e,
         }
     }
     else {
-        logPrintf("Pass here 203");
+        logPrintf("Pass here 203\n");
     }
 
 
@@ -225,5 +227,5 @@ void my_elecEnergyAndGrad( Everything& e,
         }
     }
 
-    return;
+    return relevantFreeEnergy(e);
 }

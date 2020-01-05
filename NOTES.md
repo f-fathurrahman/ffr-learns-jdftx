@@ -35,6 +35,9 @@ std::vector<QuantumNumber> qnums; //!< k-points, spins and weights for each stat
 inline double muEff(double mu, double Bz, int q) const { return mu + Bz*qnums[q].spin; }
 ```
 
+# Relevant free energy
+
+Defined in `Energies.cpp`
 
 
 
