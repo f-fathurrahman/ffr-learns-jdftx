@@ -158,12 +158,15 @@ void MyElecMinimizer::step(const MyElecGradient& dir, double alpha)
   }
 }
 
+#include "my_elecEnergyAndGrad.cpp"
+
 double MyElecMinimizer::compute(MyElecGradient* grad, MyElecGradient* Kgrad)
 {
   if(grad) grad->init(e);  
   if(Kgrad) Kgrad->init(e);
     
-  double ener = e.eVars.elecEnergyAndGrad(e.ener, grad, Kgrad);
+  //double ener = e.eVars.elecEnergyAndGrad(e.ener, grad, Kgrad);
+  double ener = my_elecEnergyAndGrad(e, grad, Kgrad, false);
     
   if(grad)
   {
