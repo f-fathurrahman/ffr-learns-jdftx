@@ -6,6 +6,8 @@
 #include <electronic/ColumnBundle.h>
 #include <commands/parser.h>
 
+#include "MyElecMinimizer.cpp"
+
 #include "my_elecFluidMinimize.cpp"
 
 int main( int argc, char** argv )
