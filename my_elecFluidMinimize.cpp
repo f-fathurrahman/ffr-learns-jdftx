@@ -89,7 +89,8 @@ void my_elecFluidMinimize( Everything& e )
   
   //ElecMinimizer emin(e);
   MyElecMinimizer emin(e);
-  //emin.minimize(e.elecMinParams);
+  
+  emin.minimize(e.elecMinParams);
   //if (!e.ionDynamicsParams.tMax) {
   //  e.eVars.setEigenvectors(); //Don't spend time with this if running MD
   //  logPrintf("Pass here 93\n");
