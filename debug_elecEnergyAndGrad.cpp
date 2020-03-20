@@ -8,8 +8,7 @@
 #include <iostream>
 #include <cmath>
 
-using namespace std;
-
+#include "MyElecGradient.cpp"
 #include "my_elecEnergyAndGrad.cpp"
 
 int main( int argc, char** argv )
@@ -20,7 +19,7 @@ int main( int argc, char** argv )
     parse(readInputFile(ip.inputFilename), e, ip.printDefaults);
     e.setup();
 
-    ElecGradient g, Kg;
+    MyElecGradient g, Kg;
     
     g.init(e);
     Kg.init(e);
