@@ -205,7 +205,7 @@ double my_elecEnergyAndGrad( Everything& e,
     }
   }
   else {
-    logPrintf("Pass here 203 in my_elecEnergyAndGrad.\n");
+    //logPrintf("Pass here 203 in my_elecEnergyAndGrad.\n");
   }
 
 

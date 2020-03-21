@@ -270,6 +270,8 @@ double MyElecMinimizer::sync(double x) const
   return x;
 }
 
+#include "my_linminQuad.cpp"
+
 // debug the minimize function
 double MyElecMinimizer::my_minimize(const MinimizeParams& p)
 {
@@ -289,6 +291,172 @@ double MyElecMinimizer::my_minimize(const MinimizeParams& p)
     
   //restrict search direction to allowed subspace
   constrain(d);
+
+  // whether current direction is along the gradient
+  bool forceGradDirection = true;
+    
+  // initially use the specified scheme, may switch to SD on trouble
+  MinimizeParams::DirectionUpdateScheme currentDirUpdateScheme = p.dirUpdateScheme;
+  bool gPrevUsed;
+  switch(currentDirUpdateScheme)
+  {
+    case MinimizeParams::FletcherReeves:
+    case MinimizeParams::SteepestDescent:
+      gPrevUsed = false;
+      break;
+    default:
+      gPrevUsed = true;
+  }
+  std::cout << "gPrevUsed = " << gPrevUsed << std::endl;
+
+  double alphaT = p.alphaTstart; //test step size
+  double alpha = alphaT; //actual step size
+  double beta = 0.0; //CG prev search direction mix factor
+  double gKNorm = 0.0, gKNormPrev = 0.0; //current and previous norms of the preconditioned gradient
+
+  // Select the linmin method:
+  //Linmin linmin = getLinmin(p);
+
+  //Iterate until convergence, max iteration count or kill signal
+  int iter = 0;
+  for( iter=0; !killFlag; iter++ )
+  //for( iter=0; iter <= 1; iter++ )
+  {
+    if( report(iter) ) //optional reporting/processing
+    {
+      E = sync( compute(&g, &Kg) ); //update energy and gradient if state was modified
+      logPrintf("%s\tState modified externally: resetting search direction.\n", p.linePrefix);
+      forceGradDirection = true; //reset search direction
+    }
+        
+    gKNorm = sync( dot(g,Kg) );
+    
+    logPrintf("\n");
+    logPrintf("%sIter: %3d  %s: ", p.linePrefix, iter, p.energyLabel);
+    logPrintf(p.energyFormat, E);
+    logPrintf("  |grad|_K: %10.3le  alpha: %10.3le", sqrt(gKNorm/p.nDim), alpha);
+
+    //Print prev step stats and set CG direction parameter if necessary
+    beta = 0.0;
+    
+    if( !forceGradDirection )
+    {
+      double dotgd = sync(dot(g,d));
+      double dotgPrevKg = gPrevUsed ? sync(dot(gPrev, Kg)) : 0.;
+
+      logPrintf("  linmin: %10.3le", dotgd/sqrt(sync(dot(g,g))*sync(dot(d,d))));
+      
+      if( gPrevUsed ) {
+        logPrintf("  cgtest: %10.3le", dotgPrevKg/sqrt(gKNorm*gKNormPrev));
+      }
+      
+      logPrintf("  t[s]: %9.2lf", clock_sec());
+
+      //Update beta:
+      switch(currentDirUpdateScheme)
+      {
+        case MinimizeParams::FletcherReeves:  beta = gKNorm/gKNormPrev; break;
+        case MinimizeParams::PolakRibiere:    beta = (gKNorm-dotgPrevKg)/gKNormPrev; break;
+        case MinimizeParams::HestenesStiefel: beta = (gKNorm-dotgPrevKg)/(dotgd-sync(dot(d,gPrev))); break;
+        case MinimizeParams::SteepestDescent: beta = 0.0; break;
+        //Should never encounter since LBFGS handled separately; just to eliminate compiler warnings
+        case MinimizeParams::LBFGS: break;
+      }
+
+      if(beta < 0.0)
+      {
+        logPrintf("\n%sEncountered beta < 0, resetting CG.", p.linePrefix);
+        beta = 0.0;
+      }
+    }
+        
+    forceGradDirection = false;
+        
+    logPrintf("\n");
+        
+    if( sqrt(gKNorm/p.nDim) < p.knormThreshold )
+    {
+      logPrintf("%sConverged (|grad|_K < %le).\n", p.linePrefix, p.knormThreshold);
+      return E;
+    }
+
+    if( ediffCheck.checkConvergence(E) )
+    {
+      logPrintf("%sConverged (|Delta %s| < %le for %d iters).\n",
+        p.linePrefix, p.energyLabel, p.energyDiffThreshold, p.nEnergyDiff);
+      return E;
+    }
+
+    if(!std::isfinite(gKNorm))
+    {
+      logPrintf("%s|grad|_K = %le. Stopping ...\n", p.linePrefix, gKNorm);
+      return E;
+    }
+
+    if(!std::isfinite(E))
+    {
+      logPrintf("%sE = %le. Stopping ...\n", p.linePrefix, E);
+      return E;
+    }
+    
+    if( iter >= p.nIterations) {
+      break;
+    }
+
+    // We are not stopping the iterations ...
+
+    if( gPrevUsed ) {
+      gPrev = g;
+    }
+    
+    gKNormPrev = gKNorm;
+
+    // Update search direction
+    d *= beta;
+    axpy(-1.0, Kg, d);  // d = beta*d - Kg
+        
+    //restrict search direction to allowed subspace
+    constrain(d);
+    
+    // Line minimization
+    alphaT = std::min(alphaT, safeStepSize(d));
+    if( my_linminQuad(*this, p, d, alphaT, alpha, E, g, Kg) )
+    {
+      // linmin succeeded:
+      if(p.updateTestStepSize)
+      {
+        alphaT = alpha;
+
+        if(alphaT < p.alphaTmin) {
+          // bad step size: make sure next test step size is not too bad
+          alphaT = p.alphaTstart; 
+        }
+      }
+    }
+    else
+    {
+      // linmin failed:
+      logPrintf("%s\tUndoing step.\n", p.linePrefix);
+      step(d, -alpha);
+      
+      E = sync(compute(&g, &Kg));
+      
+      if(beta)
+      {
+        // Failed, but not along the gradient direction:
+        logPrintf("%s\tStep failed: resetting search direction.\n", p.linePrefix);
+        forceGradDirection = true; //reset search direction
+      }
+      else
+      {
+        // Failed along the gradient direction
+        logPrintf("%s\tStep failed along negative gradient direction.\n", p.linePrefix);
+        logPrintf("%sProbably at roundoff error limit. (Stopping)\n", p.linePrefix);
+        return E;
+      }
+    }
+
+  } // end of iter
 
   logPrintf("Leaving MyElecMinimizer::my_minimize\n");
 
