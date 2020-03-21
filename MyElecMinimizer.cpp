@@ -68,6 +68,8 @@ public:
   bool report(int iter);
   void constrain(MyElecGradient&);
 
+  double my_minimize(const MinimizeParams& p);
+
   //!< All processes minimize together; make sure scalars are in sync to round-off error
   double sync(double x) const;
   
@@ -110,7 +112,7 @@ MyElecMinimizer::MyElecMinimizer(Everything& e)
   if( e.cntrl.subspaceRotationAdjust &&
       ( eInfo.fillingsUpdate==ElecInfo::FillingsHsub || !eInfo.scalarFillings) )
   {
-    logPrintf("make_shared MySubspaceRotationAdjust is entered\n");
+    //logPrintf("make_shared MySubspaceRotationAdjust is entered\n");
     sra = std::make_shared<MySubspaceRotationAdjust>(e);
   }
 }
@@ -266,4 +268,29 @@ double MyElecMinimizer::sync(double x) const
 {
   mpiWorld->bcast(x);
   return x;
+}
+
+// debug the minimize function
+double MyElecMinimizer::my_minimize(const MinimizeParams& p)
+{
+  logPrintf("Entering MyElecMinimizer::my_minimize\n");
+
+  MyElecGradient g, gPrev, Kg;
+
+  // get initial energy and gradient
+  double E = sync( compute(&g, &Kg) );
+  logPrintf("E = %18.10f\n", E);
+
+  // list of past energies
+  EdiffCheck ediffCheck(p.nEnergyDiff, p.energyDiffThreshold);
+
+  // step direction (will be reset in first iteration)
+  MyElecGradient d = clone(Kg);
+    
+  //restrict search direction to allowed subspace
+  constrain(d);
+
+  logPrintf("Leaving MyElecMinimizer::my_minimize\n");
+
+  return 0.0;
 }

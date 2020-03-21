@@ -5,7 +5,7 @@ void my_elecFluidMinimize( Everything& e )
   ElecVars &eVars = e.eVars;
   ElecInfo& eInfo = e.eInfo;
   //IonInfo& iInfo = e.iInfo;
-  Energies &ener = e.ener;
+  //Energies &ener = e.ener;
 
   // Haux will be initialized here
   // This section will not be executed for for FillingsConst (insulator case).
@@ -22,13 +22,13 @@ void my_elecFluidMinimize( Everything& e )
       // calculate Hsub at current fillings:
       eInfo.fillingsUpdate = ElecInfo::FillingsConst;
 
-      logPrintf("\nBefore calculating energy:\n");
-      ener.print(); logPrintf("\n");
+      //logPrintf("\nBefore calculating energy:\n");
+      //ener.print(); logPrintf("\n");
 
       eVars.elecEnergyAndGrad( e.ener, 0, 0, true );
       
-      logPrintf("\nAfter calculating energy:\n");
-      ener.print(); logPrintf("\n");
+      //logPrintf("\nAfter calculating energy:\n");
+      //ener.print(); logPrintf("\n");
 
       eInfo.fillingsUpdate = ElecInfo::FillingsHsub;
       
@@ -70,18 +70,19 @@ void my_elecFluidMinimize( Everything& e )
       eVars.Haux_eigs[q] += eye(eInfo.nBands)*(eInfo.mu-mu);
     }
   }
-  std::cout << "fillingsUpdate = " << eInfo.fillingsUpdate << std::endl;
-  std::cout << "mu = " << eInfo.mu << std::endl;
+  //std::cout << "fillingsUpdate = " << eInfo.fillingsUpdate << std::endl;
+  //std::cout << "mu = " << eInfo.mu << std::endl;
 
-  double zz;
-
-  zz = eVars.elecEnergyAndGrad(ener);
-  logPrintf("zz = %18.10f\n", zz);
-  ener.print();
+  /*double zz;
 
   zz = eVars.elecEnergyAndGrad(ener);
   logPrintf("zz = %18.10f\n", zz);
   ener.print();
+
+  zz = eVars.elecEnergyAndGrad(ener);
+  logPrintf("zz = %18.10f\n", zz);
+  ener.print();
+  */
 
   logPrintf("\n-------- Electronic minimization -----------\n"); logFlush();
   
@@ -90,7 +91,9 @@ void my_elecFluidMinimize( Everything& e )
   //ElecMinimizer emin(e);
   MyElecMinimizer emin(e);
   
-  emin.minimize(e.elecMinParams);
+  emin.my_minimize(e.elecMinParams);
+  //emin.minimize(e.elecMinParams); // the original
+
   //if (!e.ionDynamicsParams.tMax) {
   //  e.eVars.setEigenvectors(); //Don't spend time with this if running MD
   //  logPrintf("Pass here 93\n");

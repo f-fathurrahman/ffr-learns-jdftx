@@ -27,7 +27,7 @@ double my_elecEnergyAndGrad( Everything& e,
   ElecVars& eVars = e.eVars;
   Energies& ener = e.ener;
 
-  std::cout << "eInfo.mu = " << eInfo.mu << std::endl;
+  //std::cout << "eInfo.mu = " << eInfo.mu << std::endl;
 
   // Cleanup old gradients:
   if( grad )
@@ -44,17 +44,17 @@ double my_elecEnergyAndGrad( Everything& e,
   bool need_Hsub = calc_Hsub || grad;
   double mu = 0., Bz = 0.;
 
-  logPrintf("need_Hsub = %d\n", need_Hsub);
+  //logPrintf("need_Hsub = %d\n", need_Hsub);
 
   if( eInfo.fillingsUpdate == ElecInfo::FillingsHsub )
   {    
     // Update nElectrons from mu, or mu from nElectrons as appropriate:
     if( std::isnan(eInfo.mu) )
     {
-      logPrintf("Finding mu: ");
+      //logPrintf("Finding mu: ");
       mu = eInfo.findMu( eVars.Haux_eigs, eInfo.nElectrons, Bz );
-      logPrintf(" mu = %18.10f\n", mu);
-      std::cout << "Bz = " << Bz << std::endl;
+      //logPrintf(" mu = %18.10f\n", mu);
+      //std::cout << "Bz = " << Bz << std::endl;
     }
     else
     {
@@ -71,14 +71,14 @@ double my_elecEnergyAndGrad( Everything& e,
       eVars.F[q] = eInfo.smear( eInfo.muEff(mu, Bz, q), eVars.Haux_eigs[q] );
     }
     
-    logPrintf("\nBefore update fillings and energies:\n");
-    ener.print();
+    //logPrintf("\nBefore update fillings and energies:\n");
+    //ener.print();
 
     // Update TS and muN:
     eInfo.updateFillingsEnergies( eVars.Haux_eigs, ener );
 
-    logPrintf("\nAfter update fillings and energies:\n");
-    ener.print();
+    //logPrintf("\nAfter update fillings and energies:\n");
+    //ener.print();
 
     // Report for SCF (ElecMinimizer handles for minimize):
     if( e.cntrl.scf && eVars.n[0] ) eInfo.smearReport();
@@ -101,8 +101,8 @@ double my_elecEnergyAndGrad( Everything& e,
   // Update Vscloc projected onto spherical functions for ultrasoft psps
   if( need_Hsub ) e.iInfo.augmentDensityGridGrad( eVars.Vscloc );
 
-  logPrintf("\nAfter update density and density-dependent pieces:\n");
-  ener.print();
+  //logPrintf("\nAfter update density and density-dependent pieces:\n");
+  //ener.print();
 
 
   //
@@ -152,8 +152,8 @@ double my_elecEnergyAndGrad( Everything& e,
   mpiWorld->allReduce(ener.E["KE"], MPIUtil::ReduceSum);
   mpiWorld->allReduce(ener.E["Enl"], MPIUtil::ReduceSum);
 
-  logPrintf("\nAfter calc KE and Enl:\n");
-  ener.print();
+  //logPrintf("\nAfter calc KE and Enl:\n");
+  //ener.print();
 
   double dmuContrib = 0.0;
   double dBzContrib = 0.0;
@@ -161,12 +161,12 @@ double my_elecEnergyAndGrad( Everything& e,
   // whether magnetization needs to be constrained
   bool Mconstrain = (eInfo.spinType==SpinZ) and std::isnan(eInfo.Bz);
 
-  logPrintf("Mconstrain  = %d\n", Mconstrain);
+  //logPrintf("Mconstrain  = %d\n", Mconstrain);
   
   // contribution due to N/M constraint via the mu/Bz gradient 
   if( grad and eInfo.fillingsUpdate==ElecInfo::FillingsHsub and (std::isnan(eInfo.mu) or Mconstrain) )
   {
-    logPrintf("Pass here 164\n");
+    //logPrintf("Pass here 164\n");
 
     // numerator and denominator of dmuContrib resolved by spin channels (if any)
     double dmuNum[2] = {0.,0.}, dmuDen[2] = {0.,0.}; 
@@ -205,7 +205,7 @@ double my_elecEnergyAndGrad( Everything& e,
     }
   }
   else {
-    logPrintf("Pass here 203\n");
+    logPrintf("Pass here 203 in my_elecEnergyAndGrad.\n");
   }
 
 
