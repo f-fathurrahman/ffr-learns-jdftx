@@ -82,6 +82,8 @@ double dot(const MyElecGradient& x, const MyElecGradient& y)
   
   std::vector<double> result(2, 0.); //calculate wavefunction and auxiliary contributions separately
   
+  //logPrintf("Initial: res = %18.10f, %18.10f\n", result[0], result[1]);
+
   for(int q=x.eInfo->qStart; q<x.eInfo->qStop; q++)
   {
     if(x.C[q] && y.C[q]) {
@@ -91,6 +93,8 @@ double dot(const MyElecGradient& x, const MyElecGradient& y)
     if(x.Haux[q] && y.Haux[q]) {
       result[1] += dotc(x.Haux[q], y.Haux[q]).real();
     }
+    //logPrintf("q = %d, res = %18.10f\n", q, dotc(x.C[q], y.C[q]).real()*2.0);
+    //logPrintf("q = %d, res = %18.10f, %18.10f\n", q, result[0], result[1]);
   }
   mpiWorld->allReduceData(result, MPIUtil::ReduceSum);
   
@@ -106,6 +110,7 @@ MyElecGradient clone(const MyElecGradient& x)
 
 void randomize(MyElecGradient& x)
 {
+  logPrintf("Calling MyElecGradient.randomize\n");
   randomize(x.C, *x.eInfo);
   for(int q=x.eInfo->qStart; q<x.eInfo->qStop; q++) {
     if(x.Haux[q])

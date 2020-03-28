@@ -307,7 +307,6 @@ double MyElecMinimizer::my_minimize(const MinimizeParams& p)
     default:
       gPrevUsed = true;
   }
-  std::cout << "gPrevUsed = " << gPrevUsed << std::endl;
 
   double alphaT = p.alphaTstart; //test step size
   double alpha = alphaT; //actual step size
@@ -322,7 +321,8 @@ double MyElecMinimizer::my_minimize(const MinimizeParams& p)
   for( iter=0; !killFlag; iter++ )
   //for( iter=0; iter <= 1; iter++ )
   {
-    if( report(iter) ) //optional reporting/processing
+
+      if( report(iter) ) //optional reporting/processing
     {
       E = sync( compute(&g, &Kg) ); //update energy and gradient if state was modified
       logPrintf("%s\tState modified externally: resetting search direction.\n", p.linePrefix);
@@ -346,7 +346,8 @@ double MyElecMinimizer::my_minimize(const MinimizeParams& p)
 
       logPrintf("  linmin: %10.3le", dotgd/sqrt(sync(dot(g,g))*sync(dot(d,d))));
       
-      if( gPrevUsed ) {
+      if( gPrevUsed )
+      {
         logPrintf("  cgtest: %10.3le", dotgPrevKg/sqrt(gKNorm*gKNormPrev));
       }
       
