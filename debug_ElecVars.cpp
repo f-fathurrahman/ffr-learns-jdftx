@@ -19,6 +19,27 @@ int main( int argc, char** argv )
     parse(readInputFile(ip.inputFilename), e, ip.printDefaults);
     e.setup();
 
+    ElecVars& eVars = e.eVars;
+    size_t Nkspin = eVars.C.size();
+    std::cout << "Nkspin = " << eVars.C.size() << std::endl;
+
+    //
+    // Try to modify ColumnBundle data: not working
+    //
+    /*for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) {
+        complex* data = eVars.C[q].data();
+        int Nstates = eVars.C[q].nCols();
+        int Ngwk = eVars.C[q].colLength();
+        //std::cout << Ngwk << std::endl;
+        logPrintf("Ngwk = %d, Nstates = %d\n", Ngwk, Nstates);
+        for(size_t i=0; i < Nstates*Ngwk; i++) {
+            data[i].x = 1.0;
+            data[i].y = 0.0;
+        }
+        eVars.orthonormalize(q);
+        //cout << eVars.data()
+    }*/
+
     MyElecGradient g, Kg;
     
     g.init(e);
@@ -26,11 +47,6 @@ int main( int argc, char** argv )
 
     double Etot = my_elecEnergyAndGrad( e, &g, &Kg, false );
     logPrintf("Etot = %18.10f\n", Etot);
-
-    // eVars.C (psiks)
-    ElecVars& eVars = e.eVars;
-    size_t Nkspin = eVars.C.size();
-    std::cout << "Nkspin = " << eVars.C.size() << std::endl;
 
     logPrintf("\nTest dot:\n");
     for(size_t i = 0; i < Nkspin; i++)
@@ -51,9 +67,19 @@ int main( int argc, char** argv )
         ss = ss + dot(g.C[i], g.C[i]);
         std::cout << dot(g.C[i], g.C[i]) << std::endl;
     }
-    std::cout << "All: " << dot(g, g) << std::endl;
-    std::cout << "All: " << dot(g, Kg) << std::endl;
+    std::cout << "All: g,g  " << dot(g, g) << std::endl;
+    std::cout << "All: g,Kg " << dot(g, Kg) << std::endl;
 
+    matrix A = eVars.C[0]^O(eVars.C[0]);
+    std::cout << A.nRows() << std::endl;
+    std::cout << A.nCols() << std::endl;
+    complex* dA = A.data();
+    std::cout << dA[A.index(0,0)].x << std::endl;
+    std::cout << dA[A.index(1,0)].x << std::endl;
+    std::cout << dA[A.index(1,1)].x << std::endl;
+    std::cout << dA[A.index(2,2)].x << std::endl;
+    std::cout << dA[A.index(2,1)].x << std::endl;
+    std::cout << dA[A.index(3,3)].x << std::endl;
     //ColumnBundle& C0 = g.C[0];
 
     //logPrintf("dot g Kg = %18.10f\n", dot(g,Kg));
