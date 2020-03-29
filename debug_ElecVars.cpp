@@ -60,13 +60,24 @@ int main( int argc, char** argv )
         std::cout << dotc(eVars.C[i], O(eVars.C[i])).real() << std::endl;
     }
 
-    logPrintf("\nTest dot g and g:\n");
+    logPrintf("\nTest dot eVars.C and eVars.C:\n");
     double ss = 0.0;
     for(size_t i = 0; i < Nkspin; i++)
     {
-        ss = ss + dot(g.C[i], g.C[i]);
-        std::cout << dot(g.C[i], g.C[i]) << std::endl;
+        ss = ss + dot(eVars.C[i], eVars.C[i]);
+        std::cout << dot(eVars.C[i], eVars.C[i]) << std::endl;
     }
+    std::cout << "ss = " << ss << std::endl;
+
+
+    logPrintf("\nTest dot g and g:\n");
+    ss = 0.0;
+    for(size_t i = 0; i < Nkspin; i++)
+    {
+        ss = ss + dot(g.C[i], O(g.C[i]));
+        std::cout << dot(g.C[i], O(g.C[i])) << std::endl;
+    }
+    std::cout << "ss = " << ss << std::endl;
     std::cout << "All: g,g  " << dot(g, g) << std::endl;
     std::cout << "All: g,Kg " << dot(g, Kg) << std::endl;
 
