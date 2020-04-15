@@ -142,6 +142,7 @@ double my_elecEnergyAndGrad( Everything& e,
         double Nq = qnum.weight*trace( eVars.F[q] );
         
         double KErollover = 2. * (Nq>1e-3 ? KEq/Nq : 1.);
+        logPrintf("Nq = %f, KEq = %f, KErollover = %f\n", Nq, KEq, KErollover);
         
         precond_inv_kinetic( HC[q], KErollover ); //apply preconditioner
         
@@ -166,25 +167,31 @@ double my_elecEnergyAndGrad( Everything& e,
   // contribution due to N/M constraint via the mu/Bz gradient 
   if( grad and eInfo.fillingsUpdate==ElecInfo::FillingsHsub and (std::isnan(eInfo.mu) or Mconstrain) )
   {
-    //logPrintf("Pass here 164\n");
+    logPrintf("Pass here 170 in my_elecEnergyAndGrad\n");
 
     // numerator and denominator of dmuContrib resolved by spin channels (if any)
     double dmuNum[2] = {0.,0.}, dmuDen[2] = {0.,0.}; 
     
+    logPrintf("Calculating dmuNum and dmuDen\n");
+    double wsum = 0.0;
     for(int q=eInfo.qStart; q<eInfo.qStop; q++)
     {
       diagMatrix fprime = eInfo.smearPrime( eInfo.muEff(mu,Bz,q), eVars.Haux_eigs[q] );
       double w = eInfo.qnums[q].weight;
       int sIndex = eInfo.qnums[q].index();
+      wsum = wsum + w;
+      logPrintf("q = %d sIndex = %d w = %f\n", q, sIndex, w);
       dmuNum[sIndex] += w * trace(fprime * ( diag(eVars.Hsub[q]) - eVars.Haux_eigs[q]) );
       dmuDen[sIndex] += w * trace(fprime);
     }
+    logPrintf("wsum = %f\n", wsum);
     
     mpiWorld->allReduce(dmuNum, 2, MPIUtil::ReduceSum);
     mpiWorld->allReduce(dmuDen, 2, MPIUtil::ReduceSum);
     
     if(std::isnan(eInfo.mu) and Mconstrain)
     {
+      logPrintf("Pass here 189 in my_elecEnergyAndGrad\n");
       //Fixed N and M (effectively independent constraints on Nup and Ndn)
       double dmuContribUp = dmuNum[0]/dmuDen[0];
       double dmuContribDn = dmuNum[1]/dmuDen[1];
@@ -193,19 +200,21 @@ double my_elecEnergyAndGrad( Everything& e,
     }
     else if(Mconstrain)
     {
+      logPrintf("Pass here 198 in my_elecEnergyAndGrad\n");
       //Fixed M only
       dmuContrib = 0.;
       dBzContrib = (dmuNum[0]-dmuNum[1])/(dmuDen[0]-dmuDen[1]);
     }
     else
     {
+      logPrintf("Pass here 205 in my_elecEnergyAndGrad\n");
       //Fixed N only
       dmuContrib = (dmuNum[0]+dmuNum[1])/(dmuDen[0]+dmuDen[1]);
       dBzContrib = 0.;
     }
   }
   else {
-    //logPrintf("Pass here 203 in my_elecEnergyAndGrad.\n");
+    logPrintf("Pass here 209 in my_elecEnergyAndGrad.\n");
   }
 
 
@@ -214,6 +223,9 @@ double my_elecEnergyAndGrad( Everything& e,
   {
     for(int q=eInfo.qStart; q < eInfo.qStop; q++)
     {
+
+      logPrintf("q = %d\n", q);
+
       const QuantumNumber& qnum = eInfo.qnums[q];
       
       // gradient w.r.t fillings except for constraint contributions
@@ -228,6 +240,8 @@ double my_elecEnergyAndGrad( Everything& e,
         Kgrad->Haux[q] = (-e.cntrl.subspaceRotationFactor) * gradF0;
     }
   }
+
+  logPrintf("eInfo.nBands = %d\n", eInfo.nBands);
 
   return relevantFreeEnergy(e);
 }
