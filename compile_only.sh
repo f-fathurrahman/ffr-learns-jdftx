@@ -9,4 +9,4 @@ INCLUDE="-I./jdftx"
 
 LIBS="-Wl,-rpath,/home/efefer/WORKS/my_github_repos/ffr-learns-jdftx: libjdftx.so -lgsl -lfftw3_threads -lfftw3 -lgslcblas -llapack -lblas -lpthread"
 
-mpic++ $INCLUDE $FLAGS -c $1
+g++ $INCLUDE $FLAGS -c $1
