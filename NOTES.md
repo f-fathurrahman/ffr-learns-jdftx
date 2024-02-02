@@ -1,3 +1,22 @@
+Show CMake options
+```
+cmake -LAH
+```
+
+```
+CC=gcc CXX=g++ cmake \
+   -D EnableMPI=no \
+   -D EnableMKL=no \
+   -D ForceFFTW=yes \
+   ../jdftx
+```
+
+```
+make VERBOSE=1
+```
+
+
+
 # Print out energy components
 
 ```
