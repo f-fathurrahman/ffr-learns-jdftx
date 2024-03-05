@@ -39,7 +39,7 @@ void my_elecFluidMinimize( Everything& e )
       }
       eVars.HauxInitialized = true;
 
-      //print_Hsub_eigs( e );
+      print_Hsub_eigs( e );
     }
     // constant mu mode
     else

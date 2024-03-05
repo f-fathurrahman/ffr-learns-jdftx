@@ -2,7 +2,7 @@ double my_elecEnergyAndGrad( Everything& e,
   MyElecGradient* grad, MyElecGradient* Kgrad, bool calc_Hsub )
 {
 
-  // This is required to properly initilizing ElecVars for metallic system.
+  // This is required to properly initilize ElecVars for metallic system.
   if(!e.eVars.HauxInitialized && e.eInfo.fillingsUpdate==ElecInfo::FillingsHsub)
   {   
     logPrintf("\nSetting up things for FillingsHsub\n");
