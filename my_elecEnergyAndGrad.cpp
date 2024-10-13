@@ -1,3 +1,5 @@
+#include "my_jdftx.h"
+
 double my_elecEnergyAndGrad( Everything& e, 
   MyElecGradient* grad, MyElecGradient* Kgrad, bool calc_Hsub )
 {

@@ -1,12 +1,4 @@
-#include <core/Minimize.h>
-#include <electronic/BandMinimizer.h>
-#include <electronic/BandDavidson.h>
-#include <electronic/Everything.h>
-#include <electronic/ElecInfo.h>
-#include <electronic/ColumnBundle.h>
-#include <electronic/SCF.h>
-
-#include "MyElecGradient.cpp"
+#include "my_jdftx.h"
 
 void my_bandMinimize(Everything& e)
 {
@@ -52,39 +44,6 @@ void my_convergeEmptyStates(Everything& e)
   e.ener.Eband = 0.; //only affects printing (if non-zero Energies::print assumes band structure calc)
   logPrintf("|deigs|: %.3e\n", SCF::eigDiffRMS(e.eVars.Hsub_eigs, eigsPrev, e)); logFlush();
 }
-
-#include "MySubspaceRotationAdjust.cpp"
-
-
-//! Variational total energy minimizer for electrons
-class MyElecMinimizer : public Minimizable<MyElecGradient>
-{
-public:
-  MyElecMinimizer(Everything& e);
-  
-  //Virtual functions from Minimizable:
-  void step(const MyElecGradient& dir, double alpha);
-  double compute(MyElecGradient* grad, MyElecGradient* Kgrad);
-  bool report(int iter);
-  void constrain(MyElecGradient&);
-
-  double my_minimize(const MinimizeParams& p);
-
-  //!< All processes minimize together; make sure scalars are in sync to round-off error
-  double sync(double x) const;
-  
-private:
-  Everything& e;
-  class ElecVars& eVars;
-  const ElecInfo& eInfo;
-  std::vector<matrix> KgradHaux; //!< latest preconditioned auxiliary gradient
-  std::vector<matrix> rotPrev; //!< cumulated unitary rotations of subspace
-  std::vector<matrix> rotPrevC; //!< cumulated transormation of wavefunctions (including non-unitary orthonormalization components)
-  std::vector<matrix> rotPrevCinv; //!< inverse of rotPrevC (which is not just dagger, since these are not exactly unitary)
-  
-  bool rotExists; //!< whether rotPrev is non-trivial (not identity)
-  std::shared_ptr<struct MySubspaceRotationAdjust> sra; //!< Subspace rotation adjustment helper
-};
 
 //
 // Implementation
@@ -159,8 +118,6 @@ void MyElecMinimizer::step(const MyElecGradient& dir, double alpha)
     }
   }
 }
-
-#include "my_elecEnergyAndGrad.cpp"
 
 double MyElecMinimizer::compute(MyElecGradient* grad, MyElecGradient* Kgrad)
 {
@@ -269,8 +226,6 @@ double MyElecMinimizer::sync(double x) const
   mpiWorld->bcast(x);
   return x;
 }
-
-#include "my_linminQuad.cpp"
 
 // debug the minimize function
 double MyElecMinimizer::my_minimize(const MinimizeParams& p)

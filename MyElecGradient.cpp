@@ -1,13 +1,4 @@
-struct MyElecGradient
-{
-  std::vector<ColumnBundle> C; //!< wavefunctions
-  std::vector<matrix> Haux; //!< auxiliary Hamiltonian
-  const ElecInfo* eInfo;
-  
-  void init(const Everything& e); //!< initialize C and Haux with the correct sizes for everything
-  
-  MyElecGradient& operator*=(double alpha); //!< scalar multiply
-};
+#include "my_jdftx.h"
 
 void MyElecGradient::init(const Everything& e)
 {

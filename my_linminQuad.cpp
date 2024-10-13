@@ -1,3 +1,5 @@
+#include "my_jdftx.h"
+
 bool my_linminQuad(
   Minimizable<MyElecGradient>& obj,
   const MinimizeParams& p,
