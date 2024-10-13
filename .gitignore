@@ -1,4 +1,5 @@
 .vscode
+ORIG_*
 LOG_*
 build
 TEMPLATE.inp
