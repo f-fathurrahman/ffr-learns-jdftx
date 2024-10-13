@@ -1,6 +1,12 @@
 {
     "files.exclude": {
-        "*.x": true
+        "*.x": true,
+        "TEMP_*": true,
+        "*.kdev4": true,
+        "print": true,
+        "*.so": true,
+        "LOG_*": true,
+        "build": true
     },
     "files.associations": {
         "cctype": "cpp",
