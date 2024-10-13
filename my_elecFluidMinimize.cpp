@@ -1,3 +1,5 @@
+#include "my_jdftx.h"
+
 void my_elecFluidMinimize( Everything& e )
 {
   // Get variables

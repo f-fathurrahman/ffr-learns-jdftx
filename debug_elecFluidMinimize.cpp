@@ -1,14 +1,7 @@
-#include <cstdio>
-#include <iostream>
+#include "my_jdftx.h"
 
-#include <electronic/Everything.h>
-#include <electronic/ElecMinimizer.h>
-#include <electronic/ColumnBundle.h>
 #include <commands/parser.h>
-
-#include "MyElecMinimizer.cpp"
-
-#include "my_elecFluidMinimize.cpp"
+#include <electronic/ElecMinimizer.h>
 
 int main( int argc, char** argv )
 {
@@ -19,9 +12,9 @@ int main( int argc, char** argv )
   e.setup();
 
   // Call this for the original implementation
-  // elecFluidMinimize( e );
+  elecFluidMinimize( e );
 
-  my_elecFluidMinimize( e );
+  //my_elecFluidMinimize( e );
 
   printf("\n");
   printf("%s is finished\n", argv[0]);

@@ -51,12 +51,22 @@ bool my_linminQuad(
 MyElecGradient clone(const MyElecGradient& x);
 void randomize(MyElecGradient& x);
 
+
+
+
+//
 // This is a struct
+//
 #include "MySubspaceRotationAdjust.cpp"
 // Can we make this a class rather than a struct?
 // Are there any reasons related to shared_pointer ?
 
+
+
+
+//
 //! Variational total energy minimizer for electrons
+//
 class MyElecMinimizer : public Minimizable<MyElecGradient>
 {
 public:
@@ -85,6 +95,13 @@ private:
   bool rotExists; //!< whether rotPrev is non-trivial (not identity)
   std::shared_ptr<struct MySubspaceRotationAdjust> sra; //!< Subspace rotation adjustment helper
 };
+
+
+//
+// Functions
+//
+void my_elecFluidMinimize( Everything& e );
+
 
 
 #endif
