@@ -1,4 +1,7 @@
 {
+    "files.exclude": {
+        "*.x": true
+    },
     "files.associations": {
         "cctype": "cpp",
         "clocale": "cpp",
