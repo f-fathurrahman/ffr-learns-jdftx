@@ -14,6 +14,9 @@
         "jdftx/doc": true,
         "jdftx/test": true,
         "jdftx/scripts": true,
+        "*.o": true,
+        "*.out": true,
+        "*.a": true,
     },
     "files.associations": {
         "cctype": "cpp",
