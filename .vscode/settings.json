@@ -6,7 +6,14 @@
         "print": true,
         "*.so": true,
         "LOG_*": true,
-        "build": true
+        "build": true,
+        "works": true,
+        "jdftx/images": true,
+        "jdftx/CMake-Modules": true,
+        "jdftx/pseudopotentials": true,
+        "jdftx/doc": true,
+        "jdftx/test": true,
+        "jdftx/scripts": true,
     },
     "files.associations": {
         "cctype": "cpp",
