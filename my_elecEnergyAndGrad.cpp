@@ -4,6 +4,10 @@ double my_elecEnergyAndGrad( Everything& e,
   MyElecGradient* grad, MyElecGradient* Kgrad, bool calc_Hsub )
 {
 
+  logPrintf("------------------------------------\n");
+  logPrintf("**** ENTER my_elecEnergyAndGrad ****\n");
+  logPrintf("------------------------------------\n");
+
   // This is required to properly initilize ElecVars for metallic system.
   if(!e.eVars.HauxInitialized && e.eInfo.fillingsUpdate==ElecInfo::FillingsHsub)
   {   
@@ -244,6 +248,10 @@ double my_elecEnergyAndGrad( Everything& e,
   }
 
   logPrintf("eInfo.nBands = %d\n", eInfo.nBands);
+
+  logPrintf("-----------------------------------\n");
+  logPrintf("**** EXIT my_elecEnergyAndGrad ****\n");
+  logPrintf("-----------------------------------\n");
 
   return relevantFreeEnergy(e);
 }

@@ -23,7 +23,7 @@ int main( int argc, char** argv )
 
     parse(readInputFile(ip.inputFilename), e, ip.printDefaults);
     e.setup();
-    debug_Everything(&e);
+    debug_Everything(e);
 
     return 0;
 }
