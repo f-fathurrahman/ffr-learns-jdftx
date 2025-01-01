@@ -1,8 +1,4 @@
-#include <electronic/Everything.h>
-#include <electronic/ColumnBundle.h>
-#include <electronic/ElecVars.h>
-#include <core/Util.h>
-#include <commands/parser.h>
+#include "my_jdftx.h"
 
 #include <iostream>
 #include <cmath>

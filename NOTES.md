@@ -1,3 +1,15 @@
+# Windows notes
+
+Works in WSL2.
+
+Need to compile original jdftx source.
+
+Compile library static library `libjdftx_debug.a` using Makefile.
+
+Build debug programs using `build.sh` script.
+
+# CMake stuffs
+
 Show CMake options
 ```
 cmake -LAH
@@ -27,27 +39,31 @@ e.ener.print()
 
 Using the function elecEnergyAndGrad:
 
-```
-double ElecVars::elecEnergyAndGrad(Energies& ener, ElecGradient* grad, ElecGradient* Kgrad, bool calc_Hsub)
+```c++
+double ElecVars::elecEnergyAndGrad(
+    Energies& ener,
+    ElecGradient* grad,
+    ElecGradient* Kgrad,
+    bool calc_Hsub)
 ```
 
 # Print out band energies (Hsub eigenvalues, with occupations, for all k-points)
 
-```cpp
+```c++
 void print_Hsub_eigs(const Everything&);
 ```
 
 # Finding Fermi energy or chemical potential
 
 Defined in ElecInfo:
-```cpp
+```c++
 double findMu(const std::vector<diagMatrix>& eps, double nElectrons, double& Bz) const; 
 ```
 
 
 # Effective mu (need more investigations)
 
-```cpp
+```c++
 std::vector<QuantumNumber> qnums; //!< k-points, spins and weights for each state
 
 //!< effective mu for each spin
@@ -65,7 +81,7 @@ Defined in `Energies.cpp`
 
 The following minimal program can be used.
 
-```cpp
+```c++
 #include <electronic/Everything.h>
 #include <electronic/ColumnBundle.h>
 #include <core/Util.h>
@@ -97,6 +113,14 @@ To minimize the time required by `e.setup()`, put the following line in the inpu
 wavefunction random
 ```
 
+# Some members of `Everything`
+
+```c++
+ElecInfo eInfo; //!< Auxiliary electronic information
+ElecVars eVars; //!< Electronic variables
+Energies ener;  //!< Energy components
+```
+
 # Wavefunctions
 
 Bloch wavefunctions are represented as `vector<ColumnBundle>` in `Everything.eVars`.
@@ -106,7 +130,9 @@ The length of `e.eVars.C` can be obtained using `.size()` method.
 It is the same as `Nkspin` in `PWDFT.jl`. In JDFTX it is named `nStates`.
 
 One wave function in a k-point is represented by `ColumnBundle`.
+
 Number of electronic states can be accessed using `.nCols()` method.
+
 Number of basis function can be accessed using `.colLength()` method.
 
 # Calculating electron density
@@ -123,7 +149,7 @@ For my normal use case IonicMinize is used.
 It seems that ElecMinimize can not be used directly, at least for metallic case.
 For metallic case, the function `elecFluidMininimize()` should be used.
 
-```cpp
+```c++
 #include <electronic/Everything.h>
 #include <electronic/ElecMinimizer.h>
 #include <electronic/ColumnBundle.h>
