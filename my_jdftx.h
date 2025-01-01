@@ -13,6 +13,7 @@
 #include <electronic/ElecInfo.h>
 #include <electronic/ColumnBundle.h>
 #include <electronic/SCF.h>
+#include <core/Util.h>
 
 struct MyElecGradient
 {

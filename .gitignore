@@ -1,3 +1,4 @@
+*.dat
 ORIG_*
 LOG_*
 build
