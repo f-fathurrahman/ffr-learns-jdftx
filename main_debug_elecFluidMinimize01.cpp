@@ -12,9 +12,9 @@ int main( int argc, char** argv )
   e.setup();
 
   // Call this for the original implementation
-  elecFluidMinimize( e );
-
-  //my_elecFluidMinimize( e );
+  //elecFluidMinimize( e );
+  
+  my_elecFluidMinimize( e );
 
   printf("\n");
   printf("%s is finished\n", argv[0]);

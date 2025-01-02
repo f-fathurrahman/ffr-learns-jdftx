@@ -8,26 +8,6 @@ double my_elecEnergyAndGrad( Everything& e,
   logPrintf("**** ENTER my_elecEnergyAndGrad ****\n");
   logPrintf("------------------------------------\n");
 
-  // This is required to properly initilize ElecVars for metallic system.
-  if(!e.eVars.HauxInitialized && e.eInfo.fillingsUpdate==ElecInfo::FillingsHsub)
-  {   
-    logPrintf("\nSetting up things for FillingsHsub\n");
-
-    // Using FillingsConst
-    e.eInfo.fillingsUpdate = ElecInfo::FillingsConst;
-    
-    // call the original member function of ElecVars to calculate energy and Hsub
-    e.eVars.elecEnergyAndGrad( e.ener, 0, 0, true );
-
-    e.eInfo.fillingsUpdate = ElecInfo::FillingsHsub;
-    
-    // Update B:
-    // Use Hsub for initial value of Haux
-    for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) e.eVars.Haux_eigs[q] = e.eVars.Hsub_eigs[q];
-    
-    e.eVars.HauxInitialized = true;
-  }
-
   // Shortcuts
   const ElecInfo& eInfo = e.eInfo;
   ElecVars& eVars = e.eVars;

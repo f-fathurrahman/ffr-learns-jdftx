@@ -89,12 +89,8 @@ void my_elecFluidMinimize( Everything& e )
   logPrintf("\n-------- Electronic minimization -----------\n"); logFlush();
   
   //elecMinimize(e); driver: use scf, direct min, etc
-  
-  //ElecMinimizer emin(e);
-  MyElecMinimizer emin(e);
-  
+  MyElecMinimizer emin(e);  
   emin.my_minimize(e.elecMinParams);
-  //emin.minimize(e.elecMinParams); // the original
 
   //if (!e.ionDynamicsParams.tMax) {
   //  e.eVars.setEigenvectors(); //Don't spend time with this if running MD

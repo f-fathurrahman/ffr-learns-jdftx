@@ -15,6 +15,9 @@
 #include <electronic/SCF.h>
 #include <core/Util.h>
 
+//
+// Definition of MyElecGradient
+//
 struct MyElecGradient
 {
   std::vector<ColumnBundle> C; //!< wavefunctions
