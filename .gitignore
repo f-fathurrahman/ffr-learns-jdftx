@@ -4,7 +4,12 @@ LOG_*
 build
 TEMPLATE.inp
 print
-jdftx
+jdftx/aux
+jdftx/pseudopotentials
+jdftx/doc
+jdftx/test
+jdftx/scripts
+jdftx/SourceFileTemplate.txt
 jdftx_orig
 works
 *.swp
