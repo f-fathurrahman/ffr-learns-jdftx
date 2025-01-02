@@ -1,20 +1,20 @@
 lattice body-centered Cubic 5.42
 
-ion-species SG15/$ID_ONCV_PBE.upf
+ion-species SG15/$ID_ONCV_LDA.upf
 
-elec-ex-corr gga-PBE
+elec-ex-corr lda-VWN
 
 elec-cutoff 20 80
 ion Fe  0 0 0  0
 
 kpoint-folding 3 3 3
 
-elec-smearing Cold 0.01
+elec-smearing Fermi 0.01
 
 spintype z-spin                  #Allow up/dn spins (non-relativistic)
 elec-initial-magnetization 3.0 no  #Initial guess, no = don't constrain
 
-#wavefunction random
+wavefunction random
 
 electronic-minimize  \
  nIterations          200 \
