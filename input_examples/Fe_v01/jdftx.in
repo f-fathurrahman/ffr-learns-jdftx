@@ -1,7 +1,9 @@
 lattice body-centered Cubic 5.42
 
-ion-species SG15/$ID_ONCV_LDA.upf
+# use PBE version because it has Pulay file
+ion-species SG15/$ID_ONCV_PBE.upf
 
+# force using lda-VWN
 elec-ex-corr lda-VWN
 
 elec-cutoff 20 80
@@ -9,15 +11,20 @@ ion Fe  0 0 0  0
 
 kpoint-folding 3 3 3
 
-elec-smearing Fermi 0.01
+elec-n-bands 12
+
+elec-smearing Fermi 0.001
 
 spintype z-spin                  #Allow up/dn spins (non-relativistic)
-elec-initial-magnetization 3.0 no  #Initial guess, no = don't constrain
+elec-initial-magnetization 2.9 no  #Initial guess, no = don't constrain
 
 wavefunction random
 
 electronic-minimize  \
  nIterations          200 \
- energyDiffThreshold  1e-08
+ energyDiffThreshold  1e-06
 
 #electronic-SCF
+
+dump End None
+

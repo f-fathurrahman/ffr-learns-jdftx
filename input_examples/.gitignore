@@ -1,3 +1,5 @@
 *.eigenvals
 *.fillings
 *.wfns
+script_*.jl
+*.xsf

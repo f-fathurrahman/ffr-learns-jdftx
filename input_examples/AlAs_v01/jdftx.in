@@ -1,0 +1,29 @@
+# in bohr
+lattice \
+  5.3101304125       5.3101304125       0.0000000000 \
+  5.3101304125       0.0000000000       5.3101304125 \
+  0.0000000000       5.3101304125       5.3101304125
+
+# use PBE version because it has Pulay file
+ion-species SG15/$ID_ONCV_PBE.upf
+
+elec-ex-corr lda-VWN
+
+elec-cutoff 20 80
+
+coords-type Lattice
+ion Al 0.10 0.00 0.00  0
+ion As 0.25 0.25 0.25  0
+
+kpoint-folding 3 3 3
+
+wavefunction random
+
+electronic-minimize  \
+ nIterations          200 \
+ energyDiffThreshold  1e-06
+
+#electronic-SCF
+
+dump End None
+
