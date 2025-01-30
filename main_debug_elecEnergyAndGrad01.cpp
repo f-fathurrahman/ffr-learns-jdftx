@@ -45,7 +45,7 @@ int main( int argc, char** argv )
     // Use Hsub for initial value of Haux
     for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) {
       e.eVars.Haux_eigs[q] = e.eVars.Hsub_eigs[q];
-      cout << e.eVars.Haux_eigs[q][0] << endl;
+      cout << "First Haux_eigs for each k = " << e.eVars.Haux_eigs[q][0] << endl;
     }
     e.eVars.HauxInitialized = true;
   }

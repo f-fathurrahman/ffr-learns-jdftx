@@ -107,7 +107,10 @@ double my_elecEnergyAndGrad( Everything& e,
   //  assert(e.exx);
   //  ener.E["EXX"] = (e.exx)(aXX, omega, eVars.F, eVars.C, need_Hsub ? &HC : 0); // not compiled ?
   //}
-  
+
+  e.eInfo.write(e.eVars.C, "eVars_C.dat");
+  logPrintf("eVars.C is written to evars_C.dat\n");
+
   //Do the single-particle contributions one state at a time to save memory (and for better cache warmth):
   ener.E["KE"] = 0.;
   ener.E["Enl"] = 0.;
@@ -148,7 +151,7 @@ double my_elecEnergyAndGrad( Everything& e,
   // whether magnetization needs to be constrained
   bool Mconstrain = (eInfo.spinType==SpinZ) and std::isnan(eInfo.Bz);
 
-  //logPrintf("Mconstrain  = %d\n", Mconstrain);
+  logPrintf("Mconstrain  = %d\n", Mconstrain);
   
   // contribution due to N/M constraint via the mu/Bz gradient 
   if( grad and eInfo.fillingsUpdate==ElecInfo::FillingsHsub and (std::isnan(eInfo.mu) or Mconstrain) )
@@ -158,7 +161,7 @@ double my_elecEnergyAndGrad( Everything& e,
     // numerator and denominator of dmuContrib resolved by spin channels (if any)
     double dmuNum[2] = {0.,0.}, dmuDen[2] = {0.,0.}; 
     
-    //logPrintf("Calculating dmuNum and dmuDen\n");
+    logPrintf("Calculating dmuNum and dmuDen\n");
     double wsum = 0.0;
     for(int q=eInfo.qStart; q<eInfo.qStop; q++)
     {
@@ -166,11 +169,11 @@ double my_elecEnergyAndGrad( Everything& e,
       double w = eInfo.qnums[q].weight;
       int sIndex = eInfo.qnums[q].index();
       wsum = wsum + w;
-      //logPrintf("q = %d sIndex = %d w = %f\n", q, sIndex, w);
+      logPrintf("q = %d sIndex = %d w = %f\n", q, sIndex, w);
       dmuNum[sIndex] += w * trace(fprime * ( diag(eVars.Hsub[q]) - eVars.Haux_eigs[q]) );
       dmuDen[sIndex] += w * trace(fprime);
     }
-    //logPrintf("wsum = %f\n", wsum);
+    logPrintf("wsum = %f\n", wsum);
     
     mpiWorld->allReduce(dmuNum, 2, MPIUtil::ReduceSum);
     mpiWorld->allReduce(dmuDen, 2, MPIUtil::ReduceSum);
@@ -202,7 +205,7 @@ double my_elecEnergyAndGrad( Everything& e,
   else {
     logPrintf("Pass here 209 in my_elecEnergyAndGrad.\n");
   }
-
+  logPrintf("dmuContrib = %f\n", dmuContrib);
 
   //Auxiliary hamiltonian gradient:
   if( grad && eInfo.fillingsUpdate==ElecInfo::FillingsHsub )
