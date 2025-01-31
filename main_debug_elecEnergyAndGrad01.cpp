@@ -75,8 +75,24 @@ int main( int argc, char** argv )
   e.eInfo.write(e.eVars.Hsub, "eVars_Hsub.dat");
   logPrintf("eVars.Hsub is written to evars_Hsub.dat\n");
 
+  // Not working
+  /*
+  std::vector<matrix> n;
+  n.push_back(e.eVars.n[0]->toMatrix());
+  e.eInfo.write(n, "eVars_n.dat");
+  */
+
+   matrix n = e.eVars.n[0]->toMatrix();
+   cout << "n.nRows() = " << n.nRows() <<  " n.nCols() = " << n.nCols() << endl;
+   cout << "Some n = " << n(0,0).x << " " << n(0,0).y << endl;
+   cout << "Some n = " << n(1,0).x << " " << n(1,0).y << endl;
+
+  //cout << "eVars.n = " << e.eVars.n[0](1) << endl;
+
+  /*
   e.eInfo.write(e.eVars.n[0].to_matrix(), "eVars_n.dat");
   logPrintf("eVars.n is written to evars_n.dat\n");
+  */
 
   //export_Hsub(e);
 
