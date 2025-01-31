@@ -108,9 +108,6 @@ double my_elecEnergyAndGrad( Everything& e,
   //  ener.E["EXX"] = (e.exx)(aXX, omega, eVars.F, eVars.C, need_Hsub ? &HC : 0); // not compiled ?
   //}
 
-  e.eInfo.write(e.eVars.C, "eVars_C.dat");
-  logPrintf("eVars.C is written to evars_C.dat\n");
-
   //Do the single-particle contributions one state at a time to save memory (and for better cache warmth):
   ener.E["KE"] = 0.;
   ener.E["Enl"] = 0.;

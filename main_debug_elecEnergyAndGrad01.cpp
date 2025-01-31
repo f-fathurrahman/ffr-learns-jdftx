@@ -8,9 +8,24 @@
 #include <iostream>
 #include <cmath>
 
+#include <string>
+
 #include "my_jdftx.h"
 
 using namespace std;
+
+void export_Hsub(Everything& e) {
+  for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) {
+    stringstream ss;
+    ss << "Hsub_" << q << ".dat";
+    FILE *fptr;
+    fptr = fopen( ss.str().c_str(), "w");
+    e.eVars.Hsub[q].print(fptr);
+    fclose(fptr);
+    cout << "Hsub written to " << ss.str() << endl;
+  }
+}
+
 
 int main( int argc, char** argv )
 {
@@ -21,7 +36,7 @@ int main( int argc, char** argv )
   e.setup();
 
   MyElecGradient g, Kg;
-  
+  // these will allocate memory?
   g.init(e);
   Kg.init(e);
 
@@ -43,16 +58,30 @@ int main( int argc, char** argv )
     
     // Update B:
     // Use Hsub for initial value of Haux
+    logPrintf("Initial values of Haux_eigs\n");
     for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) {
       e.eVars.Haux_eigs[q] = e.eVars.Hsub_eigs[q];
-      cout << "First Haux_eigs for each k = " << e.eVars.Haux_eigs[q][0] << endl;
+      logPrintf("\nikspin index = %d\n", q);
+      for(int ist=0; ist < e.eInfo.nStates; ist++) {
+        logPrintf("%4d %18.10f\n",ist,  e.eVars.Haux_eigs[q][ist]);
+      }
     }
     e.eVars.HauxInitialized = true;
   }
 
-  double Etot = my_elecEnergyAndGrad( e, &g, &Kg, false ); // ener is included in e
+  e.eInfo.write(e.eVars.C, "eVars_C.dat");
+  logPrintf("eVars.C is written to evars_C.dat\n");
 
-  logPrintf("Etot = %18.10f\n", Etot);
+  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub.dat");
+  logPrintf("eVars.Hsub is written to evars_Hsub.dat\n");
+
+  e.eInfo.write(e.eVars.n[0].to_matrix(), "eVars_n.dat");
+  logPrintf("eVars.n is written to evars_n.dat\n");
+
+  //export_Hsub(e);
+
+  //double Etot = my_elecEnergyAndGrad( e, &g, &Kg, false ); // ener is included in e
+  //logPrintf("Etot = %18.10f\n", Etot);
 
   printf("\n");
   printf("%s is finished\n", argv[0]);
