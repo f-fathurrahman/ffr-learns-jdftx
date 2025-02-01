@@ -1,3 +1,5 @@
+*.jldat
+
 *.eigenvals
 *.fillings
 *.wfns
