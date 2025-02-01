@@ -106,7 +106,7 @@ private:
 //
 void my_elecFluidMinimize( Everything& e );
 
-
+void write_info(Everything &e);
 
 #endif
 

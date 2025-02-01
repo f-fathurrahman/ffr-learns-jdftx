@@ -13,7 +13,8 @@ LIBS = -Wl,-rpath,/home/efefer/WORKS/my_github_repos/ffr-learns-jdftx: libjdftx.
 CXX_SRC = \
 MyElecGradient.cpp \
 my_elecEnergyAndGrad.cpp my_linminQuad.cpp \
-MyElecMinimizer.cpp my_elecFluidMinimize.cpp
+MyElecMinimizer.cpp my_elecFluidMinimize.cpp \
+write_info.cpp
 
 OBJ = $(CXX_SRC:.cpp=.o)
 

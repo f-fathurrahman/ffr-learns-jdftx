@@ -14,6 +14,7 @@
 
 using namespace std;
 
+// formatted output
 void export_Hsub(Everything& e) {
   for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) {
     stringstream ss;
@@ -34,6 +35,8 @@ int main( int argc, char** argv )
   initSystemCmdline(argc, argv, ip);
   parse(readInputFile(ip.inputFilename), e, ip.printDefaults);
   e.setup();
+
+  write_info(e);
 
   MyElecGradient g, Kg;
   // these will allocate memory?
