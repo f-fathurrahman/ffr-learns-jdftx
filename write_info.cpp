@@ -19,8 +19,9 @@ void write_info(Everything &e)
   fprintf(fp, "Nkspin = %ld\n", Nkspin);
   fprintf(fp, "Nstates = %d\n", Nstates);
 
+  // Number of plane waves per-ikspin
   for(unsigned long i = 0; i < Nkspin; i++) {
-    fprintf(fp, "%ld \n", e.eVars.C[i].colLength());
+    fprintf(fp, "Npw[%ld] = %ld\n", i, e.eVars.C[i].colLength());
   }
   mpiWorld->fclose(fp);
 }

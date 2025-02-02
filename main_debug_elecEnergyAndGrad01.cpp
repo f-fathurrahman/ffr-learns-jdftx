@@ -99,8 +99,8 @@ int main( int argc, char** argv )
 
   //export_Hsub(e);
 
-  //double Etot = my_elecEnergyAndGrad( e, &g, &Kg, false ); // ener is included in e
-  //logPrintf("Etot = %18.10f\n", Etot);
+  double Etot = my_elecEnergyAndGrad( e, &g, &Kg, false ); // ener is included in e
+  logPrintf("Etot = %18.10f\n", Etot);
 
   printf("\n");
   printf("%s is finished\n", argv[0]);

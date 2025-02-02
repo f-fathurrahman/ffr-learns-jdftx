@@ -31,14 +31,14 @@ function load_psiks()
 end
 
 
-function load_Hsub()
+function load_Hsub(; filename="eVars_Hsub.dat")
     Nkspin = 8
     Nstates = 12
 
     Ndata = sum(Nstates*Nstates * Nkspin)
     raw_data = Vector{ComplexF64}(undef, Ndata)
 
-    file = open("eVars_Hsub.dat", "r")
+    file = open(filename, "r")
     read!(file, raw_data);
     close(file)
 
@@ -63,7 +63,10 @@ function main()
     serialize("psiks.jldat", psiks)
     #
     Hsub = load_Hsub()
-    serialize("Hsub.jldat", psiks)
+    serialize("Hsub.jldat", Hsub)
+    #
+    Hsub_after = load_Hsub(filename="eVars_Hsub_after.dat")
+    serialize("Hsub_after.jldat", Hsub_after)
 end
 
-
+main()

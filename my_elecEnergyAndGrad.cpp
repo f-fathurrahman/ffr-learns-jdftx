@@ -28,18 +28,19 @@ double my_elecEnergyAndGrad( Everything& e,
 
   // Determine whether Hsub and hence HC needs to be calculated:
   bool need_Hsub = calc_Hsub || grad;
+  logPrintf("need_Hsub = %d\n", need_Hsub);
+
   double mu = 0., Bz = 0.;
 
-  //logPrintf("need_Hsub = %d\n", need_Hsub);
 
   if( eInfo.fillingsUpdate == ElecInfo::FillingsHsub )
   {    
     // Update nElectrons from mu, or mu from nElectrons as appropriate:
     if( std::isnan(eInfo.mu) )
     {
-      //logPrintf("Finding mu: ");
+      logPrintf("Finding mu: ");
       mu = eInfo.findMu( eVars.Haux_eigs, eInfo.nElectrons, Bz );
-      //logPrintf(" mu = %18.10f\n", mu);
+      logPrintf(" mu = %18.10f\n", mu);
       //std::cout << "Bz = " << Bz << std::endl;
     }
     else
@@ -88,7 +89,7 @@ double my_elecEnergyAndGrad( Everything& e,
   if( need_Hsub ) e.iInfo.augmentDensityGridGrad( eVars.Vscloc );
 
   //logPrintf("\nAfter update density and density-dependent pieces:\n");
-  //ener.print();
+  ener.print();
 
 
   //
@@ -122,6 +123,7 @@ double my_elecEnergyAndGrad( Everything& e,
       HC[q] -= O( eVars.C[q] ) * eVars.Hsub[q]; //Include orthonormality contribution
       
       grad->C[q] = HC[q] * ( eVars.F[q]*qnum.weight );
+      //logPrintf("grad loop q=%d weight=%f\n", q, qnum.weight);
       
       if( Kgrad )
       {
@@ -132,12 +134,15 @@ double my_elecEnergyAndGrad( Everything& e,
         
         precond_inv_kinetic( HC[q], KErollover ); //apply preconditioner
         
-        std::swap( Kgrad->C[q], HC[q]); //this frees HC[q]
+        std::swap( Kgrad->C[q], HC[q] ); //this frees HC[q]
       }
     }
   }
   mpiWorld->allReduce(ener.E["KE"], MPIUtil::ReduceSum);
   mpiWorld->allReduce(ener.E["Enl"], MPIUtil::ReduceSum);
+
+  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub_after.dat");
+  logPrintf("eVars.Hsub after grad is written to evars_Hsub_after.dat\n");
 
   //logPrintf("\nAfter calc KE and Enl:\n");
   //ener.print();
@@ -162,13 +167,23 @@ double my_elecEnergyAndGrad( Everything& e,
     double wsum = 0.0;
     for(int q=eInfo.qStart; q<eInfo.qStop; q++)
     {
+      double mu_effective = eInfo.muEff(mu, Bz, q);
+      //
       diagMatrix fprime = eInfo.smearPrime( eInfo.muEff(mu,Bz,q), eVars.Haux_eigs[q] );
+      std::stringstream ss;
+      ss << "fprime_" << q << ".dat";
+      FILE *fptr;
+      fptr = fopen( ss.str().c_str(), "w");
+      fprime.print(fptr);
+      fclose(fptr);
+      //
       double w = eInfo.qnums[q].weight;
       int sIndex = eInfo.qnums[q].index();
       wsum = wsum + w;
-      logPrintf("q = %d sIndex = %d w = %f\n", q, sIndex, w);
       dmuNum[sIndex] += w * trace(fprime * ( diag(eVars.Hsub[q]) - eVars.Haux_eigs[q]) );
       dmuDen[sIndex] += w * trace(fprime);
+      logPrintf("q=%d s=%d w=%f dmu=(%f, %f) mu_eff=%f\n",
+        q, sIndex, w, dmuNum[sIndex], dmuDen[sIndex], mu_effective);
     }
     logPrintf("wsum = %f\n", wsum);
     
@@ -204,13 +219,16 @@ double my_elecEnergyAndGrad( Everything& e,
   }
   logPrintf("dmuContrib = %f\n", dmuContrib);
 
-  //Auxiliary hamiltonian gradient:
+  //
+  // Auxiliary hamiltonian gradient:
+  //
+  logPrintf("\nStart auxiliary Hamiltonian\n");
   if( grad && eInfo.fillingsUpdate==ElecInfo::FillingsHsub )
   {
     for(int q=eInfo.qStart; q < eInfo.qStop; q++)
     {
 
-      //logPrintf("q = %d\n", q);
+      logPrintf("q = %d\n", q);
 
       const QuantumNumber& qnum = eInfo.qnums[q];
       
