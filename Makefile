@@ -14,7 +14,8 @@ CXX_SRC = \
 MyElecGradient.cpp \
 my_elecEnergyAndGrad.cpp my_linminQuad.cpp \
 MyElecMinimizer.cpp my_elecFluidMinimize.cpp \
-write_info.cpp
+write_info.cpp \
+my_calcDensity.cpp my_applyHamiltonian.cpp
 
 OBJ = $(CXX_SRC:.cpp=.o)
 

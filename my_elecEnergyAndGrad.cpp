@@ -33,25 +33,21 @@ double my_elecEnergyAndGrad( Everything& e,
   double mu = 0., Bz = 0.;
 
 
-  if( eInfo.fillingsUpdate == ElecInfo::FillingsHsub )
-  {    
+  if( eInfo.fillingsUpdate == ElecInfo::FillingsHsub ) {    
     // Update nElectrons from mu, or mu from nElectrons as appropriate:
-    if( std::isnan(eInfo.mu) )
-    {
+    if( std::isnan(eInfo.mu) ) {
       logPrintf("Finding mu: ");
       mu = eInfo.findMu( eVars.Haux_eigs, eInfo.nElectrons, Bz );
       logPrintf(" mu = %18.10f\n", mu);
       //std::cout << "Bz = " << Bz << std::endl;
     }
-    else
-    {
+    else {
       mu = eInfo.mu;
       ((ElecInfo&)eInfo).nElectrons = eInfo.nElectronsCalc( mu, eVars.Haux_eigs, Bz );
     }
     
     // Compute fillings from aux hamiltonian eigenvalues:
-    for(int q=eInfo.qStart; q<eInfo.qStop; q++)
-    {
+    for(int q=eInfo.qStart; q<eInfo.qStop; q++) {
       //logPrintf("q = %d\n", q);
       //logPrintf("Bz = %18.10f\n", Bz);
       //logPrintf("muEff = %18.10f\n", eInfo.muEff(mu, Bz, q));      
@@ -112,8 +108,8 @@ double my_elecEnergyAndGrad( Everything& e,
   //Do the single-particle contributions one state at a time to save memory (and for better cache warmth):
   ener.E["KE"] = 0.;
   ener.E["Enl"] = 0.;
-  for(int q=eInfo.qStart; q < e.eInfo.qStop; q++)
-  {
+  for(int q=eInfo.qStart; q < e.eInfo.qStop; q++) {
+    //
     double KEq = eVars.applyHamiltonian(q, eVars.F[q], HC[q], ener, need_Hsub);
     
     if(grad) //Calculate wavefunction gradients:

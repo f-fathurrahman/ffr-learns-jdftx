@@ -13,6 +13,8 @@
 #include <electronic/ElecInfo.h>
 #include <electronic/ColumnBundle.h>
 #include <electronic/SCF.h>
+
+#include <core/ScalarFieldArray.h>
 #include <core/Util.h>
 
 #include <iostream>
@@ -110,6 +112,17 @@ private:
 void my_elecFluidMinimize( Everything& e );
 
 void write_info(Everything &e);
+
+ScalarFieldArray my_calcDensity(Everything& e);
+
+double my_applyHamiltonian(
+  Everything& e,
+  int q,
+  const diagMatrix& Fq,
+  ColumnBundle& HCq,
+  Energies& ener,
+  bool need_Hsub
+);
 
 #endif
 
