@@ -130,5 +130,9 @@ void my_ElecMinimizer_step(
   double alpha
 );
 
+void write_eVars_F(Everything& e);
+void write_eVars_Hsub(Everything& e);
+void write_eVars_n(Everything& e);
+
 #endif
 

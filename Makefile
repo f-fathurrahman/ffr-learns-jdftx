@@ -16,7 +16,8 @@ my_elecEnergyAndGrad.cpp my_linminQuad.cpp \
 MyElecMinimizer.cpp my_elecFluidMinimize.cpp \
 write_info.cpp \
 my_calcDensity.cpp my_applyHamiltonian.cpp \
-my_ElecMinimizer_step.cpp
+my_ElecMinimizer_step.cpp \
+export_variables.cpp
 
 OBJ = $(CXX_SRC:.cpp=.o)
 
