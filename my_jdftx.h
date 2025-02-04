@@ -91,8 +91,7 @@ public:
   //!< All processes minimize together; make sure scalars are in sync to round-off error
   double sync(double x) const;
 
-// XXX absolutely needed to make these private?
-private:
+  // XXX They are originally private
   Everything& e;
   class ElecVars& eVars;
   const ElecInfo& eInfo;
@@ -122,6 +121,13 @@ double my_applyHamiltonian(
   ColumnBundle& HCq,
   Energies& ener,
   bool need_Hsub
+);
+
+void my_ElecMinimizer_step(
+  Everything& e,
+  MyElecMinimizer& elecMin,
+  MyElecGradient& dir,
+  double alpha
 );
 
 #endif
