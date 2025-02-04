@@ -8,4 +8,6 @@ INCLUDE="-I./jdftx"
 LIBS="-Wl,-rpath,/home/efefer/WORKS/my_github_repos/ffr-learns-jdftx: libjdftx.so -lgsl -lfftw3_threads -lfftw3 -lgslcblas -llapack -lblas -lpthread"
 
 make
+set -x
 g++ $INCLUDE $FLAGS $1 -o $prefix.x libjdftx_debug.a $LIBS
+
