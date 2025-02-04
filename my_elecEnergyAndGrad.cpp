@@ -1,7 +1,12 @@
 #include "my_jdftx.h"
 
-double my_elecEnergyAndGrad( Everything& e, 
-  MyElecGradient* grad, MyElecGradient* Kgrad, bool calc_Hsub )
+// originally e.ener is passes instead of Everything
+
+double my_elecEnergyAndGrad(
+  Everything& e, 
+  MyElecGradient* grad,
+  MyElecGradient* Kgrad,
+  bool calc_Hsub )
 {
 
   //logPrintf("------------------------------------\n");
@@ -85,35 +90,33 @@ double my_elecEnergyAndGrad( Everything& e,
   if( need_Hsub ) e.iInfo.augmentDensityGridGrad( eVars.Vscloc );
 
   //logPrintf("\nAfter update density and density-dependent pieces:\n");
-  ener.print();
+  //ener.print();
 
 
   //
   // update wavefunction dependent parts
   //
 
-  //gradient w.r.t C (upto weights and fillings)
+  // gradient w.r.t C (upto weights and fillings)
   std::vector<ColumnBundle> HC(eInfo.nStates);
   
-  //Exact exchange if required:
-  ener.E["EXX"] = 0.;
-  //if( e.exCorr.exxFactor() )
-  //{
-  //  double aXX = e.exCorr.exxFactor();
-  //  double omega = e.exCorr.exxRange();
-  //  assert(e.exx);
-  //  ener.E["EXX"] = (e.exx)(aXX, omega, eVars.F, eVars.C, need_Hsub ? &HC : 0); // not compiled ?
-  //}
+  // Exact exchange if required:
+  ener.E["EXX"] = 0.0;
+  // EXX stuffs are removed
 
-  //Do the single-particle contributions one state at a time to save memory (and for better cache warmth):
   ener.E["KE"] = 0.;
   ener.E["Enl"] = 0.;
-  for(int q=eInfo.qStart; q < e.eInfo.qStop; q++) {
+
+
+  // Do the single-particle contributions one state at a time to save memory (and for better cache warmth):
+   for(int q=eInfo.qStart; q < e.eInfo.qStop; q++) {
     //
     double KEq = eVars.applyHamiltonian(q, eVars.F[q], HC[q], ener, need_Hsub);
+    // some components of ener are also computed here?
     
-    if(grad) //Calculate wavefunction gradients:
-    {
+    // Calculate wavefunction gradients:
+    if(grad) {
+      //
       const QuantumNumber& qnum = eInfo.qnums[q];
       
       HC[q] -= O( eVars.C[q] ) * eVars.Hsub[q]; //Include orthonormality contribution
@@ -121,15 +124,15 @@ double my_elecEnergyAndGrad( Everything& e,
       grad->C[q] = HC[q] * ( eVars.F[q]*qnum.weight );
       //logPrintf("grad loop q=%d weight=%f\n", q, qnum.weight);
       
-      if( Kgrad )
-      {
+      // Preconditioning
+      if( Kgrad ) {
+        //
         double Nq = qnum.weight*trace( eVars.F[q] );
-        
-        double KErollover = 2. * (Nq>1e-3 ? KEq/Nq : 1.);
+        double KErollover = 2. * (Nq > 1e-3 ? KEq/Nq : 1.0);
         //logPrintf("Nq = %f, KEq = %f, KErollover = %f\n", Nq, KEq, KErollover);
-        
+        //
         precond_inv_kinetic( HC[q], KErollover ); //apply preconditioner
-        
+        //
         std::swap( Kgrad->C[q], HC[q] ); //this frees HC[q]
       }
     }
@@ -148,11 +151,12 @@ double my_elecEnergyAndGrad( Everything& e,
 
   // whether magnetization needs to be constrained
   bool Mconstrain = (eInfo.spinType==SpinZ) and std::isnan(eInfo.Bz);
-
   logPrintf("Mconstrain  = %d\n", Mconstrain);
   
   // contribution due to N/M constraint via the mu/Bz gradient 
-  if( grad and eInfo.fillingsUpdate==ElecInfo::FillingsHsub and (std::isnan(eInfo.mu) or Mconstrain) )
+  if( grad and
+      eInfo.fillingsUpdate==ElecInfo::FillingsHsub and
+      ( std::isnan(eInfo.mu) or Mconstrain ) )
   {
     //logPrintf("Pass here 170 in my_elecEnergyAndGrad\n");
 
@@ -166,6 +170,7 @@ double my_elecEnergyAndGrad( Everything& e,
       double mu_effective = eInfo.muEff(mu, Bz, q);
       //
       diagMatrix fprime = eInfo.smearPrime( eInfo.muEff(mu,Bz,q), eVars.Haux_eigs[q] );
+      //
       std::stringstream ss;
       ss << "fprime_" << q << ".dat";
       FILE *fptr;
@@ -186,7 +191,7 @@ double my_elecEnergyAndGrad( Everything& e,
     mpiWorld->allReduce(dmuNum, 2, MPIUtil::ReduceSum);
     mpiWorld->allReduce(dmuDen, 2, MPIUtil::ReduceSum);
     
-    if(std::isnan(eInfo.mu) and Mconstrain)
+    if( std::isnan(eInfo.mu) and Mconstrain )
     {
       //logPrintf("Pass here 189 in my_elecEnergyAndGrad\n");
       //Fixed N and M (effectively independent constraints on Nup and Ndn)
@@ -211,21 +216,21 @@ double my_elecEnergyAndGrad( Everything& e,
     }
   }
   else {
-    logPrintf("Pass here 209 in my_elecEnergyAndGrad.\n");
+    logPrintf("Not computing dmuContrib and dBzContrib\n");
   }
   logPrintf("dmuContrib = %f\n", dmuContrib);
 
   //
   // Auxiliary hamiltonian gradient:
   //
-  logPrintf("\nStart auxiliary Hamiltonian\n");
-  if( grad && eInfo.fillingsUpdate==ElecInfo::FillingsHsub )
-  {
+  if( grad && eInfo.fillingsUpdate==ElecInfo::FillingsHsub ) {
+    //
+    logPrintf("\nStart auxiliary Hamiltonian\n");
+    //
     for(int q=eInfo.qStart; q < eInfo.qStop; q++)
     {
 
       logPrintf("q = %d\n", q);
-
       const QuantumNumber& qnum = eInfo.qnums[q];
       
       // gradient w.r.t fillings except for constraint contributions
@@ -248,3 +253,4 @@ double my_elecEnergyAndGrad( Everything& e,
 
   return relevantFreeEnergy(e);
 }
+

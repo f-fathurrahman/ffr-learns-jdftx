@@ -14,19 +14,6 @@
 
 using namespace std;
 
-// formatted output
-void export_Hsub(Everything& e) {
-  for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) {
-    stringstream ss;
-    ss << "Hsub_" << q << ".dat";
-    FILE *fptr;
-    fptr = fopen( ss.str().c_str(), "w");
-    e.eVars.Hsub[q].print(fptr);
-    fclose(fptr);
-    cout << "Hsub written to " << ss.str() << endl;
-  }
-}
-
 
 int main( int argc, char** argv )
 {
@@ -51,12 +38,14 @@ int main( int argc, char** argv )
     logPrintf("Haux is not yet initialized\n");
     logPrintf("Setting up things for FillingsHsub\n");
 
-    // Using FillingsConst
+    // Using FillingsConst for computing energy and Hsub ?
     e.eInfo.fillingsUpdate = ElecInfo::FillingsConst;
     
     // call the original member function of ElecVars to calculate energy and Hsub
     e.eVars.elecEnergyAndGrad( e.ener, 0, 0, true );
+    e.ener.print();
 
+    // Set again to the original fillingsUpdate
     e.eInfo.fillingsUpdate = ElecInfo::FillingsHsub;
     
     // Update B:

@@ -66,7 +66,9 @@ int main( int argc, char** argv ) {
   e.eInfo.write(e.eVars.Hsub, "eVars_Hsub.dat");
   logPrintf("eVars.Hsub is written to evars_Hsub.dat\n");
 
-  auto n = my_calcDensity(e);
+  e.eVars.n = my_calcDensity(e);
+
+  write_eVars_n(e);
 
   return 0;
 }

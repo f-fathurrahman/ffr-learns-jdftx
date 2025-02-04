@@ -14,6 +14,7 @@
 
 using namespace std;
 
+// This is originally done in elecFluidMinimize before calling elecEnergyAndGrad
 void initialize_Haux(Everything& e) {
 
   logPrintf("---------------------\n");
@@ -28,7 +29,10 @@ void initialize_Haux(Everything& e) {
     logPrintf("Setting up things for FillingsHsub\n");
 
     // Using FillingsConst
+    e.eInfo.write(e.eVars.F, "eVars_F_step00.dat");
     e.eInfo.fillingsUpdate = ElecInfo::FillingsConst;
+    e.eInfo.write(e.eVars.F, "eVars_F_step01.dat");
+    //write_eVars_F(e);
     // grad and Kgrad are not computed.
     double Etot = my_elecEnergyAndGrad( e, 0, 0, true );
     logPrintf("Etot = %18.10f\n", Etot);
