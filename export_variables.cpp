@@ -1,10 +1,10 @@
 #include "my_jdftx.h"
 
 // formatted output
-void export_eVars_Hsub(Everything& e) {
+void export_eVars_Hsub(Everything& e, const char* prefix) {
   for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) {
     std::stringstream ss;
-    ss << "eVars_Hsub_" << q+1 << ".dat";
+    ss << prefix << q+1 << ".dat";
     FILE *fptr;
     fptr = fopen( ss.str().c_str(), "w");
     e.eVars.Hsub[q].print(fptr);
@@ -13,10 +13,10 @@ void export_eVars_Hsub(Everything& e) {
   }
 }
 
-void write_eVars_F(Everything& e) {
+void write_eVars_F(Everything& e, const char* prefix) {
   for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) {
     std::stringstream ss;
-    ss << "eVars_F_" << q+1 << ".dat";
+    ss << prefix << q+1 << ".dat";
     FILE *fptr;
     fptr = fopen( ss.str().c_str(), "w");
     e.eVars.F[q].print(fptr);
@@ -25,12 +25,12 @@ void write_eVars_F(Everything& e) {
   }
 }
 
-void write_eVars_n(Everything& e) {
+void write_eVars_n(Everything& e, const char* prefix) {
   int Nspin = e.eVars.n.size();
   for(int ispin = 0; ispin < Nspin; ispin++) {
     matrix n = e.eVars.n[ispin]->toMatrix();
     std::stringstream ss;
-    ss << "eVars_n_" << ispin+1 << ".dat";
+    ss << prefix << ispin+1 << ".dat";
     FILE *fptr;
     fptr = fopen( ss.str().c_str(), "w");
     n.print(fptr, "%18.10lg\t"); // only real parts ?

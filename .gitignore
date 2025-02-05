@@ -1,4 +1,5 @@
 *.dat
+*.bindat
 ORIG_*
 LOG_*
 build

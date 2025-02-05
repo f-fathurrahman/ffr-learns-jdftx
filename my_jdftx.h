@@ -130,9 +130,9 @@ void my_ElecMinimizer_step(
   double alpha
 );
 
-void write_eVars_F(Everything& e);
-void write_eVars_Hsub(Everything& e);
-void write_eVars_n(Everything& e);
+void write_eVars_F(Everything& e, const char* prefix="eVars_F_");
+void write_eVars_Hsub(Everything& e, const char* prefix="eVars_Hsub_");
+void write_eVars_n(Everything& e, const char* prefix="eVars_n_");
 
 #endif
 
