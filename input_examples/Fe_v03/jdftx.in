@@ -1,0 +1,30 @@
+lattice Cubic 5.42
+
+ion-species ../Fe_v02/Fe.pz-hgh.UPF
+
+# force using lda-VWN
+elec-ex-corr lda-VWN
+
+elec-cutoff 20 80
+ion Fe  0 0 0  0
+ion Fe  0.5 0.5 0.5 0
+
+elec-n-bands 11
+
+kpoint-folding 3 3 3
+
+elec-smearing Fermi 0.001
+
+spintype z-spin                  #Allow up/dn spins (non-relativistic)
+elec-initial-magnetization 2.9 no  #Initial guess, no = don't constrain
+
+wavefunction random
+
+electronic-minimize  \
+ nIterations          200 \
+ energyDiffThreshold  1e-06
+
+#electronic-SCF
+
+dump End None
+
