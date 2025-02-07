@@ -1,18 +1,20 @@
 using LinearAlgebra
 using Serialization
+using DelimitedFiles
 
 function get_harcoded_params()
     # Hardcoded parameters
     Nkspin = 8
-    Nstates = 12
+    Nstates = 7
     Npw = [321, 350, 333, 334, 321, 350, 333, 334]
-    return Nkspin, Nstates, Npw
+    Ns = (20, 20, 20)
+    return Nkspin, Nstates, Npw, Ns
 end
 
 
 function load_psiks()
 
-    Nkspin, Nstates, Npw = get_harcoded_params()
+    Nkspin, Nstates, Npw, _ = get_harcoded_params()
 
     Ndata = sum(Nstates * Npw)
     raw_data = Vector{ComplexF64}(undef, Ndata)
@@ -39,7 +41,7 @@ end
 
 function load_Hsub(; filename="eVars_Hsub.bindat")
 
-    Nkspin, Nstates, _ = get_harcoded_params()
+    Nkspin, Nstates, _, _ = get_harcoded_params()
 
     Ndata = Nstates * Nstates * Nkspin
     raw_data = Vector{ComplexF64}(undef, Ndata)
@@ -65,7 +67,7 @@ end
 
 function load_diagMatrix_vector(filename, T)
 
-    Nkspin, Nstates, _ = get_harcoded_params()
+    Nkspin, Nstates, _, _ = get_harcoded_params()
 
     Ndata = Nstates * Nkspin
     raw_data = Vector{T}(undef, Ndata)
@@ -87,9 +89,12 @@ function load_diagMatrix_vector(filename, T)
 end
 
 function load_eVars_n()
+    _, _, _, Ns = get_harcoded_params()
     n1 = readdlm("eVars_n_1.dat")
+    @assert size(n1) == (prod(Ns),1)
     if isfile("eVars_n_2.dat")
         n2 = readdlm("eVars_n_2.dat")
+        @assert size(n2) == (prod(Ns),1)
     else
         n2 = zeros(eltype(n1), size(n1))
     end

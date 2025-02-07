@@ -90,6 +90,10 @@ end
 function main()
     Ham = prepare_Ham()
     psiks = prepare_psiks(Ham)
+    Focc = prepare_Focc(Ham)
+    Ham.electrons.Focc[:,:] = Focc[:,:]
+    Rhoe_jdftx = prepare_Rhoe_jdftx(Ham)
+    calc_rhoe!(Ham, psiks, Ham.rhoe)
 end
 =#
 
