@@ -10,7 +10,8 @@ ion Fe  0 0 0  0
 
 kpoint-folding 3 3 3
 
-elec-n-bands 12
+# This is the default value
+elec-n-bands 7
 
 elec-smearing Fermi 0.001
 
