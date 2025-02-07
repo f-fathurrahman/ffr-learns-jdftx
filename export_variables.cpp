@@ -34,7 +34,7 @@ void write_eVars_n(Everything& e, const char* prefix) {
     FILE *fptr;
     fptr = fopen( ss.str().c_str(), "w");
     n.print(fptr, "%18.10lg\t"); // only real parts ?
-    // "%lg%+lgi\t"
+    //n.print(fptr, "%18.10lg%+18.10lgi\t"); // both real and imag parts
     fclose(fptr);
     std::cout << "eVars.n is written to " << ss.str() << std::endl;
   }
