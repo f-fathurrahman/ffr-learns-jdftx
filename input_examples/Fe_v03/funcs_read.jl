@@ -112,7 +112,7 @@ function load_diagMatrix_vector(filename, T)
     return D
 end
 
-function load_eVars_n()
+function load_eVars_n(; do_transpose=false)
 
     (; Ns) = get_harcoded_params()
 
@@ -125,17 +125,19 @@ function load_eVars_n()
         n2 = zeros(eltype(n1), size(n1))
     end
 
-    n1 = permutedims(
-        reshape(n1, Ns),
-        (3,2,1)
-    )
-    n1 = reshape(n1, prod(Ns), 1)
+    if do_transpose
+        n1 = permutedims(
+            reshape(n1, Ns),
+            (3,2,1)
+        )
+        n1 = reshape(n1, prod(Ns), 1)
 
-    n2 = permutedims(
-        reshape(n2, Ns),
-        (3,2,1)
-    )
-    n2 = reshape(n2, prod(Ns), 1)
+        n2 = permutedims(
+            reshape(n2, Ns),
+            (3,2,1)
+        )
+        n2 = reshape(n2, prod(Ns), 1)
+    end
 
     return n1, n2
 end

@@ -71,7 +71,7 @@ function prepare_psiks(Ham)
         # Renormalize, assuming NCPP, no overlap operator
         psiks[ikspin][:,:] .*= sqrt(CellVolume)
     end
-    #reorder_psiks!(Ham, psiks)
+
     return psiks
 end
 
@@ -99,8 +99,8 @@ function prepare_Focc(Ham)
     return Focc_r
 end
 
-function prepare_Rhoe_jdftx(Ham)
-    n1, n2 = load_eVars_n()
+function prepare_Rhoe_jdftx(Ham; do_transpose=false)
+    n1, n2 = load_eVars_n(; do_transpose=do_transpose)
     Npoints = size(n1, 1)
     if sum(abs.(n2)) < 10*eps()
         Nspin = 1

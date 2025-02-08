@@ -8,13 +8,40 @@ function get_harcoded_params()
     Nstates = 7
     Npw = [321, 350, 333, 334, 321, 350, 333, 334]
     Ns = (20, 20, 20)
-    return Nkspin, Nstates, Npw, Ns
+    return (;
+        :Nkspin => Nkspin,
+        :Nstates => Nstates,
+        :Npw => Npw,
+        :Ns => Ns
+    )
 end
 
+function load_iGarr_ikspin(ikspin)
+    (; Npw) = get_harcoded_params()
+
+    filename = "iGarr_" * string(ikspin) * ".bindat"
+    Ndata = 3*Npw[ikspin]
+    raw_data = Vector{Int32}(undef, Ndata)
+    #
+    file = open(filename, "r")
+    read!(file, raw_data)
+    close(file)
+    #
+    #data = reshape(raw_data, Npw[ikspin], 3) # ?
+    #
+    idx_miller = Vector{Tuple{Int64,Int64,Int64}}(undef, Npw[ikspin])
+    istart = 1
+    for i in 1:Npw[ikspin]
+        idx_miller[i] = (raw_data[istart], raw_data[istart+1], raw_data[istart+2])
+        #idx_miller[i] = (data[i,1], data[i,2], data[i,3])
+        istart += 3
+    end
+    return idx_miller
+end
 
 function load_psiks()
 
-    Nkspin, Nstates, Npw, _ = get_harcoded_params()
+    (; Nkspin, Nstates, Npw) = get_harcoded_params()
 
     Ndata = sum(Nstates * Npw)
     raw_data = Vector{ComplexF64}(undef, Ndata)
@@ -41,7 +68,7 @@ end
 
 function load_Hsub(; filename="eVars_Hsub.bindat")
 
-    Nkspin, Nstates, _, _ = get_harcoded_params()
+    (; Nkspin, Nstates) = get_harcoded_params()
 
     Ndata = Nstates * Nstates * Nkspin
     raw_data = Vector{ComplexF64}(undef, Ndata)
@@ -67,7 +94,7 @@ end
 
 function load_diagMatrix_vector(filename, T)
 
-    Nkspin, Nstates, _, _ = get_harcoded_params()
+    (; Nkspin, Nstates) = get_harcoded_params()
 
     Ndata = Nstates * Nkspin
     raw_data = Vector{T}(undef, Ndata)
@@ -88,8 +115,10 @@ function load_diagMatrix_vector(filename, T)
     return D
 end
 
-function load_eVars_n()
-    _, _, _, Ns = get_harcoded_params()
+function load_eVars_n(; do_transpose=false)
+
+    (; Ns) = get_harcoded_params()
+
     n1 = readdlm("eVars_n_1.dat")
     @assert size(n1) == (prod(Ns),1)
     if isfile("eVars_n_2.dat")
@@ -98,5 +127,20 @@ function load_eVars_n()
     else
         n2 = zeros(eltype(n1), size(n1))
     end
+
+    if do_transpose
+        n1 = permutedims(
+            reshape(n1, Ns),
+            (3,2,1)
+        )
+        n1 = reshape(n1, prod(Ns), 1)
+
+        n2 = permutedims(
+            reshape(n2, Ns),
+            (3,2,1)
+        )
+        n2 = reshape(n2, prod(Ns), 1)
+    end
+
     return n1, n2
 end
