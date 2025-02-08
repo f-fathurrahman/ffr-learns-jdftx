@@ -33,12 +33,10 @@ int main( int argc, char** argv ) {
     e.basis[ikspin].iGarr.write(ss.str().c_str());
   }
   //
-  //size_t SIZE3 = 3*sizeof(int);
-  size_t SIZE3 = sizeof(vector3<int>);
   auto data0 = e.basis[0].iGarr.data();
   for(size_t i=0; i<e.basis[0].nbasis; i++) {
     cout << (i+1) << " " << data0->x() << " " << data0->y() << " "  << data0->z() << endl;
-    data0 += SIZE3;
+    data0++; // increment by using the size of whatever this pointer points to
   }
   //
   //cout << e.basis[0].head.size() << endl;
