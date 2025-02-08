@@ -33,10 +33,11 @@ int main( int argc, char** argv ) {
     e.basis[ikspin].iGarr.write(ss.str().c_str());
   }
   //
-  size_t SIZE3 = sizeof(int); //sizeof(vector3<int>);
+  //size_t SIZE3 = 3*sizeof(int);
+  size_t SIZE3 = sizeof(vector3<int>);
   auto data0 = e.basis[0].iGarr.data();
-  for(int i=0; i<5; i++) {
-    cout << i << " " << data0->x() << " " << data0->y() << " "  << data0->z() << endl;
+  for(size_t i=0; i<e.basis[0].nbasis; i++) {
+    cout << (i+1) << " " << data0->x() << " " << data0->y() << " "  << data0->z() << endl;
     data0 += SIZE3;
   }
   //
