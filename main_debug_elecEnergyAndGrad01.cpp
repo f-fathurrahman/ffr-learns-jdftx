@@ -61,11 +61,11 @@ int main( int argc, char** argv )
     e.eVars.HauxInitialized = true;
   }
 
-  e.eInfo.write(e.eVars.C, "eVars_C.dat");
-  logPrintf("eVars.C is written to evars_C.dat\n");
+  e.eInfo.write(e.eVars.C, "eVars_C.bindat");
+  logPrintf("eVars.C is written to evars_C.bindat\n");
 
-  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub.dat");
-  logPrintf("eVars.Hsub is written to evars_Hsub.dat\n");
+  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub.bindat");
+  logPrintf("eVars.Hsub is written to evars_Hsub.bindat\n");
 
   // Not working
   /*

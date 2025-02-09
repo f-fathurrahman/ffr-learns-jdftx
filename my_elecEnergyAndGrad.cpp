@@ -140,8 +140,9 @@ double my_elecEnergyAndGrad(
   mpiWorld->allReduce(ener.E["KE"], MPIUtil::ReduceSum);
   mpiWorld->allReduce(ener.E["Enl"], MPIUtil::ReduceSum);
 
-  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub_after.dat");
-  logPrintf("eVars.Hsub after grad is written to evars_Hsub_after.dat\n");
+  // This is Hsub that will be used to compute gradient w.r.t Haux
+  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub_after.bindat");
+  logPrintf("eVars.Hsub after grad is written to evars_Hsub_after.bindat\n");
 
   //logPrintf("\nAfter calc KE and Enl:\n");
   //ener.print();
