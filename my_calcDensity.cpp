@@ -15,13 +15,13 @@ ScalarFieldArray my_calcDensity(Everything& e)
       e.eVars.F[q], e.eVars.C[q], density.size(), &e.gInfo
     );
     // additional contributions: pseudopotential contribution
-    //e.iInfo.augmentDensitySpherical(
-    //  e.eInfo.qnums[q], e.eVars.F[q], e.eVars.VdagC[q]
-    //);
+    e.iInfo.augmentDensitySpherical(
+      e.eInfo.qnums[q], e.eVars.F[q], e.eVars.VdagC[q]
+    );
 
   }
   //
-  //e.iInfo.augmentDensityGrid(density);
+  e.iInfo.augmentDensityGrid(density);
   //
   for(ScalarField& ns: density)
   {
