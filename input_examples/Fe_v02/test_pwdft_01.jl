@@ -45,7 +45,7 @@ function reorder_psiks(Ham, psiks)
         idx_G = get_idx_pwdft_G(Ham, ikspin)
         for igw in 1:Ngw[ik]
             igw_pwdft = findfirst(isequal(idx_G[igw]), idx_gw2g_k);
-            @info "igw=$(igw) idx_G=$(idx_G[igw]) igw_pwdft=$(igw_pwdft)"
+            #@info "igw=$(igw) idx_G=$(idx_G[igw]) igw_pwdft=$(igw_pwdft)"
             psiks_new[ikspin][igw_pwdft,:] = psiks[ikspin][igw,:]
         end
     end

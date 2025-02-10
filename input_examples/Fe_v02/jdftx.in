@@ -1,4 +1,8 @@
-lattice body-centered Cubic 5.42
+#lattice body-centered Cubic 5.42
+lattice \
+      2.7100000000       2.7100000000       2.7100000000 \
+     -2.7100000000       2.7100000000       2.7100000000 \
+     -2.7100000000      -2.7100000000       2.7100000000
 
 ion-species Fe.pz-hgh.UPF
 

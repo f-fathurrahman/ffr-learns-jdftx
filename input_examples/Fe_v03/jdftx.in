@@ -1,4 +1,8 @@
-lattice Cubic 5.42
+#lattice Cubic 5.42
+lattice \
+  5.42 0.0 0.0 \
+  0.0 5.42 0.0 \
+  0.0 0.0 5.42
 
 ion-species ../Fe_v02/Fe.pz-hgh.UPF
 

@@ -1,3 +1,4 @@
+using Infiltrator
 using PWDFT
 
 include("funcs_read.jl")
@@ -45,7 +46,7 @@ function reorder_psiks(Ham, psiks)
         idx_G = get_idx_pwdft_G(Ham, ikspin)
         for igw in 1:Ngw[ik]
             igw_pwdft = findfirst(isequal(idx_G[igw]), idx_gw2g_k);
-            @info "igw=$(igw) idx_G=$(idx_G[igw]) igw_pwdft=$(igw_pwdft)"
+            #@info "igw=$(igw) idx_G=$(idx_G[igw]) igw_pwdft=$(igw_pwdft)"
             psiks_new[ikspin][igw_pwdft,:] = psiks[ikspin][igw,:]
         end
     end
@@ -123,7 +124,7 @@ function prepare_Rhoe_jdftx(Ham; do_transpose=false)
     return Rhoe
 end
 
-#=
+
 function main()
     Ham = prepare_Ham();
     dVol = Ham.pw.CellVolume/prod(Ham.pw.Ns);
@@ -140,6 +141,8 @@ function main()
     psiks_new = reorder_psiks(Ham, psiks);
     calc_rhoe!(Ham, psiks_new, Rhoe_ordered);
 
-end
-=#
+    @infiltrate
 
+end
+
+main()
