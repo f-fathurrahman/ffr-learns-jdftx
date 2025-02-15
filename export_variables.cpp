@@ -39,3 +39,13 @@ void write_eVars_n(Everything& e, const char* prefix) {
     std::cout << "eVars.n is written to " << ss.str() << std::endl;
   }
 }
+
+void write_iGarr(Everything& e) {
+  // Write iGarr (Miller indices?)
+  int Nkspin = e.basis.size();
+  for(int ikspin=0; ikspin < Nkspin; ikspin++) {
+    std::stringstream ss;
+    ss << "iGarr_" << ikspin+1 << ".bindat";
+    e.basis[ikspin].iGarr.write(ss.str().c_str());
+  }
+}

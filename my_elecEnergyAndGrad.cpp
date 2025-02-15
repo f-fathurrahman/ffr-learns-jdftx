@@ -9,9 +9,9 @@ double my_elecEnergyAndGrad(
   bool calc_Hsub )
 {
 
-  //logPrintf("------------------------------------\n");
-  //logPrintf("**** ENTER my_elecEnergyAndGrad ****\n");
-  //logPrintf("------------------------------------\n");
+  logPrintf("------------------------------------\n");
+  logPrintf("**** ENTER my_elecEnergyAndGrad ****\n");
+  logPrintf("------------------------------------\n");
 
   // Shortcuts
   const ElecInfo& eInfo = e.eInfo;
@@ -172,12 +172,14 @@ double my_elecEnergyAndGrad(
       //
       diagMatrix fprime = eInfo.smearPrime( eInfo.muEff(mu,Bz,q), eVars.Haux_eigs[q] );
       //
-      std::stringstream ss;
-      ss << "fprime_" << q << ".dat";
-      FILE *fptr;
-      fptr = fopen( ss.str().c_str(), "w");
-      fprime.print(fptr);
-      fclose(fptr);
+      // This for writing fprime 
+      //
+      //std::stringstream ss;
+      //ss << "fprime_" << q << ".dat";
+      //FILE *fptr;
+      //fptr = fopen( ss.str().c_str(), "w");
+      //fprime.print(fptr);
+      //fclose(fptr);
       //
       double w = eInfo.qnums[q].weight;
       int sIndex = eInfo.qnums[q].index();
@@ -247,10 +249,9 @@ double my_elecEnergyAndGrad(
     }
   }
 
-  //logPrintf("eInfo.nBands = %d\n", eInfo.nBands);
-  //logPrintf("-----------------------------------\n");
-  //logPrintf("**** EXIT my_elecEnergyAndGrad ****\n");
-  //logPrintf("-----------------------------------\n");
+  logPrintf("-----------------------------------\n");
+  logPrintf("**** EXIT my_elecEnergyAndGrad ****\n");
+  logPrintf("-----------------------------------\n");
 
   return relevantFreeEnergy(e);
 }

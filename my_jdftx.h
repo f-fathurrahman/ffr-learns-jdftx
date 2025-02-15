@@ -136,6 +136,9 @@ double my_ElecMinimizer_minimize(
   const MinimizeParams& p
 );
 
+void initialize_Haux(Everything& e);
+
+void write_iGarr(Everything& e);
 void write_eVars_F(Everything& e, const char* prefix="eVars_F_");
 void write_eVars_Hsub(Everything& e, const char* prefix="eVars_Hsub_");
 void write_eVars_n(Everything& e, const char* prefix="eVars_n_");
