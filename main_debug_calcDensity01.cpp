@@ -35,6 +35,7 @@ int main( int argc, char** argv ) {
   }
 
   e.eInfo.write(e.eVars.F, "eVars_F.bindat");
+  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub.bindat");
   e.eInfo.write(e.eVars.C, "eVars_C.bindat");
 
   e.eVars.n = my_calcDensity(e);

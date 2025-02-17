@@ -27,6 +27,10 @@ int main( int argc, char** argv ) {
 
   initialize_Haux(e);
 
+  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub.bindat");
+  e.eInfo.write(e.eVars.F, "eVars_F.bindat");
+  e.eInfo.write(e.eVars.C, "eVars_C.bindat");
+
   MyElecMinimizer elecMin(e);
   my_ElecMinimizer_minimize(e, elecMin, e.elecMinParams);
 

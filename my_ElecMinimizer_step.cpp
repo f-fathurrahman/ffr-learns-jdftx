@@ -11,7 +11,9 @@ void my_ElecMinimizer_step(
 
   for(int q=elecMin.eInfo.qStart; q < elecMin.eInfo.qStop; q++)
   {
+    //
     // Update step for wavefunctions
+    //
     if(elecMin.rotExists) {
       axpy( alpha, dir.C[q] * elecMin.rotPrevC[q], e.eVars.C[q] );
     }
@@ -19,22 +21,21 @@ void my_ElecMinimizer_step(
       axpy( alpha, dir.C[q], e.eVars.C[q] );
     }
     //
-    if( e.eInfo.fillingsUpdate==ElecInfo::FillingsConst && e.eInfo.scalarFillings)
-    {
+    // Now for Haux (if needed)
+    //
+    if( e.eInfo.fillingsUpdate==ElecInfo::FillingsConst && e.eInfo.scalarFillings) {
       // Constant scalar fillings: no rotations required
       e.eVars.orthonormalize(q);
     }
-    else
-    {
+    else {
       // Haux or non-scalar fillings: rotations required
       assert( dir.Haux[q] );
       matrix rot; //?
-      if( e.eInfo.fillingsUpdate == ElecInfo::FillingsHsub)
-      {
+      if( e.eInfo.fillingsUpdate == ElecInfo::FillingsHsub) {
         //Haux fillings:
         matrix Haux = e.eVars.Haux_eigs[q];
         if(elecMin.rotExists) {
-          axpy(alpha, dagger( elecMin.rotPrev[q] ) * dir.Haux[q]*elecMin.rotPrev[q], Haux);
+          axpy(alpha, dagger( elecMin.rotPrev[q] ) * dir.Haux[q] * elecMin.rotPrev[q], Haux);
         }
         else {
           axpy(alpha, dir.Haux[q], Haux);
@@ -43,18 +44,17 @@ void my_ElecMinimizer_step(
         Haux.diagonalize( rot, e.eVars.Haux_eigs[q] );
         // results are in rot and Haux_eigs?
       }
-      else
-      {
+      else {
         //Non-scalar fillings:
         assert( !e.eInfo.scalarFillings );
         //auxiliary matrix directly generates rotations
         rot = cis(alpha * dir.Haux[q]);
         // cis is defined in core/matrixLinalg.cpp
       }
-      matrix rotC = rot;
+      matrix rotC = rot; // copy eigenvectors from Haux
       e.eVars.orthonormalize(q, &rotC); // orthonormalize wavefunc with extra rotations
-      elecMin.rotPrev[q] = elecMin.rotPrev[q] * rot;
-      elecMin.rotPrevC[q] = elecMin.rotPrevC[q] * rotC;
+      elecMin.rotPrev[q] = elecMin.rotPrev[q] * rot; // accumulate
+      elecMin.rotPrevC[q] = elecMin.rotPrevC[q] * rotC; // rotPrev for wavefunc
       elecMin.rotPrevCinv[q] = inv(rotC) * elecMin.rotPrevCinv[q];
       elecMin.rotExists = true; //rotation is no longer identity
     }

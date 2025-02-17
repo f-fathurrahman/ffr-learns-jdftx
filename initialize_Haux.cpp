@@ -21,10 +21,11 @@ void initialize_Haux(Everything& e) {
     //write_eVars_F(e);
     // grad and Kgrad are not computed.
     double Etot = my_elecEnergyAndGrad( e, 0, 0, true );
-    logPrintf("Etot = %18.10f\n", Etot);
+    logPrintf("Etot = %18.10f (can be ignored)\n", Etot);
     // Hsub is computed
-    logPrintf("Energy components:");
-    e.ener.print();
+    //logPrintf("Energy components:");
+    //e.ener.print();
+    // XXX: Etot is not used here, only Hsub
 
     // Set again to FillingsHsub
     e.eInfo.fillingsUpdate = ElecInfo::FillingsHsub;

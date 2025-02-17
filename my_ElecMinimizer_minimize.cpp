@@ -14,6 +14,7 @@ double my_ElecMinimizer_minimize(
   // get initial energy and gradient
   double E = elecMin.compute(&g, &Kg);
   logPrintf("Initial energy E = %18.10f\n", E);
+  e.ener.print();
 
   // list of past energies
   EdiffCheck ediffCheck(p.nEnergyDiff, p.energyDiffThreshold);

@@ -164,7 +164,7 @@ double my_elecEnergyAndGrad(
     // numerator and denominator of dmuContrib resolved by spin channels (if any)
     double dmuNum[2] = {0.,0.}, dmuDen[2] = {0.,0.}; 
     
-    logPrintf("Calculating dmuNum and dmuDen\n");
+    //logPrintf("Calculating dmuNum and dmuDen\n");
     double wsum = 0.0;
     for(int q=eInfo.qStart; q<eInfo.qStop; q++)
     {
@@ -228,12 +228,11 @@ double my_elecEnergyAndGrad(
   //
   if( grad && eInfo.fillingsUpdate==ElecInfo::FillingsHsub ) {
     //
-    logPrintf("\nStart auxiliary Hamiltonian\n");
+    //logPrintf("\nStart auxiliary Hamiltonian\n");
     //
-    for(int q=eInfo.qStart; q < eInfo.qStop; q++)
-    {
+    for(int q=eInfo.qStart; q < eInfo.qStop; q++) {
 
-      logPrintf("q = %d\n", q);
+      //logPrintf("q = %d\n", q);
       const QuantumNumber& qnum = eInfo.qnums[q];
       
       // gradient w.r.t fillings except for constraint contributions
