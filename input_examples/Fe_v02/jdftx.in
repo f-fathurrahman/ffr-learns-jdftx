@@ -28,6 +28,8 @@ electronic-minimize  \
  nIterations          100 \
  energyDiffThreshold  1e-06
 
+subspace-rotation-factor 1 no
+
 #electronic-SCF
 
 dump End None

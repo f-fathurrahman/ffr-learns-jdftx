@@ -57,10 +57,10 @@ struct MySubspaceRotationAdjust
         scaleFactor = std::min(scaleFactor, kappaMax/kappa); //cap scale factor at maximum
         kappa *= scaleFactor;
         cumulatedScale *= scaleFactor;
-        logPrintf("\tSubspaceRotationAdjust: set factor to %.3lg\n", kappa);
+        logPrintf("\tMySubspaceRotationAdjust: set factor to %.3lg\n", kappa);
         if(fabs(log(cumulatedScale)) > 2.) //cumulated scale adjustment > e^2
         {
-          logPrintf("\tSubspaceRotationAdjust: resetting CG because factor has changed by %lg\n", cumulatedScale);
+          logPrintf("\tMySubspaceRotationAdjust: resetting CG because factor has changed by %lg\n", cumulatedScale);
           cumulatedScale = 1.;
           return true; //resets CG
         }

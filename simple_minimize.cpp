@@ -48,7 +48,7 @@ double simple_minimize(
     //Iterate until convergence, max iteration count or kill signal
     int iter = 0;
     //for( iter=0; !killFlag; iter++ )
-    for( iter=0; iter <= 10; iter++ ) {
+    for( iter=0; iter <= 200; iter++ ) {
   
       //optional reporting/processing
       if( elecMin.report(iter) ) {
@@ -93,38 +93,34 @@ double simple_minimize(
           case MinimizeParams::LBFGS: break;
         }
   
-        if(beta < 0.0)
-        {
+        if(beta < 0.0) {
           logPrintf("\n%sEncountered beta < 0, resetting CG.", p.linePrefix);
           beta = 0.0;
         }
       }
           
-      forceGradDirection = false;
-          
+      forceGradDirection = true; //false;
+      beta = 0.0; // ffr debug: force SD    
+
       logPrintf("\n");
           
-      if( sqrt(gKNorm/p.nDim) < p.knormThreshold )
-      {
+      if( sqrt(gKNorm/p.nDim) < p.knormThreshold ) {
         logPrintf("%sConverged (|grad|_K < %le).\n", p.linePrefix, p.knormThreshold);
         return E;
       }
   
-      if( ediffCheck.checkConvergence(E) )
-      {
+      if( ediffCheck.checkConvergence(E) ) {
         logPrintf("%sConverged (|Delta %s| < %le for %d iters).\n",
           p.linePrefix, p.energyLabel, p.energyDiffThreshold, p.nEnergyDiff);
         return E;
       }
   
-      if(!std::isfinite(gKNorm))
-      {
+      if(!std::isfinite(gKNorm)) {
         logPrintf("%s|grad|_K = %le. Stopping ...\n", p.linePrefix, gKNorm);
         return E;
       }
   
-      if(!std::isfinite(E))
-      {
+      if(!std::isfinite(E)) {
         logPrintf("%sE = %le. Stopping ...\n", p.linePrefix, E);
         return E;
       }
