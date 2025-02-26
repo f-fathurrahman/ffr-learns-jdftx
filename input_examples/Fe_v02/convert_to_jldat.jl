@@ -29,6 +29,11 @@ function main()
     #
     Hsub = load_Hsub()
     serialize("Hsub.jldat", Hsub)
+    #
+    g_Haux = load_matrices_Nkspin_Nstates("g_Haux.bindat")
+    serialize("g_Haux.jldat", g_Haux)
+    Kg_Haux = load_matrices_Nkspin_Nstates("Kg_Haux.bindat")
+    serialize("Kg_Haux.jldat", Kg_Haux)
 end
 main()
 

@@ -54,7 +54,13 @@ function load_psiks()
 end
 
 
+# filename can vary
 function load_Hsub(; filename="eVars_Hsub.bindat")
+    return load_matrices_Nkspin_Nstates(filename)
+end
+
+# filename must be supplied
+function load_matrices_Nkspin_Nstates(filename)
 
     (; Nkspin, Nstates) = get_harcoded_params()
 
