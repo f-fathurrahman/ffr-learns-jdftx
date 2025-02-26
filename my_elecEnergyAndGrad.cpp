@@ -9,9 +9,9 @@ double my_elecEnergyAndGrad(
   bool calc_Hsub )
 {
 
-  logPrintf("------------------------------------\n");
-  logPrintf("**** ENTER my_elecEnergyAndGrad ****\n");
-  logPrintf("------------------------------------\n");
+  //logPrintf("------------------------------------\n");
+  //logPrintf("**** ENTER my_elecEnergyAndGrad ****\n");
+  //logPrintf("------------------------------------\n");
 
   // Shortcuts
   const ElecInfo& eInfo = e.eInfo;
@@ -33,7 +33,7 @@ double my_elecEnergyAndGrad(
 
   // Determine whether Hsub and hence HC needs to be calculated:
   bool need_Hsub = calc_Hsub || grad;
-  logPrintf("need_Hsub = %d\n", need_Hsub);
+  //logPrintf("need_Hsub = %d\n", need_Hsub);
 
   double mu = 0., Bz = 0.;
 
@@ -41,9 +41,9 @@ double my_elecEnergyAndGrad(
   if( eInfo.fillingsUpdate == ElecInfo::FillingsHsub ) {    
     // Update nElectrons from mu, or mu from nElectrons as appropriate:
     if( std::isnan(eInfo.mu) ) {
-      logPrintf("Finding mu: ");
+      //logPrintf("Finding mu: ");
       mu = eInfo.findMu( eVars.Haux_eigs, eInfo.nElectrons, Bz );
-      logPrintf(" mu = %18.10f\n", mu);
+      //logPrintf(" mu = %18.10f\n", mu);
       //std::cout << "Bz = " << Bz << std::endl;
     }
     else {
@@ -141,8 +141,8 @@ double my_elecEnergyAndGrad(
   mpiWorld->allReduce(ener.E["Enl"], MPIUtil::ReduceSum);
 
   // This is Hsub that will be used to compute gradient w.r.t Haux
-  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub_after.bindat");
-  logPrintf("eVars.Hsub after grad is written to evars_Hsub_after.bindat\n");
+  //e.eInfo.write(e.eVars.Hsub, "eVars_Hsub_after.bindat");
+  //logPrintf("eVars.Hsub after grad is written to evars_Hsub_after.bindat\n");
 
   //logPrintf("\nAfter calc KE and Enl:\n");
   //ener.print();
@@ -152,7 +152,7 @@ double my_elecEnergyAndGrad(
 
   // whether magnetization needs to be constrained
   bool Mconstrain = (eInfo.spinType==SpinZ) and std::isnan(eInfo.Bz);
-  logPrintf("Mconstrain  = %d\n", Mconstrain);
+  //logPrintf("Mconstrain  = %d\n", Mconstrain);
   
   // contribution due to N/M constraint via the mu/Bz gradient 
   if( grad and
@@ -168,7 +168,7 @@ double my_elecEnergyAndGrad(
     double wsum = 0.0;
     for(int q=eInfo.qStart; q<eInfo.qStop; q++)
     {
-      double mu_effective = eInfo.muEff(mu, Bz, q);
+      //double mu_effective = eInfo.muEff(mu, Bz, q);
       //
       diagMatrix fprime = eInfo.smearPrime( eInfo.muEff(mu,Bz,q), eVars.Haux_eigs[q] );
       //
@@ -186,10 +186,10 @@ double my_elecEnergyAndGrad(
       wsum = wsum + w;
       dmuNum[sIndex] += w * trace(fprime * ( diag(eVars.Hsub[q]) - eVars.Haux_eigs[q]) );
       dmuDen[sIndex] += w * trace(fprime);
-      logPrintf("q=%d s=%d w=%f dmu=(%f, %f) mu_eff=%f\n",
-        q, sIndex, w, dmuNum[sIndex], dmuDen[sIndex], mu_effective);
+      //logPrintf("q=%d s=%d w=%f dmu=(%f, %f) mu_eff=%f\n",
+      //  q, sIndex, w, dmuNum[sIndex], dmuDen[sIndex], mu_effective);
     }
-    logPrintf("wsum = %f\n", wsum);
+    //logPrintf("wsum = %f\n", wsum);
     
     mpiWorld->allReduce(dmuNum, 2, MPIUtil::ReduceSum);
     mpiWorld->allReduce(dmuDen, 2, MPIUtil::ReduceSum);
@@ -219,9 +219,9 @@ double my_elecEnergyAndGrad(
     }
   }
   else {
-    logPrintf("Not computing dmuContrib and dBzContrib\n");
+    logPrintf("my_elecEnergyAndGrad: Not computing dmuContrib and dBzContrib\n");
   }
-  logPrintf("dmuContrib = %f\n", dmuContrib);
+  //logPrintf("dmuContrib = %f\n", dmuContrib);
 
   //
   // Auxiliary hamiltonian gradient:
@@ -248,9 +248,9 @@ double my_elecEnergyAndGrad(
     }
   }
 
-  logPrintf("-----------------------------------\n");
-  logPrintf("**** EXIT my_elecEnergyAndGrad ****\n");
-  logPrintf("-----------------------------------\n");
+  //logPrintf("-----------------------------------\n");
+  //logPrintf("**** EXIT my_elecEnergyAndGrad ****\n");
+  //logPrintf("-----------------------------------\n");
 
   return relevantFreeEnergy(e);
 }

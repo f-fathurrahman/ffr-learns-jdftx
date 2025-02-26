@@ -18,7 +18,9 @@ write_info.cpp \
 my_calcDensity.cpp my_applyHamiltonian.cpp \
 my_ElecMinimizer_step.cpp \
 my_ElecMinimizer_minimize.cpp \
+my_ElecMinimizer_compute.cpp \
 initialize_Haux.cpp \
+simple_minimize.cpp \
 export_variables.cpp
 
 OBJ = $(CXX_SRC:.cpp=.o)

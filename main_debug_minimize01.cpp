@@ -32,7 +32,9 @@ int main( int argc, char** argv ) {
   e.eInfo.write(e.eVars.C, "eVars_C.bindat");
 
   MyElecMinimizer elecMin(e);
-  my_ElecMinimizer_minimize(e, elecMin, e.elecMinParams);
+  //my_ElecMinimizer_minimize(e, elecMin, e.elecMinParams);
+  e.elecMinParams.linePrefix = "SIMPLE_MIN: ";
+  simple_minimize(e, elecMin, e.elecMinParams);
 
   e.ener.print();
 

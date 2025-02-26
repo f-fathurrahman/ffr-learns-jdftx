@@ -50,12 +50,6 @@ void my_bandMinimize(Everything& e);
 double my_elecEnergyAndGrad( Everything& e, 
   MyElecGradient* grad, MyElecGradient* Kgrad, bool calc_Hsub );
 
-bool my_linminQuad(
-  Minimizable<MyElecGradient>& obj,
-  const MinimizeParams& p,
-  const MyElecGradient& d,
-  double alphaT, double& alpha, double& E, MyElecGradient& g, MyElecGradient& Kg );
-
 MyElecGradient clone(const MyElecGradient& x);
 void randomize(MyElecGradient& x);
 
@@ -126,7 +120,7 @@ double my_applyHamiltonian(
 void my_ElecMinimizer_step(
   Everything& e,
   MyElecMinimizer& elecMin,
-  MyElecGradient& dir,
+  const MyElecGradient& dir,
   double alpha
 );
 
@@ -135,6 +129,32 @@ double my_ElecMinimizer_minimize(
   MyElecMinimizer& elecMin,
   const MinimizeParams& p
 );
+
+double my_ElecMinimizer_compute(
+  Everything& e,
+  MyElecMinimizer& elecMin,
+  MyElecGradient* grad,
+  MyElecGradient* Kgrad
+);
+
+double simple_minimize(
+  Everything& e,
+  MyElecMinimizer& elecMin,
+  const MinimizeParams& p
+);
+
+bool my_linminQuad(
+  Everything& e,
+  MyElecMinimizer& elecMin,  
+  const MinimizeParams& p,
+  const MyElecGradient& d,
+  double alphaT,
+  double& alpha,
+  double& E,
+  MyElecGradient& g,
+  MyElecGradient& Kg
+);
+
 
 void initialize_Haux(Everything& e);
 

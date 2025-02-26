@@ -1,41 +1,46 @@
 #include "my_jdftx.h"
 
 bool my_linminQuad(
-  Minimizable<MyElecGradient>& obj,
+  Everything& e,
+  MyElecMinimizer& elecMin,
   const MinimizeParams& p,
   const MyElecGradient& d,
-  double alphaT, double& alpha, double& E, MyElecGradient& g, MyElecGradient& Kg )
+  double alphaT,
+  double& alpha,
+  double& E,
+  MyElecGradient& g,
+  MyElecGradient& Kg )
 {
         
   double alphaPrev = 0.0; //the progress made so far along d
   double Eorig = E;
-  double gdotd = obj.sync(dot(g,d)); //directional derivative at starting point
+  double gdotd = dot(g,d); //directional derivative at starting point
   
-  if( gdotd >= 0.0 )
-  {
+  if( gdotd >= 0.0 ) {
     logPrintf("%s\tBad step direction: g.d > 0.\n", p.linePrefix);
     alpha = alphaPrev;
+    logPrintf("%s\tUsing previous alpha = %f\n", p.linePrefix, alpha);
     return false;
   }
 
   //Test step and step size prediction:
   double ET = 0.0; //test step energy
-  for(int s=0; s<p.nAlphaAdjustMax; s++)
-  {
-    if(alphaT < p.alphaTmin)
-    {
+  for(int s=0; s < p.nAlphaAdjustMax; s++) {
+    //
+    logPrintf("my_linMinQuad: trial step = %d alphaT=%le alphaPrev=%le\n", s, alphaT, alphaPrev);
+    if(alphaT < p.alphaTmin) {
       logPrintf("%s\talphaT below threshold %le. Quitting step.\n", p.linePrefix, p.alphaTmin);
       alpha = alphaPrev;
       return false;
     }
     
     // Try the test step:
-    obj.step(d, alphaT-alphaPrev); alphaPrev = alphaT;
-    ET = obj.sync( obj.compute(0,0) );
+    my_ElecMinimizer_step(e, elecMin, d, alphaT-alphaPrev);
+    alphaPrev = alphaT;
+    ET = my_ElecMinimizer_compute(e, elecMin, 0, 0);
     
     // Check if step crossed domain of validity of parameter space:
-    if(!std::isfinite(ET))
-    {
+    if( !std::isfinite(ET) ) {
       alphaT *= p.alphaTreduceFactor;
       logPrintf("%s\tTest step failed with %s = %le, reducing alphaT to %le.\n",
                 p.linePrefix, p.energyLabel, ET, alphaT);
@@ -45,69 +50,65 @@ bool my_linminQuad(
     alpha = 0.5*pow(alphaT,2)*gdotd/(alphaT*gdotd + E - ET);
 
     //Check reasonableness of predicted step size:
-    if(alpha < 0)
-    {
+    if(alpha < 0) {
       // Curvature has the wrong sign
       // That implies ET < E, so accept step for now, and try descending further next time
       alphaT *= p.alphaTincreaseFactor;
       
-      logPrintf("%s\tWrong curvature in test step, increasing alphaT to %le.\n", p.linePrefix, alphaT);
+      logPrintf("\tWrong curvature in test step, increasing alphaT to %le.\n", alphaT);
       
-      E = obj.sync(obj.compute(&g, &Kg));
+      E = my_ElecMinimizer_compute(e, elecMin, &g, &Kg);
       return true;
     }
     
-    if(alpha/alphaT > p.alphaTincreaseFactor)
-    {
+    if(alpha/alphaT > p.alphaTincreaseFactor) {
       alphaT *= p.alphaTincreaseFactor;
       logPrintf("%s\tPredicted alpha/alphaT>%lf, increasing alphaT to %le.\n",
                 p.linePrefix, p.alphaTincreaseFactor, alphaT);
-      continue;
+      continue; // continue iteration ?
     }
     
-    if(alphaT/alpha < p.alphaTreduceFactor)
-    {
+    if(alphaT/alpha < p.alphaTreduceFactor) {
       alphaT *= p.alphaTreduceFactor;
       logPrintf("%s\tPredicted alpha/alphaT < %lf, reducing alphaT to %le.\n",
                 p.linePrefix, p.alphaTreduceFactor, alphaT);
-      continue;
+      continue; // continue iteration
     }
     
     //Successful test step:
+    logPrintf("my_linminQuad: successful trial step: using alpha = %le\n", alpha);
     break;
   }
 
 
 
-  if(!std::isfinite(E))
-  {
+  if(!std::isfinite(E)) {
     logPrintf("%s\tTest step failed %d times. Quitting step.\n", p.linePrefix, p.nAlphaAdjustMax);
     alpha = alphaPrev;
     return false;
   }
 
   // Actual step:
-  for(int s=0; s < p.nAlphaAdjustMax; s++)
-  {
+  for(int s=0; s < p.nAlphaAdjustMax; s++) {
+
+    logPrintf("my_linminQuad: Actual step, iter=%d using alpha = %le\n", s, alpha);
+
     //Try the step:
-    obj.step(d, alpha-alphaPrev);
+    my_ElecMinimizer_step(e, elecMin, d, alpha-alphaPrev);
     alphaPrev = alpha;
 
-    E = obj.sync(obj.compute(&g, &Kg));
+    E = my_ElecMinimizer_compute(e, elecMin, &g, &Kg);
     
-    if(!std::isfinite(E))
-    {
+    if( !std::isfinite(E) ) {
       alpha *= p.alphaTreduceFactor;
-      logPrintf("%s\tStep failed with %s = %le, reducing alpha to %le.\n",
-                p.linePrefix, p.energyLabel, E, alpha);
+      logPrintf("\tStep failed with %s = %le, reducing alpha to %le.\n", p.energyLabel, E, alpha);
       continue;
     }
     
-    if(E > Eorig)
-    {
+    // Trial energy is higher, reduce alpha
+    if(E > Eorig) {
       alpha *= p.alphaTreduceFactor;
-      logPrintf("%s\tStep increased %s by %le, reducing alpha to %le.\n",
-                p.linePrefix, p.energyLabel, E-Eorig, alpha);
+      logPrintf("\tStep increased %s by %le, reducing alpha to %le.\n", p.energyLabel, E-Eorig, alpha);
       continue;
     }
 
@@ -115,10 +116,9 @@ bool my_linminQuad(
     break;
   }
   
-  if(!std::isfinite(E) || E>Eorig)
-  {
-    logPrintf("%s\tStep failed to reduce %s after %d attempts. Quitting step.\n",
-              p.linePrefix, p.energyLabel, p.nAlphaAdjustMax); fflush(p.fpLog);
+  if(!std::isfinite(E) || E>Eorig) {
+    logPrintf("\tStep failed to reduce %s after %d attempts. Quitting step.\n", p.energyLabel, p.nAlphaAdjustMax);
+    fflush(p.fpLog);
     return false;
   }
   

@@ -376,7 +376,7 @@ double MyElecMinimizer::my_minimize(const MinimizeParams& p)
     
     // Line minimization
     alphaT = std::min(alphaT, safeStepSize(d));
-    if( my_linminQuad(*this, p, d, alphaT, alpha, E, g, Kg) )
+    if( my_linminQuad(e, *this, p, d, alphaT, alpha, E, g, Kg) )
     {
       // linmin succeeded:
       if(p.updateTestStepSize)

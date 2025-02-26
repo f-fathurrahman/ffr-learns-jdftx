@@ -3,14 +3,22 @@
 void my_ElecMinimizer_step(
   Everything& e,
   MyElecMinimizer& elecMin,
-  MyElecGradient& dir,
+  const MyElecGradient& dir,
   double alpha
 )
 {
   assert( dir.eInfo == &e.eInfo );
 
-  for(int q=elecMin.eInfo.qStart; q < elecMin.eInfo.qStop; q++)
-  {
+  bool is_rot_exist_prev = elecMin.rotExists;
+
+  logPrintf("**** ENTER my_ElecMinimizer_step with alpha=%le\n", alpha);
+  if(elecMin.rotExists) {
+    logPrintf("my_ElecMinimizer_step: rotations will be applied\n");
+  } else {
+    logPrintf("my_ElecMinimizer_step: rotations will NOT be applied\n");
+  }
+
+  for(int q=elecMin.eInfo.qStart; q < elecMin.eInfo.qStop; q++) {
     //
     // Update step for wavefunctions
     //
@@ -59,4 +67,12 @@ void my_ElecMinimizer_step(
       elecMin.rotExists = true; //rotation is no longer identity
     }
   }
+
+  if(!is_rot_exist_prev) {
+    if(elecMin.rotExists) {
+      logPrintf("!!!! my_ElecMinimizer_step: rotExists is set to true and it is set to false before\n");
+    }
+  }
+
+  logPrintf(" **** EXIT my_ElecMinimizer_step\n");
 }
