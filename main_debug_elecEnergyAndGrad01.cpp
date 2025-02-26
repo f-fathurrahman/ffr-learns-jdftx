@@ -24,72 +24,23 @@ int main( int argc, char** argv )
   e.setup();
 
   write_info(e);
+  write_iGarr(e);
+
+  initialize_Haux(e);
+
+  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub.bindat");
+  e.eInfo.write(e.eVars.F, "eVars_F.bindat");
+  e.eInfo.write(e.eVars.C, "eVars_C.bindat");
 
   MyElecGradient g, Kg;
-  // these will allocate memory?
   g.init(e);
   Kg.init(e);
 
-  // This is required to properly initilize ElecVars for metallic system.
-  if(!e.eVars.HauxInitialized && e.eInfo.fillingsUpdate==ElecInfo::FillingsHsub)
-  {
-    cout << "e.eVars.HauxInitialized = " << e.eVars.HauxInitialized << endl;
-    cout << "e.eInfo.fillingsUpdate = " << e.eInfo.fillingsUpdate << endl;
-    logPrintf("Haux is not yet initialized\n");
-    logPrintf("Setting up things for FillingsHsub\n");
-
-    // Using FillingsConst for computing energy and Hsub ?
-    e.eInfo.fillingsUpdate = ElecInfo::FillingsConst;
-    
-    // call the original member function of ElecVars to calculate energy and Hsub
-    e.eVars.elecEnergyAndGrad( e.ener, 0, 0, true );
-    e.ener.print();
-
-    // Set again to the original fillingsUpdate
-    e.eInfo.fillingsUpdate = ElecInfo::FillingsHsub;
-    
-    // Update B:
-    // Use Hsub for initial value of Haux
-    logPrintf("Initial values of Haux_eigs\n");
-    for(int q = e.eInfo.qStart; q < e.eInfo.qStop; q++) {
-      e.eVars.Haux_eigs[q] = e.eVars.Hsub_eigs[q];
-      logPrintf("\nikspin index = %d\n", q);
-      for(int ist=0; ist < e.eInfo.nStates; ist++) {
-        logPrintf("%4d %18.10f\n",ist,  e.eVars.Haux_eigs[q][ist]);
-      }
-    }
-    e.eVars.HauxInitialized = true;
-  }
-
-  e.eInfo.write(e.eVars.C, "eVars_C.bindat");
-  logPrintf("eVars.C is written to evars_C.bindat\n");
-
-  e.eInfo.write(e.eVars.Hsub, "eVars_Hsub.bindat");
-  logPrintf("eVars.Hsub is written to evars_Hsub.bindat\n");
-
-  // Not working
-  /*
-  std::vector<matrix> n;
-  n.push_back(e.eVars.n[0]->toMatrix());
-  e.eInfo.write(n, "eVars_n.dat");
-  */
-
-   matrix n = e.eVars.n[0]->toMatrix();
-   cout << "n.nRows() = " << n.nRows() <<  " n.nCols() = " << n.nCols() << endl;
-   cout << "Some n = " << n(0,0).x << " " << n(0,0).y << endl;
-   cout << "Some n = " << n(1,0).x << " " << n(1,0).y << endl;
-
-  //cout << "eVars.n = " << e.eVars.n[0](1) << endl;
-
-  /*
-  e.eInfo.write(e.eVars.n[0].to_matrix(), "eVars_n.dat");
-  logPrintf("eVars.n is written to evars_n.dat\n");
-  */
-
-  //export_Hsub(e);
-
   double Etot = my_elecEnergyAndGrad( e, &g, &Kg, false ); // ener is included in e
   logPrintf("Etot = %18.10f\n", Etot);
+
+  e.eInfo.write(g.Haux, "g_Haux.bindat");
+  e.eInfo.write(Kg.Haux, "Kg_Haux.bindat");
 
   printf("\n");
   printf("%s is finished\n", argv[0]);
