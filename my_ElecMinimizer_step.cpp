@@ -50,7 +50,8 @@ void my_ElecMinimizer_step(
         }
         //rotation chosen to diagonalize auxiliary matrix
         Haux.diagonalize( rot, e.eVars.Haux_eigs[q] );
-        // results are in rot and Haux_eigs?
+        // ffr: results are in rot and Haux_eigs?
+        // ffr: Haux is not modified?
       }
       else {
         //Non-scalar fillings:
