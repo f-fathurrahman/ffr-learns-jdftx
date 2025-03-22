@@ -146,35 +146,31 @@ double simple_minimize(
       
       // Line minimization
       alphaT = std::min(alphaT, elecMin.safeStepSize(d));
-      if( my_linminQuad(e, elecMin, p, d, alphaT, alpha, E, g, Kg) )
-      {
+      if( my_linminQuad(e, elecMin, p, d, alphaT, alpha, E, g, Kg) ) {
         // linmin succeeded:
-        if(p.updateTestStepSize)
-        {
+        if(p.updateTestStepSize) {
           alphaT = alpha;
-  
+          logPrintf("linminQuad is successful. alphaT is updated to alpha = %f\n", alphaT);
           if(alphaT < p.alphaTmin) {
             // bad step size: make sure next test step size is not too bad
             alphaT = p.alphaTstart; 
+            logPrintf("Bad step size is encountered, alphaT is set to alphaTstart = %f\n", p.alphaTstart);
           }
         }
       }
-      else
-      {
+      else {
         // linmin failed:
         logPrintf("%s\tUndoing step.\n", p.linePrefix);
         elecMin.step(d, -alpha);
         
         E = elecMin.compute(&g, &Kg);
         
-        if(beta)
-        {
+        if(beta) {
           // Failed, but not along the gradient direction:
           logPrintf("%s\tStep failed: resetting search direction.\n", p.linePrefix);
           forceGradDirection = true; //reset search direction
         }
-        else
-        {
+        else {
           // Failed along the gradient direction
           logPrintf("%s\tStep failed along negative gradient direction.\n", p.linePrefix);
           logPrintf("%sProbably at roundoff error limit. (Stopping)\n", p.linePrefix);

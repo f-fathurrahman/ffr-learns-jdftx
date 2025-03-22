@@ -56,7 +56,8 @@ bool my_linminQuad(
       alphaT *= p.alphaTincreaseFactor;
       
       logPrintf("\tWrong curvature in test step, increasing alphaT to %le.\n", alphaT);
-      
+      //
+      // ffr: why we do early return here? alphaT is modified for the next iteration? 
       E = my_ElecMinimizer_compute(e, elecMin, &g, &Kg);
       return true;
     }
