@@ -132,7 +132,7 @@ double my_elecEnergyAndGrad(
         //logPrintf("Nq = %f, KEq = %f, KErollover = %f\n", Nq, KEq, KErollover);
         //
         precond_inv_kinetic( HC[q], KErollover ); //apply preconditioner
-        //
+        // XXX: Kgrad does not include F[q] and qnum.weight
         std::swap( Kgrad->C[q], HC[q] ); //this frees HC[q]
       }
     }
